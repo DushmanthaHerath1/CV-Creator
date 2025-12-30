@@ -325,16 +325,7 @@ export const cvSchema = z.object({
 });
 ```
 
-12/30/2025 - 04.02AM
-You are absolutely right. If it works, it works! 🚀
-
-In software engineering, sometimes we ignore "strict" linter warnings when we know the impact is harmless. For a CV builder, re-subscribing to the form watcher a few extra times is not going to hurt anyone. The code is clean, readable, and does exactly what it needs to do (saves the data).
-
-Since you are happy with the code and the features **(Brick 5: Photo Upload + Auto-Save)** are working, it is time to update our Save File.
-
-Here is your **Manifest Update**. Copy these blocks into your project documentation/manifest file so we have a permanent record of this working state.
-
----
+## 12/30/2025 - 04.02AM
 
 ### 💾 MANIFEST UPDATE (Brick 5: Photo & Auto-Save)
 
@@ -663,4 +654,311 @@ function App() {
   );
 }
 export default App;
+```
+
+12/31/2025 - 03.46AM
+Here are the specific updates you need to make to your `project-menifest.md` to reflect the **PDF Engine**, **Image Compressor**, and **Extended Details** we just built.
+
+Copy these blocks and replace the corresponding sections in your manifest file.
+
+### 1. Update "Tech Stack" & "File Structure"
+
+_Add the new PDF library and the new PDF component file._
+
+```markdown
+**Tech Stack:**
+
+- React + Vite
+- Tailwind CSS (Styling)
+- React Hook Form (State Management)
+- Zod (Validation)
+- Lucide React (Icons)
+- @react-pdf/renderer (PDF Generation) 🆕
+
+**Current File Structure:**
+src/
+├── components/
+│ ├── pdf/
+│ │ └── CVDocument.jsx (PDF Template Engine) 🆕
+│ ├── PersonalDetails.jsx (Inputs + Extended Fields)
+│ ├── PhotoUpload.jsx (Compression Logic)
+│ ├── Experience.jsx
+│ ├── Education.jsx
+│ ├── Skills.jsx
+│ └── CVPreview.jsx (Download Button & Web View)
+├── schemas/
+│ └── cvSchema.js (Zod Rules)
+├── App.jsx
+├── index.css
+├── index.html (Buffer Polyfill)
+└── main.jsx
+```
+
+---
+
+### 2. Update "The Schema (`src/schemas/cvSchema.js`)"
+
+_Replace the old schema block with this one (includes the new Location/Socials/BioData fields)._
+
+```javascript
+import { z } from "zod";
+
+export const cvSchema = z.object({
+  personalInfo: z.object({
+    fullName: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().min(10, "Phone number is too short"),
+    role: z.string().min(2, "Job title is required"),
+    summary: z.string().optional(),
+    photo: z.string().optional(),
+
+    // --- NEW EXTENDED FIELDS ---
+    address: z.string().optional(),
+    linkedin: z.string().optional(),
+    github: z.string().optional(),
+    dob: z.string().optional(),
+    gender: z.string().optional(),
+    nationality: z.string().optional(),
+    maritalStatus: z.string().optional(),
+    idNumber: z.string().optional(),
+  }),
+  experience: z
+    .array(
+      z.object({
+        role: z.string().min(2, "Role required"),
+        company: z.string().min(2, "Company required"),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+  education: z
+    .array(
+      z.object({
+        school: z.string().min(2, "School required"),
+        degree: z.string().min(2, "Degree required"),
+        date: z.string().optional(),
+      })
+    )
+    .optional(),
+  skills: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Skill cannot be empty"),
+      })
+    )
+    .optional(),
+});
+```
+
+---
+
+### 3. Update "Photo Upload (`src/components/PhotoUpload.jsx`)"
+
+_Reflects the new **Canvas Compression** logic._
+
+```jsx
+import React, { useRef, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import { Camera, X, Loader2 } from "lucide-react";
+
+const PhotoUpload = () => {
+  const { setValue, watch } = useFormContext();
+  const fileInputRef = useRef(null);
+  const photoURL = watch("personalInfo.photo");
+  const [isCompressing, setIsCompressing] = useState(false);
+
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 300;
+          const scaleSize = MAX_WIDTH / img.width;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.7));
+        };
+      };
+    });
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setIsCompressing(true);
+      try {
+        const compressedPhoto = await compressImage(file);
+        setValue("personalInfo.photo", compressedPhoto);
+      } catch (error) {
+        console.error("Image compression error:", error);
+        alert("Failed to process image. Try a different file.");
+      } finally {
+        setIsCompressing(false);
+      }
+    }
+  };
+
+  const handleRemove = () => {
+    setValue("personalInfo.photo", "");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  return (
+    <div className="flex items-center gap-4 mb-6">
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      <div
+        className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden relative group cursor-pointer hover:border-blue-500 transition"
+        onClick={() => !photoURL && fileInputRef.current.click()}
+      >
+        {isCompressing ? (
+          <Loader2 className="animate-spin text-blue-500" size={24} />
+        ) : photoURL ? (
+          <>
+            <img
+              src={photoURL}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+            <div
+              className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white text-xs font-bold"
+              onClick={() => fileInputRef.current.click()}
+            >
+              Change
+            </div>
+          </>
+        ) : (
+          <div className="text-gray-400 flex flex-col items-center">
+            <Camera size={24} />
+            <span className="text-[10px] uppercase font-bold mt-1">Upload</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+export default PhotoUpload;
+```
+
+---
+
+### 4. Update "The Preview Engine (`src/components/CVPreview.jsx`)"
+
+_Reflects the switch to `PDFDownloadLink`._
+
+```jsx
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import CVDocument from "./pdf/CVDocument";
+import { Download } from "lucide-react";
+// ... (Imports for icons used in web preview: Mail, Phone, etc.)
+
+const CVPreview = () => {
+  const { watch } = useFormContext();
+  const data = watch();
+
+  return (
+    <div className="sticky top-0 h-screen p-4 overflow-y-auto bg-gray-100 border-l border-gray-200">
+      <div className="flex justify-between items-center mb-4 px-2 max-w-[210mm] mx-auto">
+        <h2 className="text-lg font-bold text-gray-800">Live Preview</h2>
+
+        {/* DOWNLOAD BUTTON */}
+        <PDFDownloadLink
+          document={<CVDocument data={data} />}
+          fileName={`${data.personalInfo.fullName || "resume"}.pdf`}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white transition bg-blue-600 rounded shadow-sm hover:bg-blue-700 no-underline"
+        >
+          {({ loading }) => (
+            <>
+              <Download size={16} />
+              {loading ? "Generating..." : "Download PDF"}
+            </>
+          )}
+        </PDFDownloadLink>
+      </div>
+
+      {/* WEB VIEW (Visual Only) */}
+      <div
+        className="bg-white shadow-2xl mx-auto p-[15mm] w-[210mm] min-h-[297mm]"
+        id="cv-print-area"
+      >
+        {/* ... (Existing HTML Structure for Web Preview) ... */}
+      </div>
+    </div>
+  );
+};
+export default CVPreview;
+```
+
+---
+
+### 5. ADD NEW SECTION: "The PDF Engine (`src/components/pdf/CVDocument.jsx`)"
+
+_This is the new critical file that generates the actual PDF._
+
+```jsx
+import React from 'react';
+import { Page, Text, View, Document, StyleSheet, Image, Link } from '@react-pdf/renderer';
+
+// Standard Helvetica Font (Safe Mode)
+const styles = StyleSheet.create({
+  page: { padding: 30, fontSize: 10, lineHeight: 1.5, fontFamily: 'Helvetica', color: '#374151' },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, borderBottomWidth: 1, borderBottomColor: '#1f2937', paddingBottom: 15 },
+  photo: { width: 60, height: 60, borderRadius: 30, objectFit: 'cover' },
+  headerRight: { marginLeft: 20, flex: 1 },
+  name: { fontSize: 22, fontWeight: 'bold', textTransform: 'uppercase', color: '#111827', marginBottom: 4, lineHeight: 1.2 },
+  // ... (Full styles for sections, grid layout, skills)
+});
+
+const CVDocument = ({ data }) => {
+  const hasBioData = data.personalInfo.address || data.personalInfo.dob || ...; // Check logic
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* Header, Summary, Experience, Education, Skills, Bio Grid */}
+        {/* ... (Full PDF XML Structure) ... */}
+      </Page>
+    </Document>
+  );
+};
+export default CVDocument;
+
+```
+
+---
+
+### 6. ADD NEW SECTION: "Buffer Polyfill (`index.html`)"
+
+_Critical for allowing PDF generation in the browser._
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="module">
+      import { Buffer } from "buffer";
+      window.Buffer = Buffer;
+      window.global = window;
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
 ```
