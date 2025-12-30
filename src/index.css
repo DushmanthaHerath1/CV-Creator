@@ -4,47 +4,50 @@
 
 /* --- PRINT STYLES --- */
 @media print {
-  /* 1. Reset the document structure */
+  /* 1. Reset Page: Force A4 size and REMOVE browser margins */
+  @page {
+    size: A4;
+    margin: 0 !important; /* <--- This kills the extra white space */
+  }
+
+  /* 2. Hide Web UI */
   html,
   body {
     margin: 0;
     padding: 0;
-    height: 100%;
+    width: 210mm;
+    height: 297mm;
     overflow: hidden; /* Stop scrolling */
+    background: white;
   }
 
-  /* 2. Hide EVERYTHING on the page */
   body * {
     visibility: hidden;
   }
 
-  /* 3. Un-hide ONLY the CV Area */
+  /* 3. Show CV Only */
   #cv-print-area,
   #cv-print-area * {
     visibility: visible;
   }
 
-  /* 4. Position the CV Area perfectly */
+  /* 4. Position it EXACTLY at 0,0 */
   #cv-print-area {
-    position: fixed; /* 'Fixed' is stronger than 'Absolute' for print */
+    position: fixed;
     left: 0;
     top: 0;
-    width: 100%;
+    width: 210mm;
+    min-height: 297mm;
     margin: 0;
+    padding: 0; /* We control padding inside the component, not here */
 
-    /* FIX FOR MISSING STYLES: Force Background Colors */
+    /* Force exact colors */
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
 
-    /* Remove web-only styling */
+    /* Remove shadows/borders */
     box-shadow: none !important;
     border: none !important;
-  }
-
-  /* 5. Set Page Margins */
-  /* We allow a tiny 5mm margin so printers don't crop the edges */
-  @page {
-    size: A4;
-    margin: 0mm; /* We control margins inside the div instead */
+    border-radius: 0 !important;
   }
 }

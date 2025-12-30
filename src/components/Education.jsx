@@ -1,79 +1,114 @@
 import React from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { Plus, Trash2, GraduationCap } from "lucide-react";
 
 const Education = () => {
+  // We grab 'errors' here
   const {
     register,
     control,
     formState: { errors },
   } = useFormContext();
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "education",
   });
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md border border-gray-200 mt-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Education</h2>
+    <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-md">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="flex items-center gap-2 text-xl font-bold text-gray-800">
+          <GraduationCap size={20} /> Education
+        </h2>
         <button
           type="button"
           onClick={() => append({ school: "", degree: "", date: "" })}
-          className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800"
+          className="flex items-center gap-1 text-sm font-bold text-blue-600 hover:text-blue-800"
         >
-          <PlusCircle size={18} /> Add School
+          <Plus size={16} /> Add School
         </button>
       </div>
 
-      <div className="space-y-4">
-        {fields.map((item, index) => (
+      <div className="space-y-6">
+        {fields.map((field, index) => (
           <div
-            key={item.id}
-            className="p-4 bg-gray-50 rounded border border-gray-200 relative"
+            key={field.id}
+            className="relative p-4 border border-gray-200 rounded bg-gray-50 group"
           >
             <button
               type="button"
               onClick={() => remove(index)}
-              className="absolute top-4 right-4 text-red-400 hover:text-red-600"
+              className="absolute text-gray-400 transition-opacity opacity-0 top-4 right-4 hover:text-red-500 group-hover:opacity-100"
             >
               <Trash2 size={18} />
             </button>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mr-8">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  University / School
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {/* School Name */}
+              <div className="col-span-2">
+                <label className="block mb-1 text-xs font-bold text-gray-500 uppercase">
+                  School / University
                 </label>
                 <input
                   {...register(`education.${index}.school`)}
-                  className="w-full p-2 border rounded bg-white"
-                  placeholder="University of Colombo"
+                  placeholder="e.g. University of Moratuwa"
+                  className={`w-full p-2 border rounded ${
+                    errors.education?.[index]?.school
+                      ? "border-red-500"
+                      : "bg-white"
+                  }`}
                 />
+                {/* 👇 FIX: Display the error message */}
+                {errors.education?.[index]?.school && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.education[index].school.message}
+                  </p>
+                )}
               </div>
+
+              {/* Degree */}
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  Degree
+                <label className="block mb-1 text-xs font-bold text-gray-500 uppercase">
+                  Degree / Course
                 </label>
                 <input
                   {...register(`education.${index}.degree`)}
-                  className="w-full p-2 border rounded bg-white"
-                  placeholder="BSc Computer Science"
+                  placeholder="e.g. BSc in Computer Science"
+                  className={`w-full p-2 border rounded ${
+                    errors.education?.[index]?.degree
+                      ? "border-red-500"
+                      : "bg-white"
+                  }`}
                 />
+                {/* 👇 FIX: Display the error message */}
+                {errors.education?.[index]?.degree && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.education[index].degree.message}
+                  </p>
+                )}
               </div>
+
+              {/* Date */}
               <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                <label className="block mb-1 text-xs font-bold text-gray-500 uppercase">
                   Graduation Year
                 </label>
                 <input
                   {...register(`education.${index}.date`)}
-                  className="w-full p-2 border rounded bg-white"
-                  placeholder="2024"
+                  placeholder="e.g. 2024"
+                  className="w-full p-2 bg-white border rounded"
                 />
               </div>
             </div>
           </div>
         ))}
+
+        {fields.length === 0 && (
+          <div className="p-6 text-center text-gray-400 border-2 border-gray-300 border-dashed rounded-lg">
+            <p className="text-sm">No education added yet.</p>
+          </div>
+        )}
       </div>
     </div>
   );

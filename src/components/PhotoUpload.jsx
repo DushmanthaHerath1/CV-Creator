@@ -1,27 +1,60 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Camera, X } from "lucide-react";
+import { Camera, X, Loader2 } from "lucide-react";
 
 const PhotoUpload = () => {
   const { setValue, watch } = useFormContext();
   const fileInputRef = useRef(null);
-
-  // Watch the current photo value to show a preview
   const photoURL = watch("personalInfo.photo");
+  const [isCompressing, setIsCompressing] = useState(false);
 
-  const handleFileChange = (e) => {
+  // 1. THE COMPRESSOR ENGINE ⚙️
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+
+        img.onload = () => {
+          // Create a canvas to do the resizing
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 300; // 300px is plenty for a CV avatar
+          const scaleSize = MAX_WIDTH / img.width;
+
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Convert back to Base64 (JPEG at 70% quality)
+          // This turns a 17MB file into ~20KB!
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+          resolve(compressedBase64);
+        };
+      };
+    });
+  };
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // 1. Create a FileReader to read the file
-      const reader = new FileReader();
+      setIsCompressing(true);
+      try {
+        // Run the compressor
+        const compressedPhoto = await compressImage(file);
 
-      // 2. When reading finishes, update the Form State
-      reader.onloadend = () => {
-        setValue("personalInfo.photo", reader.result);
-      };
-
-      // 3. Start reading the file as a Data URL (Base64)
-      reader.readAsDataURL(file);
+        // Save the tiny version
+        setValue("personalInfo.photo", compressedPhoto);
+      } catch (error) {
+        console.error("Image compression error:", error); // 👈 Now we use the variable!
+        alert("Failed to process image. Try a different file.");
+      } finally {
+        setIsCompressing(false);
+      }
     }
   };
 
@@ -32,7 +65,6 @@ const PhotoUpload = () => {
 
   return (
     <div className="flex items-center gap-4 mb-6">
-      {/* Hidden File Input */}
       <input
         type="file"
         accept="image/*"
@@ -41,19 +73,19 @@ const PhotoUpload = () => {
         className="hidden"
       />
 
-      {/* The Visual Circle */}
       <div
         className="relative flex items-center justify-center w-24 h-24 overflow-hidden transition border-2 border-gray-300 border-dashed rounded-full cursor-pointer bg-gray-50 group hover:border-blue-500"
         onClick={() => !photoURL && fileInputRef.current.click()}
       >
-        {photoURL ? (
+        {isCompressing ? (
+          <Loader2 className="text-blue-500 animate-spin" size={24} />
+        ) : photoURL ? (
           <>
             <img
               src={photoURL}
               alt="Profile"
               className="object-cover w-full h-full"
             />
-            {/* Hover Overlay to Edit */}
             <div
               className="absolute inset-0 items-center justify-center hidden text-xs font-bold text-white bg-black/50 group-hover:flex"
               onClick={() => fileInputRef.current.click()}
@@ -69,12 +101,13 @@ const PhotoUpload = () => {
         )}
       </div>
 
-      {/* Helper Text / Remove Button */}
       <div>
         <h3 className="text-sm font-bold text-gray-700">Profile Picture</h3>
-        <p className="mb-2 text-xs text-gray-500">Max file size: 2MB</p>
+        <p className="mb-2 text-xs text-gray-500">
+          {isCompressing ? "Compressing..." : "Auto-compressed & optimized"}
+        </p>
 
-        {photoURL && (
+        {photoURL && !isCompressing && (
           <button
             type="button"
             onClick={handleRemove}
