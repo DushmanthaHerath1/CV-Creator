@@ -962,3 +962,209 @@ _Critical for allowing PDF generation in the browser._
   </body>
 </html>
 ```
+
+## 01/01/2026 - 03.50AM
+
+### 💾 1. PROJECT MANIFEST UPDATE (Brick 6 & 7: PDF Engine & Smart Pagination)
+
+**Status:** Advanced PDF Generation (Client-Side), Smart Pagination (Ghost Measurement), Multi-Page "Jobseeker" Preview.
+
+#### A. Tech Stack Update
+
+_Add these to your stack list:_
+
+- **@react-pdf/renderer**: For generating the actual PDF binary.
+- **file-saver**: For triggering the manual download.
+
+#### B. The Smart Preview (`src/components/CVPreview.jsx`)
+
+_This is the new "Brain" that splits content into pages visually._
+
+```jsx
+import React, { useState, useLayoutEffect, useRef, useMemo } from "react";
+import { useFormContext } from "react-hook-form";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import CVDocument from "./pdf/CVDocument";
+import {
+  Mail,
+  Phone,
+  Briefcase,
+  GraduationCap,
+  Wrench,
+  Linkedin,
+  Github,
+  User,
+  FileText,
+  Download,
+  Loader2,
+} from "lucide-react";
+
+// CONFIGURATION
+const A4_HEIGHT_PX = 1123;
+const PAGE_MARGIN = 100;
+const USABLE_HEIGHT = A4_HEIGHT_PX - PAGE_MARGIN;
+
+// ... (SectionHeader Helper) ...
+
+const CVPreview = () => {
+  const { watch } = useFormContext();
+  const data = watch();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const ghostRef = useRef(null);
+  const [pageLayout, setPageLayout] = useState([]);
+
+  // ... (contentBlocks definition with useMemo) ...
+
+  // --- THE GHOST MEASURER ---
+  useLayoutEffect(() => {
+    if (!ghostRef.current) return;
+
+    const pages = [[]];
+    let currentPageHeight = 0;
+    let currentPageIndex = 0;
+
+    const elements = Array.from(ghostRef.current.children);
+
+    elements.forEach((el) => {
+      const height = el.offsetHeight;
+      const blockId = el.getAttribute("data-id");
+
+      if (currentPageHeight + height > USABLE_HEIGHT) {
+        currentPageIndex++;
+        pages[currentPageIndex] = [];
+        currentPageHeight = 0;
+      }
+
+      pages[currentPageIndex].push(blockId);
+      currentPageHeight += height;
+    });
+
+    if (JSON.stringify(pages) !== JSON.stringify(pageLayout)) {
+      setPageLayout(pages);
+    }
+  }, [contentBlocks, pageLayout]);
+
+  // ... (handleDownload function) ...
+
+  return (
+    <div className="sticky top-0 h-screen overflow-y-auto bg-gray-100 border-l border-gray-200">
+      {/* ... Controls ... */}
+
+      {/* GHOST LAYER */}
+      <div
+        ref={ghostRef}
+        className="absolute top-0 left-0 w-[210mm] invisible pointer-events-none"
+      >
+        {contentBlocks.map((block) => (
+          <div key={block.id} data-id={block.id} className="p-1">
+            {block.render()}
+          </div>
+        ))}
+      </div>
+
+      {/* VISIBLE PAGES */}
+      <div className="flex flex-col items-center gap-8 pb-20">
+        {pageLayout.map((pageItems, pageIndex) => (
+          <div
+            key={pageIndex}
+            className="bg-white shadow-xl w-[210mm] min-h-[297mm] p-[15mm] relative"
+          >
+            {/* ... Page Content ... */}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+export default CVPreview;
+```
+
+#### C. The PDF Template (`src/components/pdf/CVDocument.jsx`)
+
+_The print instructions that receive the "Breaks" map._
+
+```jsx
+import React from "react";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+  Link,
+} from "@react-pdf/renderer";
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 30,
+    fontSize: 10,
+    lineHeight: 1.5,
+    fontFamily: "Helvetica",
+    color: "#374151",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1f2937",
+    paddingBottom: 15,
+  },
+  photo: { width: 100, height: 100, borderRadius: 50, objectFit: "cover" }, // Enlarged Photo
+  headerRight: { marginLeft: 30, flex: 1 },
+  // ... (Rest of styles)
+});
+
+const CVDocument = ({ data, breaks = {} }) => {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* ... (View structures with {breaks['id'] && <View break />} logic) ... */}
+      </Page>
+    </Document>
+  );
+};
+export default CVDocument;
+```
+
+---
+
+### 💾 2. GIT SAVE POINT
+
+Run these commands in your VS Code terminal to lock this version in:
+
+```bash
+# 1. Add the new PDF files and updated Preview
+git add .
+
+# 2. Commit the victory
+git commit -m "feat: implemented smart multi-page pagination, ghost measurement, and jobseeker-style layout"
+
+# 3. Push to GitHub
+git push origin main
+
+```
+
+---
+
+### 🧱 What is the Next Brick?
+
+We have a solid foundation:
+
+1. **Form:** Works.
+2. **Validation:** Secure.
+3. **Photos:** Upload & Compress.
+4. **PDF Engine:** Smart & Paginated.
+
+The next logical step in a CV Builder is usually **customization**. Currently, your CV is "Hardcoded Blue & Gray".
+
+**Proposed Brick 8: The Theme Engine (The Painter) 🎨**
+
+- **Color Picker:** Let the user choose their primary color (instead of just blue).
+- **Font Switcher:** Let the user pick between Serif (Classic) and Sans-Serif (Modern).
+- **Live Update:** The PDF and Preview update instantly.
+
+Shall we pick up the paintbrushes, or do you have another feature in mind? 🖌️
