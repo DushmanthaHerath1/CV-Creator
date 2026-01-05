@@ -4,12 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { cvSchema } from "./schemas/cvSchema";
 import { saveCVData, loadCVData } from "./db"; // 👈 Import new DB tools
 import { Loader2 } from "lucide-react"; // Import a spinner icon
-
 import PersonalDetails from "./components/PersonalDetails";
 import Experience from "./components/Experience";
 import Education from "./components/Education";
 import Skills from "./components/Skills";
 import CVPreview from "./components/CVPreview";
+import Certificates from "./components/Certificates";
+import References from "./components/References";
 
 function App() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -30,6 +31,8 @@ function App() {
       experience: [],
       education: [],
       skills: [],
+      certificates: [],
+      references: [],
     },
   });
 
@@ -99,6 +102,8 @@ function App() {
               <Experience />
               <Education />
               <Skills />
+              <Certificates />
+              <References />
             </form>
           </div>
 

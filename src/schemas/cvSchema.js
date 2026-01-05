@@ -53,4 +53,27 @@ export const cvSchema = z.object({
       })
     )
     .optional(),
+
+  certificates: z
+    .array(
+      z.object({
+        name: z.string().min(2, "Certificate name required"),
+        issuer: z.string().optional(),
+        date: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  references: z
+    .array(
+      z.object({
+        name: z.string().min(2, "Name required"),
+        position: z.string().optional(), // New
+        company: z.string().optional(),
+        location: z.string().optional(), // New
+        phone: z.string().optional(),
+        email: z.string().email("Invalid email").or(z.literal("")).optional(),
+      })
+    )
+    .optional(),
 });

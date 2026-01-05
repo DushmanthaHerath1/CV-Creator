@@ -7,9 +7,311 @@ import {
   StyleSheet,
   Image,
   Link,
+  Svg,
+  Path,
 } from "@react-pdf/renderer";
 
-// Standard Helvetica Font (No crashing)
+// --- 🛠️ ICON LIBRARY (Safe Path-Only Versions of Lucide Icons) ---
+
+// 1. CONTACT ICONS
+const IconMail = () => (
+  <Svg width={10} height={10} viewBox="0 0 24 24">
+    {/* Path for Envelope Flap */}
+    <Path
+      d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Rect converted to Path for Envelope Body */}
+    <Path
+      d="M4 4 h16 a2 2 0 0 1 2 2 v12 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-12 a2 2 0 0 1 2 -2 z"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconPhone = () => (
+  <Svg width={10} height={10} viewBox="0 0 24 24">
+    <Path
+      d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconLinkedin = () => (
+  <Svg width={10} height={10} viewBox="0 0 24 24">
+    <Path
+      d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Rect converted to Path */}
+    <Path
+      d="M2 9 h4 v12 h-4 z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Circle converted to Path */}
+    <Path
+      d="M4 2 a2 2 0 1 1 0 4 a2 2 0 0 1 0 -4 z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconGithub = () => (
+  <Svg width={10} height={10} viewBox="0 0 24 24">
+    <Path
+      d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 18c-4.51 2-5-2-7-2"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconMapPin = () => (
+  <Svg width={8} height={8} viewBox="0 0 24 24">
+    <Path
+      d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+      stroke="#6b7280"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Circle converted to Path */}
+    <Path
+      d="M12 7 a3 3 0 1 1 0 6 a3 3 0 0 1 0 -6 z"
+      stroke="#6b7280"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// 2. SECTION ICONS (Lucide Designs - Path Only)
+
+// Summary (User)
+const IconSummary = () => (
+  <Svg width={12} height={12} viewBox="0 0 24 24">
+    <Path
+      d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Circle converted to Path */}
+    <Path
+      d="M12 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// Experience (Briefcase Business)
+const IconExperience = () => (
+  <Svg width={12} height={12} viewBox="0 0 24 24">
+    <Path
+      d="M12 12h.01"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 13a18.15 18.15 0 0 1-20 0"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Rect converted to Path */}
+    <Path
+      d="M4 6 h16 a2 2 0 0 1 2 2 v10 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-10 a2 2 0 0 1 2 -2 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// Education (Graduation Cap)
+const IconEducation = () => (
+  <Svg width={12} height={12} viewBox="0 0 24 24">
+    <Path
+      d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 10v6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// Skills (Lightbulb)
+const IconSkills = () => (
+  <Svg width={12} height={12} viewBox="0 0 24 24">
+    <Path
+      d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 18h6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M10 22h4"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// Certificates (Badge Check)
+const IconCert = () => (
+  <Svg width={12} height={12} viewBox="0 0 24 24">
+    <Path
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="m9 12 2 2 4-4"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// References (Users - Multiple)
+const IconUsers = () => (
+  <Svg width={12} height={12} viewBox="0 0 24 24">
+    <Path
+      d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 3.128a4 4 0 0 1 0 7.744"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 21v-2a4 4 0 0 0-3-3.87"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    {/* Circle converted to Path */}
+    <Path
+      d="M9 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// Personal Info - Single User
+const IconUser = IconSummary;
+
 const styles = StyleSheet.create({
   page: {
     padding: 30,
@@ -27,7 +329,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   photo: { width: 100, height: 100, borderRadius: 50, objectFit: "cover" },
-  headerRight: { marginLeft: 20, flex: 1 }, // Spacing fix
+  headerRight: { marginLeft: 30, flex: 1 },
   name: {
     fontSize: 22,
     fontWeight: "bold",
@@ -35,7 +337,7 @@ const styles = StyleSheet.create({
     color: "#111827",
     marginBottom: 4,
     lineHeight: 1.2,
-  }, // Overlap fix
+  },
   role: {
     fontSize: 11,
     color: "#4b5563",
@@ -44,24 +346,32 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   contactRow: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-  contactItem: { fontSize: 9, color: "#374151" },
+  contactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    fontSize: 9,
+    color: "#374151",
+  },
   link: { color: "#2563eb", textDecoration: "none" },
 
-  // Sections
   section: { marginBottom: 10 },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    color: "#1f2937",
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
     paddingBottom: 4,
     marginBottom: 8,
     marginTop: 5,
   },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    color: "#1f2937",
+    marginLeft: 6,
+  },
 
-  // Jobs
   jobBlock: { marginBottom: 10 },
   jobHeader: {
     flexDirection: "row",
@@ -84,7 +394,6 @@ const styles = StyleSheet.create({
   },
   description: { fontSize: 9, textAlign: "justify", color: "#4b5563" },
 
-  // Skills & Info
   skillBadge: {
     backgroundColor: "#f3f4f6",
     paddingVertical: 3,
@@ -97,6 +406,10 @@ const styles = StyleSheet.create({
     border: "1pt solid #e5e7eb",
   },
   skillsContainer: { flexDirection: "row", flexWrap: "wrap" },
+
+  refGrid: { flexDirection: "row", flexWrap: "wrap", gap: 15 },
+  refItem: { width: "45%", marginBottom: 10 },
+
   infoRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
@@ -114,7 +427,6 @@ const styles = StyleSheet.create({
   infoValue: { width: "70%", fontSize: 9, color: "#111827" },
 });
 
-// 🧠 THE SMART ENGINE: Accepts `breaks` map
 const CVDocument = ({ data, breaks = {} }) => {
   const hasBioData =
     data.personalInfo.address ||
@@ -127,7 +439,7 @@ const CVDocument = ({ data, breaks = {} }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* HEADER (Always Atomic) */}
+        {/* HEADER */}
         <View wrap={false}>
           <View style={styles.header}>
             {data.personalInfo.photo && (
@@ -143,30 +455,42 @@ const CVDocument = ({ data, breaks = {} }) => {
 
               <View style={styles.contactRow}>
                 {data.personalInfo.email && (
-                  <Text style={styles.contactItem}>
-                    {data.personalInfo.email}
-                  </Text>
+                  <View style={styles.contactItem}>
+                    <IconMail />
+                    <Text style={{ marginLeft: 4 }}>
+                      {data.personalInfo.email}
+                    </Text>
+                  </View>
                 )}
                 {data.personalInfo.phone && (
-                  <Text style={styles.contactItem}>
-                    {data.personalInfo.phone}
-                  </Text>
+                  <View style={styles.contactItem}>
+                    <IconPhone />
+                    <Text style={{ marginLeft: 4 }}>
+                      {data.personalInfo.phone}
+                    </Text>
+                  </View>
                 )}
                 {data.personalInfo.linkedin && (
-                  <Link
-                    src={data.personalInfo.linkedin}
-                    style={[styles.contactItem, styles.link]}
-                  >
-                    LinkedIn
-                  </Link>
+                  <View style={styles.contactItem}>
+                    <IconLinkedin />
+                    <Link
+                      src={data.personalInfo.linkedin}
+                      style={{ marginLeft: 4, ...styles.link }}
+                    >
+                      LinkedIn
+                    </Link>
+                  </View>
                 )}
                 {data.personalInfo.github && (
-                  <Link
-                    src={data.personalInfo.github}
-                    style={[styles.contactItem, styles.link]}
-                  >
-                    GitHub
-                  </Link>
+                  <View style={styles.contactItem}>
+                    <IconGithub />
+                    <Link
+                      src={data.personalInfo.github}
+                      style={{ marginLeft: 4, ...styles.link }}
+                    >
+                      GitHub
+                    </Link>
+                  </View>
                 )}
               </View>
             </View>
@@ -175,15 +499,13 @@ const CVDocument = ({ data, breaks = {} }) => {
 
         {/* SUMMARY */}
         {data.personalInfo.summary && (
-          <View wrap={false}>
-            {/* 🧠 CONDITIONAL BREAK */}
+          <View wrap={false} style={styles.section}>
             {breaks["summary"] && <View break />}
-            <View style={styles.section}>
+            <View style={styles.sectionTitleRow}>
+              <IconSummary />
               <Text style={styles.sectionTitle}>Professional Summary</Text>
-              <Text style={styles.description}>
-                {data.personalInfo.summary}
-              </Text>
             </View>
+            <Text style={styles.description}>{data.personalInfo.summary}</Text>
           </View>
         )}
 
@@ -191,21 +513,22 @@ const CVDocument = ({ data, breaks = {} }) => {
         {data.experience?.length > 0 && (
           <View style={styles.section}>
             {breaks["exp-header"] && <View break />}
-            <Text style={styles.sectionTitle}>Experience</Text>
+            <View style={styles.sectionTitleRow}>
+              <IconExperience />
+              <Text style={styles.sectionTitle}>Experience</Text>
+            </View>
 
             {data.experience.map((job, index) => (
-              <View key={index} wrap={false}>
+              <View key={index} style={styles.jobBlock} wrap={false}>
                 {breaks[`exp-${index}`] && <View break />}
-                <View style={styles.jobBlock}>
-                  <View style={styles.jobHeader}>
-                    <Text style={styles.jobRole}>{job.role}</Text>
-                    <Text style={styles.jobDate}>
-                      {job.startDate} — {job.endDate}
-                    </Text>
-                  </View>
-                  <Text style={styles.company}>{job.company}</Text>
-                  <Text style={styles.description}>{job.description}</Text>
+                <View style={styles.jobHeader}>
+                  <Text style={styles.jobRole}>{job.role}</Text>
+                  <Text style={styles.jobDate}>
+                    {job.startDate} — {job.endDate}
+                  </Text>
                 </View>
+                <Text style={styles.company}>{job.company}</Text>
+                <Text style={styles.description}>{job.description}</Text>
               </View>
             ))}
           </View>
@@ -215,17 +538,18 @@ const CVDocument = ({ data, breaks = {} }) => {
         {data.education?.length > 0 && (
           <View style={styles.section}>
             {breaks["edu-header"] && <View break />}
-            <Text style={styles.sectionTitle}>Education</Text>
+            <View style={styles.sectionTitleRow}>
+              <IconEducation />
+              <Text style={styles.sectionTitle}>Education</Text>
+            </View>
             {data.education.map((edu, index) => (
-              <View key={index} wrap={false}>
+              <View key={index} style={styles.jobBlock} wrap={false}>
                 {breaks[`edu-${index}`] && <View break />}
-                <View style={styles.jobBlock}>
-                  <View style={styles.jobHeader}>
-                    <Text style={styles.jobRole}>{edu.school}</Text>
-                    <Text style={styles.jobDate}>{edu.date}</Text>
-                  </View>
-                  <Text style={styles.description}>{edu.degree}</Text>
+                <View style={styles.jobHeader}>
+                  <Text style={styles.jobRole}>{edu.school}</Text>
+                  <Text style={styles.jobDate}>{edu.date}</Text>
                 </View>
+                <Text style={styles.description}>{edu.degree}</Text>
               </View>
             ))}
           </View>
@@ -233,80 +557,193 @@ const CVDocument = ({ data, breaks = {} }) => {
 
         {/* SKILLS */}
         {data.skills?.length > 0 && (
-          <View wrap={false}>
+          <View wrap={false} style={styles.section}>
             {breaks["skills"] && <View break />}
-            <View style={styles.section}>
+            <View style={styles.sectionTitleRow}>
+              <IconSkills />
               <Text style={styles.sectionTitle}>Skills</Text>
-              <View style={styles.skillsContainer}>
-                {data.skills.map((skill, index) => (
-                  <Text key={index} style={styles.skillBadge}>
-                    {skill.name}
-                  </Text>
-                ))}
+            </View>
+            <View style={styles.skillsContainer}>
+              {data.skills.map((skill, index) => (
+                <Text key={index} style={styles.skillBadge}>
+                  {skill.name}
+                </Text>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* CERTIFICATES */}
+        {data.certificates?.length > 0 && (
+          <View style={styles.section}>
+            {breaks["cert-header"] && <View break />}
+            <View style={styles.sectionTitleRow}>
+              <IconCert />
+              <Text style={styles.sectionTitle}>Certificates</Text>
+            </View>
+            {data.certificates.map((cert, index) => (
+              <View key={index} style={styles.jobBlock} wrap={false}>
+                {breaks[`cert-${index}`] && <View break />}
+                <View style={styles.jobHeader}>
+                  <Text style={styles.jobRole}>{cert.name}</Text>
+                  <Text style={styles.jobDate}>{cert.date}</Text>
+                </View>
+                <Text style={styles.description}>{cert.issuer}</Text>
               </View>
+            ))}
+          </View>
+        )}
+
+        {/* REFERENCES (Grid) */}
+        {data.references?.length > 0 && (
+          <View style={styles.section}>
+            {breaks["ref-header"] && <View break />}
+            <View style={styles.sectionTitleRow}>
+              <IconUsers />
+              <Text style={styles.sectionTitle}>References</Text>
+            </View>
+            <View style={styles.refGrid}>
+              {data.references.map((ref, index) => (
+                <View key={index} style={styles.refItem} wrap={false}>
+                  {breaks[`ref-${index}`] && <View break />}
+                  <Text
+                    style={{ fontWeight: "bold", fontSize: 10, color: "#000" }}
+                  >
+                    {ref.name}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 9,
+                      fontWeight: "medium",
+                      color: "#1f2937",
+                    }}
+                  >
+                    {ref.position}
+                  </Text>
+                  <Text style={{ fontSize: 9, color: "#374151" }}>
+                    {ref.company}
+                  </Text>
+                  {ref.location && (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: 1,
+                      }}
+                    >
+                      <IconMapPin />
+                      <Text
+                        style={{ fontSize: 8, color: "#6b7280", marginLeft: 2 }}
+                      >
+                        {ref.location}
+                      </Text>
+                    </View>
+                  )}
+
+                  <View style={{ marginTop: 4 }}>
+                    {ref.phone && (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginBottom: 1,
+                        }}
+                      >
+                        <IconPhone />
+                        <Text
+                          style={{
+                            fontSize: 9,
+                            color: "#374151",
+                            marginLeft: 4,
+                          }}
+                        >
+                          {ref.phone}
+                        </Text>
+                      </View>
+                    )}
+                    {ref.email && (
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <IconMail />
+                        <Text
+                          style={{
+                            fontSize: 9,
+                            color: "#374151",
+                            marginLeft: 4,
+                          }}
+                        >
+                          {ref.email}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              ))}
             </View>
           </View>
         )}
 
         {/* PERSONAL INFO */}
         {hasBioData && (
-          <View wrap={false}>
+          <View wrap={false} style={styles.section}>
             {breaks["personal"] && <View break />}
-            <View style={styles.section}>
+            <View style={styles.sectionTitleRow}>
+              <IconUser />
               <Text style={styles.sectionTitle}>Personal Information</Text>
-              {data.personalInfo.address && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Address</Text>
-                  <Text style={styles.infoValue}>
-                    {data.personalInfo.address}
-                  </Text>
-                </View>
-              )}
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                <View style={{ width: "50%", paddingRight: 10 }}>
-                  {data.personalInfo.dob && (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>DOB</Text>
-                      <Text style={styles.infoValue}>
-                        {data.personalInfo.dob}
-                      </Text>
-                    </View>
-                  )}
-                  {data.personalInfo.gender && (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>Gender</Text>
-                      <Text style={styles.infoValue}>
-                        {data.personalInfo.gender}
-                      </Text>
-                    </View>
-                  )}
-                  {data.personalInfo.maritalStatus && (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>Status</Text>
-                      <Text style={styles.infoValue}>
-                        {data.personalInfo.maritalStatus}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-                <View style={{ width: "50%", paddingLeft: 10 }}>
-                  {data.personalInfo.nationality && (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>Nationality</Text>
-                      <Text style={styles.infoValue}>
-                        {data.personalInfo.nationality}
-                      </Text>
-                    </View>
-                  )}
-                  {data.personalInfo.idNumber && (
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoLabel}>NIC/ID</Text>
-                      <Text style={styles.infoValue}>
-                        {data.personalInfo.idNumber}
-                      </Text>
-                    </View>
-                  )}
-                </View>
+            </View>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <View style={{ width: "50%", paddingRight: 10 }}>
+                {data.personalInfo.address && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Address</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.address}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.dob && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>DOB</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.dob}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.gender && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Gender</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.gender}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.maritalStatus && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Status</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.maritalStatus}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <View style={{ width: "50%", paddingLeft: 10 }}>
+                {data.personalInfo.nationality && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Nationality</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.nationality}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.idNumber && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>NIC/ID</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.idNumber}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>
