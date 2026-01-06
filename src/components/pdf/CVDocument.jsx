@@ -11,12 +11,16 @@ import {
   Path,
 } from "@react-pdf/renderer";
 
-// --- 🛠️ ICON LIBRARY (Safe Path-Only Versions of Lucide Icons) ---
+// --- 🛠️ ICON LIBRARY (ALL Size 10, ALL Color #374151 or Accent) ---
 
 // 1. CONTACT ICONS
-const IconMail = () => (
-  <Svg width={10} height={10} viewBox="0 0 24 24">
-    {/* Path for Envelope Flap */}
+const IconMail = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
     <Path
       d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"
       stroke="#374151"
@@ -25,7 +29,6 @@ const IconMail = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Rect converted to Path for Envelope Body */}
     <Path
       d="M4 4 h16 a2 2 0 0 1 2 2 v12 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-12 a2 2 0 0 1 2 -2 z"
       stroke="#374151"
@@ -37,8 +40,13 @@ const IconMail = () => (
   </Svg>
 );
 
-const IconPhone = () => (
-  <Svg width={10} height={10} viewBox="0 0 24 24">
+const IconPhone = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
     <Path
       d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
       stroke="#374151"
@@ -50,8 +58,13 @@ const IconPhone = () => (
   </Svg>
 );
 
-const IconLinkedin = () => (
-  <Svg width={10} height={10} viewBox="0 0 24 24">
+const IconLinkedin = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
     <Path
       d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
       stroke="#2563eb"
@@ -60,7 +73,6 @@ const IconLinkedin = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Rect converted to Path */}
     <Path
       d="M2 9 h4 v12 h-4 z"
       stroke="#2563eb"
@@ -69,7 +81,6 @@ const IconLinkedin = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Circle converted to Path */}
     <Path
       d="M4 2 a2 2 0 1 1 0 4 a2 2 0 0 1 0 -4 z"
       stroke="#2563eb"
@@ -81,11 +92,16 @@ const IconLinkedin = () => (
   </Svg>
 );
 
-const IconGithub = () => (
-  <Svg width={10} height={10} viewBox="0 0 24 24">
+const IconGithub = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
     <Path
       d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
-      stroke="#374151"
+      stroke="#374151" // Fixed to dark gray
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -93,7 +109,7 @@ const IconGithub = () => (
     />
     <Path
       d="M9 18c-4.51 2-5-2-7-2"
-      stroke="#374151"
+      stroke="#374151" // Fixed to dark gray
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -102,20 +118,25 @@ const IconGithub = () => (
   </Svg>
 );
 
-const IconMapPin = () => (
-  <Svg width={8} height={8} viewBox="0 0 24 24">
+// 🛑 THE ALIEN FIX: Size 10, Color #374151 (Dark Gray)
+const IconMapPin = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
     <Path
       d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
-      stroke="#6b7280"
+      stroke="#374151" // Dark Gray
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Circle converted to Path */}
     <Path
       d="M12 7 a3 3 0 1 1 0 6 a3 3 0 0 1 0 -6 z"
-      stroke="#6b7280"
+      stroke="#374151" // Dark Gray
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -124,11 +145,14 @@ const IconMapPin = () => (
   </Svg>
 );
 
-// 2. SECTION ICONS (Lucide Designs - Path Only)
-
-// Summary (User)
+// 2. SECTION ICONS
 const IconSummary = () => (
-  <Svg width={12} height={12} viewBox="0 0 24 24">
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
     <Path
       d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
       stroke="#1f2937"
@@ -137,7 +161,6 @@ const IconSummary = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Circle converted to Path */}
     <Path
       d="M12 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
       stroke="#1f2937"
@@ -149,9 +172,13 @@ const IconSummary = () => (
   </Svg>
 );
 
-// Experience (Briefcase Business)
 const IconExperience = () => (
-  <Svg width={12} height={12} viewBox="0 0 24 24">
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
     <Path
       d="M12 12h.01"
       stroke="#1f2937"
@@ -176,7 +203,6 @@ const IconExperience = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Rect converted to Path */}
     <Path
       d="M4 6 h16 a2 2 0 0 1 2 2 v10 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-10 a2 2 0 0 1 2 -2 z"
       stroke="#1f2937"
@@ -188,9 +214,13 @@ const IconExperience = () => (
   </Svg>
 );
 
-// Education (Graduation Cap)
 const IconEducation = () => (
-  <Svg width={12} height={12} viewBox="0 0 24 24">
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
     <Path
       d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"
       stroke="#1f2937"
@@ -218,9 +248,13 @@ const IconEducation = () => (
   </Svg>
 );
 
-// Skills (Lightbulb)
 const IconSkills = () => (
-  <Svg width={12} height={12} viewBox="0 0 24 24">
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
     <Path
       d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
       stroke="#1f2937"
@@ -248,9 +282,13 @@ const IconSkills = () => (
   </Svg>
 );
 
-// Certificates (Badge Check)
 const IconCert = () => (
-  <Svg width={12} height={12} viewBox="0 0 24 24">
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
     <Path
       d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
       stroke="#1f2937"
@@ -270,9 +308,13 @@ const IconCert = () => (
   </Svg>
 );
 
-// References (Users - Multiple)
 const IconUsers = () => (
-  <Svg width={12} height={12} viewBox="0 0 24 24">
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
     <Path
       d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
       stroke="#1f2937"
@@ -297,7 +339,6 @@ const IconUsers = () => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Circle converted to Path */}
     <Path
       d="M9 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
       stroke="#1f2937"
@@ -309,7 +350,6 @@ const IconUsers = () => (
   </Svg>
 );
 
-// Personal Info - Single User
 const IconUser = IconSummary;
 
 const styles = StyleSheet.create({
@@ -351,6 +391,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     fontSize: 9,
     color: "#374151",
+    lineHeight: 1.2,
   },
   link: { color: "#2563eb", textDecoration: "none" },
 
@@ -396,14 +437,21 @@ const styles = StyleSheet.create({
 
   skillBadge: {
     backgroundColor: "#f3f4f6",
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 4,
+    borderRadius: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 14,
     marginRight: 6,
     marginBottom: 6,
-    fontSize: 8,
-    color: "#1f2937",
-    border: "1pt solid #e5e7eb",
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  skillText: {
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#374151",
+    lineHeight: 1,
   },
   skillsContainer: { flexDirection: "row", flexWrap: "wrap" },
 
@@ -416,6 +464,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f3f4f6",
     paddingVertical: 4,
     alignItems: "center",
+    lineHeight: 1.2,
   },
   infoLabel: {
     width: "30%",
@@ -425,6 +474,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   infoValue: { width: "70%", fontSize: 9, color: "#111827" },
+
+  // 📐 ICON ALIGNMENT (Nudge up for perfect centering)
+  refIcon: {
+    transform: "translateY(-1.5)",
+  },
 });
 
 const CVDocument = ({ data, breaks = {} }) => {
@@ -565,9 +619,9 @@ const CVDocument = ({ data, breaks = {} }) => {
             </View>
             <View style={styles.skillsContainer}>
               {data.skills.map((skill, index) => (
-                <Text key={index} style={styles.skillBadge}>
-                  {skill.name}
-                </Text>
+                <View key={index} style={styles.skillBadge}>
+                  <Text style={styles.skillText}>{skill.name}</Text>
+                </View>
               ))}
             </View>
           </View>
@@ -623,6 +677,8 @@ const CVDocument = ({ data, breaks = {} }) => {
                   <Text style={{ fontSize: 9, color: "#374151" }}>
                     {ref.company}
                   </Text>
+
+                  {/* Location Icon (Corrected Size & Color) */}
                   {ref.location && (
                     <View
                       style={{
@@ -631,9 +687,9 @@ const CVDocument = ({ data, breaks = {} }) => {
                         marginTop: 1,
                       }}
                     >
-                      <IconMapPin />
+                      <IconMapPin style={styles.refIcon} />
                       <Text
-                        style={{ fontSize: 8, color: "#6b7280", marginLeft: 2 }}
+                        style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}
                       >
                         {ref.location}
                       </Text>
@@ -641,6 +697,7 @@ const CVDocument = ({ data, breaks = {} }) => {
                   )}
 
                   <View style={{ marginTop: 4 }}>
+                    {/* Phone Icon */}
                     {ref.phone && (
                       <View
                         style={{
@@ -649,7 +706,7 @@ const CVDocument = ({ data, breaks = {} }) => {
                           marginBottom: 1,
                         }}
                       >
-                        <IconPhone />
+                        <IconPhone style={styles.refIcon} />
                         <Text
                           style={{
                             fontSize: 9,
@@ -661,11 +718,12 @@ const CVDocument = ({ data, breaks = {} }) => {
                         </Text>
                       </View>
                     )}
+                    {/* Email Icon */}
                     {ref.email && (
                       <View
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
-                        <IconMail />
+                        <IconMail style={styles.refIcon} />
                         <Text
                           style={{
                             fontSize: 9,

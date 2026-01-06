@@ -12,7 +12,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 import "react-pdf/dist/Page/TextLayer.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 
-// 🛑 FIX: Define options OUTSIDE the component to prevent infinite re-loading
+// 🛑 CRITICAL FIX: Define options OUTSIDE the component.
+// This prevents the "Options prop changed" warning and unnecessary reloads.
 const PDF_OPTIONS = {
   cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
   cMapPacked: true,
@@ -22,14 +23,17 @@ const CVPreview = () => {
   const { watch } = useFormContext();
   const formData = watch();
 
-  // 1. DEBOUNCE LOGIC (Prevents typing lag)
+  // 1. DEBOUNCE LOGIC
   const [debouncedDataString] = useDebounce(JSON.stringify(formData), 1000);
   const debouncedData = useMemo(
     () => JSON.parse(debouncedDataString),
     [debouncedDataString]
   );
 
-  const [pdfBlob, setPdfBlob] = useState(null);
+  // 🛑 CRITICAL FIX: Store the URL string, not the Blob object.
+  // Storing the raw Blob causes "Detached ArrayBuffer" errors when React re-renders.
+  const [pdfUrl, setPdfUrl] = useState(null);
+
   const [numPages, setNumPages] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [scale, setScale] = useState(1.0);
@@ -49,28 +53,48 @@ const CVPreview = () => {
     return () => window.removeEventListener("resize", updateWidth);
   }, []);
 
-  // 📝 GENERATOR
+  // 📝 GENERATOR ENGINE
   useEffect(() => {
+    // Flag to prevent race conditions
+    let isMounted = true;
+
     const generatePdf = async () => {
       setIsGenerating(true);
       try {
+        // Generate Blob
         const blob = await pdf(<CVDocument data={debouncedData} />).toBlob();
-        setPdfBlob(blob);
+
+        if (isMounted) {
+          // Convert Blob to URL (This is safer for the Viewer than the raw blob)
+          const url = URL.createObjectURL(blob);
+          setPdfUrl((prevUrl) => {
+            // Revoke old URL to free memory
+            if (prevUrl) URL.revokeObjectURL(prevUrl);
+            return url;
+          });
+        }
       } catch (error) {
         console.error("PDF Gen Error:", error);
       } finally {
-        setIsGenerating(false);
+        if (isMounted) setIsGenerating(false);
       }
     };
 
     if (debouncedData) generatePdf();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+
+    // 🛑 FIXED: Removed 'CVDocument' from dependency array to satisfy ESLint
+    // and prevent the infinite render loop that caused the crash.
   }, [debouncedData]);
 
   const handleDownload = () => {
-    if (!pdfBlob) return;
-    const url = URL.createObjectURL(pdfBlob);
+    if (!pdfUrl) return;
     const link = document.createElement("a");
-    link.href = url;
+    link.href = pdfUrl;
     link.download = `${debouncedData.personalInfo.fullName || "CV"}.pdf`;
     link.click();
   };
@@ -115,7 +139,7 @@ const CVPreview = () => {
 
           <button
             onClick={handleDownload}
-            disabled={!pdfBlob}
+            disabled={!pdfUrl}
             className="flex items-center gap-1.5 bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded text-sm font-bold transition disabled:opacity-50"
           >
             <Download size={14} /> Download PDF
@@ -128,10 +152,10 @@ const CVPreview = () => {
         ref={containerRef}
         className="flex justify-center flex-1 p-8 overflow-y-auto bg-slate-200 scroll-smooth"
       >
-        {pdfBlob ? (
+        {pdfUrl ? (
           <Document
-            file={pdfBlob}
-            options={PDF_OPTIONS} // 👈 USING STABLE CONSTANT HERE
+            file={pdfUrl} // 👈 Using URL string instead of Blob object
+            options={PDF_OPTIONS} // 👈 Using stable options object
             onLoadSuccess={({ numPages }) => setNumPages(numPages)}
             loading={null}
             className="flex flex-col gap-6"
