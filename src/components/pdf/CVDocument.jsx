@@ -11,7 +11,7 @@ import {
   Path,
 } from "@react-pdf/renderer";
 
-// --- 🛠️ ICON LIBRARY (ALL Size 10, ALL Color #374151 or Accent) ---
+// --- 🛠️ ICON LIBRARY (Standardized Size 10x10 & Uniform Colors) ---
 
 // 1. CONTACT ICONS
 const IconMail = ({ style }) => (
@@ -101,7 +101,7 @@ const IconGithub = ({ style }) => (
   >
     <Path
       d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
-      stroke="#374151" // Fixed to dark gray
+      stroke="#374151"
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -109,7 +109,7 @@ const IconGithub = ({ style }) => (
     />
     <Path
       d="M9 18c-4.51 2-5-2-7-2"
-      stroke="#374151" // Fixed to dark gray
+      stroke="#374151"
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -118,7 +118,6 @@ const IconGithub = ({ style }) => (
   </Svg>
 );
 
-// 🛑 THE ALIEN FIX: Size 10, Color #374151 (Dark Gray)
 const IconMapPin = ({ style }) => (
   <Svg
     width={10}
@@ -128,7 +127,7 @@ const IconMapPin = ({ style }) => (
   >
     <Path
       d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
-      stroke="#374151" // Dark Gray
+      stroke="#374151"
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -136,7 +135,7 @@ const IconMapPin = ({ style }) => (
     />
     <Path
       d="M12 7 a3 3 0 1 1 0 6 a3 3 0 0 1 0 -6 z"
-      stroke="#374151" // Dark Gray
+      stroke="#374151"
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -435,6 +434,7 @@ const styles = StyleSheet.create({
   },
   description: { fontSize: 9, textAlign: "justify", color: "#4b5563" },
 
+  // 💎 CUTE SKILL BADGES
   skillBadge: {
     backgroundColor: "#f3f4f6",
     borderRadius: 12,
@@ -442,7 +442,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     marginRight: 6,
     marginBottom: 6,
-
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -475,7 +474,6 @@ const styles = StyleSheet.create({
   },
   infoValue: { width: "70%", fontSize: 9, color: "#111827" },
 
-  // 📐 ICON ALIGNMENT (Nudge up for perfect centering)
   refIcon: {
     transform: "translateY(-1.5)",
   },
@@ -551,7 +549,7 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         </View>
 
-        {/* SUMMARY */}
+        {/* SUMMARY (Wraps Whole Section) */}
         {data.personalInfo.summary && (
           <View wrap={false} style={styles.section}>
             {breaks["summary"] && <View break />}
@@ -563,18 +561,23 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         )}
 
-        {/* EXPERIENCE */}
+        {/* EXPERIENCE (Embedded Header Strategy) */}
         {data.experience?.length > 0 && (
           <View style={styles.section}>
-            {breaks["exp-header"] && <View break />}
-            <View style={styles.sectionTitleRow}>
-              <IconExperience />
-              <Text style={styles.sectionTitle}>Experience</Text>
-            </View>
-
             {data.experience.map((job, index) => (
               <View key={index} style={styles.jobBlock} wrap={false}>
-                {breaks[`exp-${index}`] && <View break />}
+                {/* Manual Breaks */}
+                {index === 0 && breaks["exp-header"] && <View break />}
+                {index > 0 && breaks[`exp-${index}`] && <View break />}
+
+                {/* 🔒 HEADER EMBEDDED IN FIRST ITEM */}
+                {index === 0 && (
+                  <View style={styles.sectionTitleRow}>
+                    <IconExperience />
+                    <Text style={styles.sectionTitle}>Experience</Text>
+                  </View>
+                )}
+
                 <View style={styles.jobHeader}>
                   <Text style={styles.jobRole}>{job.role}</Text>
                   <Text style={styles.jobDate}>
@@ -588,17 +591,22 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         )}
 
-        {/* EDUCATION */}
+        {/* EDUCATION (Embedded Header Strategy) */}
         {data.education?.length > 0 && (
           <View style={styles.section}>
-            {breaks["edu-header"] && <View break />}
-            <View style={styles.sectionTitleRow}>
-              <IconEducation />
-              <Text style={styles.sectionTitle}>Education</Text>
-            </View>
             {data.education.map((edu, index) => (
               <View key={index} style={styles.jobBlock} wrap={false}>
-                {breaks[`edu-${index}`] && <View break />}
+                {index === 0 && breaks["edu-header"] && <View break />}
+                {index > 0 && breaks[`edu-${index}`] && <View break />}
+
+                {/* 🔒 HEADER EMBEDDED IN FIRST ITEM */}
+                {index === 0 && (
+                  <View style={styles.sectionTitleRow}>
+                    <IconEducation />
+                    <Text style={styles.sectionTitle}>Education</Text>
+                  </View>
+                )}
+
                 <View style={styles.jobHeader}>
                   <Text style={styles.jobRole}>{edu.school}</Text>
                   <Text style={styles.jobDate}>{edu.date}</Text>
@@ -609,7 +617,7 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         )}
 
-        {/* SKILLS */}
+        {/* SKILLS (Wraps Whole Section) */}
         {data.skills?.length > 0 && (
           <View wrap={false} style={styles.section}>
             {breaks["skills"] && <View break />}
@@ -627,17 +635,22 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         )}
 
-        {/* CERTIFICATES */}
+        {/* CERTIFICATES (Embedded Header Strategy) */}
         {data.certificates?.length > 0 && (
           <View style={styles.section}>
-            {breaks["cert-header"] && <View break />}
-            <View style={styles.sectionTitleRow}>
-              <IconCert />
-              <Text style={styles.sectionTitle}>Certificates</Text>
-            </View>
             {data.certificates.map((cert, index) => (
               <View key={index} style={styles.jobBlock} wrap={false}>
-                {breaks[`cert-${index}`] && <View break />}
+                {index === 0 && breaks["cert-header"] && <View break />}
+                {index > 0 && breaks[`cert-${index}`] && <View break />}
+
+                {/* 🔒 HEADER EMBEDDED IN FIRST ITEM */}
+                {index === 0 && (
+                  <View style={styles.sectionTitleRow}>
+                    <IconCert />
+                    <Text style={styles.sectionTitle}>Certificates</Text>
+                  </View>
+                )}
+
                 <View style={styles.jobHeader}>
                   <Text style={styles.jobRole}>{cert.name}</Text>
                   <Text style={styles.jobDate}>{cert.date}</Text>
@@ -648,9 +661,9 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         )}
 
-        {/* REFERENCES (Grid) */}
+        {/* REFERENCES (Wraps Whole Section) */}
         {data.references?.length > 0 && (
-          <View style={styles.section}>
+          <View style={styles.section} wrap={false}>
             {breaks["ref-header"] && <View break />}
             <View style={styles.sectionTitleRow}>
               <IconUsers />
@@ -658,7 +671,7 @@ const CVDocument = ({ data, breaks = {} }) => {
             </View>
             <View style={styles.refGrid}>
               {data.references.map((ref, index) => (
-                <View key={index} style={styles.refItem} wrap={false}>
+                <View key={index} style={styles.refItem}>
                   {breaks[`ref-${index}`] && <View break />}
                   <Text
                     style={{ fontWeight: "bold", fontSize: 10, color: "#000" }}
@@ -678,7 +691,6 @@ const CVDocument = ({ data, breaks = {} }) => {
                     {ref.company}
                   </Text>
 
-                  {/* Location Icon (Corrected Size & Color) */}
                   {ref.location && (
                     <View
                       style={{
@@ -697,7 +709,6 @@ const CVDocument = ({ data, breaks = {} }) => {
                   )}
 
                   <View style={{ marginTop: 4 }}>
-                    {/* Phone Icon */}
                     {ref.phone && (
                       <View
                         style={{
@@ -718,7 +729,6 @@ const CVDocument = ({ data, breaks = {} }) => {
                         </Text>
                       </View>
                     )}
-                    {/* Email Icon */}
                     {ref.email && (
                       <View
                         style={{ flexDirection: "row", alignItems: "center" }}
@@ -742,7 +752,7 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         )}
 
-        {/* PERSONAL INFO */}
+        {/* PERSONAL INFO (Wraps Whole Section) */}
         {hasBioData && (
           <View wrap={false} style={styles.section}>
             {breaks["personal"] && <View break />}
