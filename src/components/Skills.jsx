@@ -1,49 +1,61 @@
 import React from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { PlusCircle, X } from "lucide-react";
+import { Lightbulb, X } from "lucide-react"; // 👈 Using Lightbulb icon
+import FormSection from "./ui/FormSection.jsx";
 
 const Skills = () => {
   const { register, control } = useFormContext();
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "skills",
   });
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md border border-gray-200 mt-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Skills</h2>
-
-      {/* The List of Chips */}
-      <div className="flex flex-wrap gap-2 mb-4">
+    <FormSection
+      title="Skills"
+      icon={Lightbulb}
+      onAdd={() => append({ name: "" })}
+      addButtonLabel="Add Skill"
+    >
+      {/* 🏷️ The Chip Container */}
+      <div className="flex flex-wrap gap-3">
         {fields.map((item, index) => (
           <div
             key={item.id}
-            className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full"
+            className="flex items-center gap-2 px-4 py-2 text-blue-800 transition-all border border-blue-100 rounded-full bg-blue-50 hover:bg-blue-100 hover:shadow-sm group"
           >
+            {/* ✍️ Transparent Input */}
             <input
               {...register(`skills.${index}.name`)}
-              className="bg-transparent border-none outline-none w-24 text-sm font-medium"
+              className="bg-transparent border-none outline-none text-sm font-semibold text-blue-900 placeholder-blue-300 w-24 sm:w-auto min-w-[60px]"
               placeholder="Skill..."
+              autoFocus={fields.length > 1 && index === fields.length - 1} // Auto-focus new chips
             />
+
+            {/* ❌ Remove Icon */}
             <button
               type="button"
               onClick={() => remove(index)}
-              className="ml-2 text-blue-400 hover:text-blue-600"
+              className="text-blue-300 transition-colors hover:text-red-500"
+              title="Remove Skill"
             >
-              <X size={14} />
+              <X size={14} strokeWidth={3} />
             </button>
           </div>
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => append({ name: "" })}
-        className="flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-800"
-      >
-        <PlusCircle size={18} /> Add Skill
-      </button>
-    </div>
+      {/* Empty State */}
+      {fields.length === 0 && (
+        <div className="p-8 text-center text-gray-400 border-2 border-gray-200 border-dashed rounded-xl">
+          <p className="text-sm font-medium">No skills listed.</p>
+          <p className="mt-1 text-xs">
+            Add tools, languages, or frameworks you excel at.
+          </p>
+        </div>
+      )}
+    </FormSection>
   );
 };
 

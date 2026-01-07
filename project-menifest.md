@@ -3158,6 +3158,8 @@ Instead of rendering Headers and Items as siblings, we mechanically bond them:
 **Outcome:** Zero orphaned headers, guaranteed semantic flow across page breaks.
 
 ```
+`src/components/pdf/CVDocument.jsx`
+
 import React from "react";
 import {
   Page,
@@ -3982,5 +3984,257 @@ const CVDocument = ({ data, breaks = {} }) => {
 };
 
 export default CVDocument;
+
+```
+
+## 07/01/2026 - 05.39AM
+
+### 🧱 Brick 13: The Atomic UI Refactor
+
+**Status:** ✅ COMPLETED (Systematized)
+**Focus:** Code Maintainability, Visual Consistency, and Scalability.
+
+**1. The Problem:**
+
+- **Inconsistency:** Each form section (`Education`, `Experience`, etc.) had its own manual Tailwind classes. Changing a border color required editing 6 different files.
+- **Repetition:** Error handling logic (`errors.education[index]?.school...`) was repeated hundreds of times.
+- **Fragility:** Form components would crash if props were missing or `undefined`.
+
+**2. The Solution: "The Atomic UI Kit"**
+We created a reusable internal library in `src/components/ui/`:
+
+- **`FormSection`:** The Master Shell. Handles the Card layout, Header styling, Icon placement, and the "Add" button logic.
+- **`FormInput` / `FormTextArea` / `FormSelect`:** Smart input components that:
+  - Auto-detect errors based on the `name` prop.
+  - Include "Crash-Proof" guard clauses for undefined paths.
+  - Enforce global styling (focus rings, padding, fonts).
+
+**3. The Refactor:**
+We rewrote **100%** of the form components to use this new system:
+
+- `PersonalDetails.jsx`: Standardized grid layout + Photo Upload integration.
+- `Education.jsx` & `Experience.jsx`: Cleaned up the field array loops.
+- `Certificates.jsx`: Switched icon to `BadgeCheck` and standardized layout.
+- `Skills.jsx`: implemented a custom "Chip/Tag" layout inside the standard `FormSection`.
+- `References.jsx`: Fully standardized.
+
+**Outcome:** Reduced boilerplate code by ~70%, guaranteed visual uniformity across the app, and established a framework for adding future sections in minutes.
+
+```
+`src/components/ui/Forminput.jsx`
+import React from "react";
+import { useFormContext } from "react-hook-form";
+
+const FormInput = ({
+  label,
+  name,
+  placeholder,
+  type = "text",
+  className = "",
+}) => {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
+  const getError = (obj, path) => {
+    if (!path || !obj) return undefined;
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+  };
+
+  const error = getError(errors, name);
+
+  return (
+    <div className={`w-full ${className}`}>
+      {label && (
+        <label className="block mb-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+          {label}
+        </label>
+      )}
+
+      <input
+        type={type}
+        {...(name ? register(name) : {})}
+        placeholder={placeholder}
+        className={`w-full px-3 py-2.5 text-sm font-medium text-gray-700 bg-white border rounded-lg outline-none transition-all duration-200
+          ${
+            error
+              ? "border-red-500 focus:ring-2 focus:ring-red-200 bg-red-50"
+              : "border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          }
+        `}
+      />
+
+      {error && (
+        <p className="mt-1.5 text-xs font-semibold text-red-500 flex items-center gap-1">
+          ⚠️ {error.message}
+        </p>
+      )}
+    </div>
+  );
+};
+
+export default FormInput;
+
+`src/components/ui/FormSction.jsx`
+import React from "react";
+
+const FormSection = ({
+  icon: Icon,
+  title,
+  children,
+  onAdd,
+  addButtonLabel,
+}) => {
+  return (
+    <div className="p-6 transition-shadow duration-300 bg-white border border-gray-200 shadow-sm rounded-xl hover:shadow-md">
+      {/* 🟢 Header Area */}
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="flex items-center gap-3 text-lg font-bold tracking-wide text-gray-800 uppercase">
+          {Icon && <Icon size={20} className="text-blue-600" />}
+          {title}
+        </h2>
+
+        {onAdd && (
+          <button
+            type="button"
+            onClick={onAdd}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+          >
+            <span className="text-lg leading-none">+</span>
+            {addButtonLabel || "Add"}
+          </button>
+        )}
+      </div>
+
+      {/* 🟢 Content Area - This is where your schools/jobs go */}
+      <div className="space-y-6">{children}</div>
+    </div>
+  );
+};
+
+export default FormSection;
+
+`src/components/ui/FormSelect.jsx`
+import React from "react";
+import { useFormContext } from "react-hook-form";
+
+const FormSelect = ({
+  label,
+  name,
+  options = [],
+  placeholder = "Select...",
+  className = "",
+}) => {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
+  const getError = (obj, path) => {
+    if (!path || !obj) return undefined;
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+  };
+
+  const error = getError(errors, name);
+
+  return (
+    <div className={`w-full ${className}`}>
+      {label && (
+        <label className="block mb-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+          {label}
+        </label>
+      )}
+      <div className="relative">
+        <select
+          {...(name ? register(name) : {})}
+          className={`w-full px-3 py-2.5 text-sm font-medium text-gray-700 bg-white border rounded-lg outline-none transition-all duration-200 appearance-none
+            ${
+              error
+                ? "border-red-500 focus:ring-2 focus:ring-red-200 bg-red-50"
+                : "border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            }
+          `}
+        >
+          <option value="">{placeholder}</option>
+          {options.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+        {/* Chevron Icon */}
+        <div className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 pointer-events-none">
+          <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+            <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+          </svg>
+        </div>
+      </div>
+      {error && (
+        <p className="mt-1.5 text-xs font-semibold text-red-500 flex items-center gap-1">
+          ⚠️ {error.message}
+        </p>
+      )}
+    </div>
+  );
+};
+
+export default FormSelect;
+
+`src/components/ui/FormTextArea.jsx`
+import React from "react";
+import { useFormContext } from "react-hook-form";
+
+const FormTextArea = ({
+  label,
+  name,
+  placeholder,
+  rows = 3,
+  className = "",
+}) => {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
+  const getError = (obj, path) => {
+    if (!path || !obj) return undefined;
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+  };
+
+  const error = getError(errors, name);
+
+  return (
+    <div className={`w-full ${className}`}>
+      {label && (
+        <label className="block mb-1.5 text-xs font-bold text-gray-500 uppercase tracking-wider">
+          {label}
+        </label>
+      )}
+      <textarea
+        {...(name ? register(name) : {})}
+        placeholder={placeholder}
+        rows={rows}
+        className={`w-full px-3 py-2.5 text-sm font-medium text-gray-700 bg-white border rounded-lg outline-none transition-all duration-200 resize-none
+          ${
+            error
+              ? "border-red-500 focus:ring-2 focus:ring-red-200 bg-red-50"
+              : "border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          }
+        `}
+      />
+      {error && (
+        <p className="mt-1.5 text-xs font-semibold text-red-500 flex items-center gap-1">
+          ⚠️ {error.message}
+        </p>
+      )}
+    </div>
+  );
+};
+
+export default FormTextArea;
+
+
+
 
 ```

@@ -1,112 +1,102 @@
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Users, Plus, Trash2 } from "lucide-react";
+import { Users, Trash2 } from "lucide-react";
+import FormSection from "./ui/FormSection.jsx";
+import FormInput from "./ui/FormInput.jsx";
 
 const References = () => {
-  const {
-    register,
-    control,
-    formState: { errors },
-  } = useFormContext();
+  const { control } = useFormContext();
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "references",
   });
 
   return (
-    <div className="p-6 mt-6 bg-white border border-gray-200 rounded-lg shadow-md">
-      <h2 className="flex items-center gap-2 mb-4 text-xl font-bold text-gray-800">
-        <Users className="text-blue-600" /> References
-      </h2>
-      <div className="space-y-6">
-        {fields.map((field, index) => (
-          <div
-            key={field.id}
-            className="relative p-4 border border-gray-200 rounded bg-gray-50"
+    <FormSection
+      title="References"
+      icon={Users}
+      onAdd={() =>
+        append({
+          name: "",
+          position: "",
+          company: "",
+          location: "",
+          phone: "",
+          email: "",
+        })
+      }
+      addButtonLabel="Add Reference"
+    >
+      {fields.map((field, index) => (
+        <div
+          key={field.id}
+          className="relative p-5 transition-all border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 hover:border-gray-200 group"
+        >
+          {/* 🗑️ Remove Button */}
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="absolute text-gray-300 transition-colors opacity-0 top-4 right-4 hover:text-red-500 group-hover:opacity-100"
+            title="Remove Reference"
           >
-            <button
-              type="button"
-              onClick={() => remove(index)}
-              className="absolute text-red-500 top-2 right-2 hover:text-red-700"
-            >
-              <Trash2 size={16} />
-            </button>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="md:col-span-2">
-                <label className="label">Reference Name</label>
-                <input
-                  {...register(`references.${index}.name`)}
-                  className="input"
-                  placeholder="e.g. John Doe"
-                />
-                {errors.references?.[index]?.name && (
-                  <p className="error">
-                    {errors.references[index].name.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="label">Position / Designation</label>
-                <input
-                  {...register(`references.${index}.position`)}
-                  className="input"
-                  placeholder="e.g. Senior Manager"
-                />
-              </div>
-              <div>
-                <label className="label">Company</label>
-                <input
-                  {...register(`references.${index}.company`)}
-                  className="input"
-                  placeholder="e.g. Tech Corp"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="label">Location (City)</label>
-                <input
-                  {...register(`references.${index}.location`)}
-                  className="input"
-                  placeholder="e.g. Colombo"
-                />
-              </div>
-              <div>
-                <label className="label">Phone</label>
-                <input
-                  {...register(`references.${index}.phone`)}
-                  className="input"
-                  placeholder="+94..."
-                />
-              </div>
-              <div>
-                <label className="label">Email</label>
-                <input
-                  {...register(`references.${index}.email`)}
-                  className="input"
-                  placeholder="john@example.com"
-                />
-              </div>
-            </div>
+            <Trash2 size={18} />
+          </button>
+
+          {/* 📝 The Grid */}
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <FormInput
+              name={`references.${index}.name`}
+              label="Reference Name"
+              placeholder="e.g. Dr. John Doe"
+              className="md:col-span-2"
+            />
+
+            <FormInput
+              name={`references.${index}.position`}
+              label="Position / Designation"
+              placeholder="e.g. Senior Lecturer"
+            />
+
+            <FormInput
+              name={`references.${index}.company`}
+              label="Company / Institute"
+              placeholder="e.g. University of Moratuwa"
+            />
+
+            <FormInput
+              name={`references.${index}.location`}
+              label="Location (City)"
+              placeholder="e.g. Colombo"
+              className="md:col-span-2"
+            />
+
+            <FormInput
+              name={`references.${index}.phone`}
+              label="Phone"
+              placeholder="+94 7..."
+            />
+
+            <FormInput
+              name={`references.${index}.email`}
+              label="Email"
+              placeholder="john@example.com"
+            />
           </div>
-        ))}
-      </div>
-      <button
-        type="button"
-        onClick={() =>
-          append({
-            name: "",
-            position: "",
-            company: "",
-            location: "",
-            phone: "",
-            email: "",
-          })
-        }
-        className="flex items-center gap-2 mt-4 text-sm font-bold text-blue-600 hover:text-blue-800"
-      >
-        <Plus size={16} /> Add Reference
-      </button>
-      <style>{`.label { display: block; font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; margin-bottom: 0.25rem; } .input { width: 100%; padding: 0.5rem; border: 1px solid #e5e7eb; border-radius: 0.25rem; font-size: 0.875rem; } .error { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; }`}</style>
-    </div>
+        </div>
+      ))}
+
+      {/* Empty State */}
+      {fields.length === 0 && (
+        <div className="p-8 text-center text-gray-400 border-2 border-gray-200 border-dashed rounded-xl">
+          <p className="text-sm font-medium">No references listed.</p>
+          <p className="mt-1 text-xs">
+            Add professional contacts who can vouch for your work.
+          </p>
+        </div>
+      )}
+    </FormSection>
   );
 };
+
 export default References;
