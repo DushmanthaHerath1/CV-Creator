@@ -11,16 +11,9 @@ import {
   Path,
 } from "@react-pdf/renderer";
 
-// --- 🛠️ ICON LIBRARY (Standardized Size 10x10 & Uniform Colors) ---
-
-// 1. CONTACT ICONS
+// --- 🛠️ ICONS (Core) ---
 const IconMail = ({ style }) => (
-  <Svg
-    width={10}
-    height={10}
-    viewBox="0 0 24 24"
-    style={style || { transform: "translateY(-0.5)" }}
-  >
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
     <Path
       d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"
       stroke="#374151"
@@ -39,14 +32,8 @@ const IconMail = ({ style }) => (
     />
   </Svg>
 );
-
 const IconPhone = ({ style }) => (
-  <Svg
-    width={10}
-    height={10}
-    viewBox="0 0 24 24"
-    style={style || { transform: "translateY(-0.5)" }}
-  >
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
     <Path
       d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
       stroke="#374151"
@@ -57,14 +44,8 @@ const IconPhone = ({ style }) => (
     />
   </Svg>
 );
-
 const IconLinkedin = ({ style }) => (
-  <Svg
-    width={10}
-    height={10}
-    viewBox="0 0 24 24"
-    style={style || { transform: "translateY(-0.5)" }}
-  >
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
     <Path
       d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
       stroke="#2563eb"
@@ -91,14 +72,8 @@ const IconLinkedin = ({ style }) => (
     />
   </Svg>
 );
-
 const IconGithub = ({ style }) => (
-  <Svg
-    width={10}
-    height={10}
-    viewBox="0 0 24 24"
-    style={style || { transform: "translateY(-0.5)" }}
-  >
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
     <Path
       d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
       stroke="#374151"
@@ -117,14 +92,8 @@ const IconGithub = ({ style }) => (
     />
   </Svg>
 );
-
 const IconMapPin = ({ style }) => (
-  <Svg
-    width={10}
-    height={10}
-    viewBox="0 0 24 24"
-    style={style || { transform: "translateY(-0.5)" }}
-  >
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
     <Path
       d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
       stroke="#374151"
@@ -144,7 +113,7 @@ const IconMapPin = ({ style }) => (
   </Svg>
 );
 
-// 2. SECTION ICONS
+// --- 🛠️ ICONS (Sections) ---
 const IconSummary = () => (
   <Svg
     width={12}
@@ -170,7 +139,6 @@ const IconSummary = () => (
     />
   </Svg>
 );
-
 const IconExperience = () => (
   <Svg
     width={12}
@@ -212,7 +180,6 @@ const IconExperience = () => (
     />
   </Svg>
 );
-
 const IconEducation = () => (
   <Svg
     width={12}
@@ -246,7 +213,6 @@ const IconEducation = () => (
     />
   </Svg>
 );
-
 const IconSkills = () => (
   <Svg
     width={12}
@@ -280,7 +246,6 @@ const IconSkills = () => (
     />
   </Svg>
 );
-
 const IconCert = () => (
   <Svg
     width={12}
@@ -306,7 +271,6 @@ const IconCert = () => (
     />
   </Svg>
 );
-
 const IconUsers = () => (
   <Svg
     width={12}
@@ -349,6 +313,127 @@ const IconUsers = () => (
   </Svg>
 );
 
+// 🆕 NEW ICONS
+const IconGlobe = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="M2 12h20" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path
+      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+  </Svg>
+);
+const IconProject = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="m12 10 2 2-2 2" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path d="m17 10-2 2 2 2" stroke="#1f2937" strokeWidth={2} fill="none" />
+  </Svg>
+);
+const IconTrophy = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="M4 22h16" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path
+      d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M18 2H6v7a6 6 0 0 0 12 0V2Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+  </Svg>
+);
+const IconActivity = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M3.5 21 14 3"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M20.5 21 10 3"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M15.5 21 12 15l-3.5 6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M2 21h20"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
 const IconUser = IconSummary;
 
 const styles = StyleSheet.create({
@@ -393,7 +478,6 @@ const styles = StyleSheet.create({
     lineHeight: 1.2,
   },
   link: { color: "#2563eb", textDecoration: "none" },
-
   section: { marginBottom: 10 },
   sectionTitleRow: {
     flexDirection: "row",
@@ -411,7 +495,6 @@ const styles = StyleSheet.create({
     color: "#1f2937",
     marginLeft: 6,
   },
-
   jobBlock: { marginBottom: 10 },
   jobHeader: {
     flexDirection: "row",
@@ -433,8 +516,6 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   description: { fontSize: 9, textAlign: "justify", color: "#4b5563" },
-
-  // 💎 CUTE SKILL BADGES
   skillBadge: {
     backgroundColor: "#f3f4f6",
     borderRadius: 12,
@@ -453,10 +534,8 @@ const styles = StyleSheet.create({
     lineHeight: 1,
   },
   skillsContainer: { flexDirection: "row", flexWrap: "wrap" },
-
   refGrid: { flexDirection: "row", flexWrap: "wrap", gap: 15 },
   refItem: { width: "45%", marginBottom: 10 },
-
   infoRow: {
     flexDirection: "row",
     borderBottomWidth: 1,
@@ -473,13 +552,235 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   infoValue: { width: "70%", fontSize: 9, color: "#111827" },
-
-  refIcon: {
-    transform: "translateY(-1.5)",
-  },
+  refIcon: { transform: "translateY(-1.5)" },
 });
 
-const CVDocument = ({ data, breaks = {} }) => {
+// --- RENDER HELPERS ---
+const ExperienceSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconExperience />
+      <Text style={styles.sectionTitle}>Experience</Text>
+    </View>
+    {data.map((job, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{job.role}</Text>
+          <Text style={styles.jobDate}>
+            {job.startDate} — {job.endDate}
+          </Text>
+        </View>
+        <Text style={styles.company}>{job.company}</Text>
+        <Text style={styles.description}>{job.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const EducationSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconEducation />
+      <Text style={styles.sectionTitle}>Education</Text>
+    </View>
+    {data.map((edu, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{edu.school}</Text>
+          <Text style={styles.jobDate}>{edu.date}</Text>
+        </View>
+
+        {/* Upgrade Degree to "Company Style" (Blue) for better hierarchy */}
+        <Text style={styles.company}>{edu.degree}</Text>
+
+        {/* Render the new Description */}
+        {edu.description && (
+          <Text style={styles.description}>{edu.description}</Text>
+        )}
+      </View>
+    ))}
+  </View>
+);
+
+const SkillsSection = ({ data }) => (
+  <View wrap={false} style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconSkills />
+      <Text style={styles.sectionTitle}>Skills</Text>
+    </View>
+    <View style={styles.skillsContainer}>
+      {data.map((skill, index) => (
+        <Text key={index} style={styles.skillBadge}>
+          {skill.name}
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
+const CertificatesSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconCert />
+      <Text style={styles.sectionTitle}>Certificates</Text>
+    </View>
+    {data.map((cert, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{cert.name}</Text>
+          <Text style={styles.jobDate}>{cert.date}</Text>
+        </View>
+        <Text style={styles.description}>{cert.issuer}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ReferencesSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <View style={styles.sectionTitleRow}>
+      <IconUsers />
+      <Text style={styles.sectionTitle}>References</Text>
+    </View>
+    <View style={styles.refGrid}>
+      {data.map((ref, index) => (
+        <View key={index} style={styles.refItem}>
+          <Text style={{ fontWeight: "bold", fontSize: 10, color: "#000" }}>
+            {ref.name}
+          </Text>
+          <Text style={{ fontSize: 9, fontWeight: "medium", color: "#1f2937" }}>
+            {ref.position}
+          </Text>
+          <Text style={{ fontSize: 9, color: "#374151" }}>{ref.company}</Text>
+          {ref.location && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 1,
+              }}
+            >
+              <IconMapPin style={styles.refIcon} />
+              <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                {ref.location}
+              </Text>
+            </View>
+          )}
+          {ref.phone && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 2,
+              }}
+            >
+              <IconPhone style={styles.refIcon} />
+              <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                {ref.phone}
+              </Text>
+            </View>
+          )}
+          {ref.email && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 1,
+              }}
+            >
+              <IconMail style={styles.refIcon} />
+              <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                {ref.email}
+              </Text>
+            </View>
+          )}
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+// 🆕 NEW SECTIONS RENDERING LOGIC
+const LanguagesSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <View style={styles.sectionTitleRow}>
+      <IconGlobe />
+      <Text style={styles.sectionTitle}>Languages</Text>
+    </View>
+    <View style={styles.skillsContainer}>
+      {data.map((lang, index) => (
+        <Text key={index} style={styles.skillBadge}>
+          {lang.language} {lang.proficiency ? `(${lang.proficiency})` : ""}
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
+const ProjectsSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconProject />
+      <Text style={styles.sectionTitle}>Projects</Text>
+    </View>
+    {data.map((item, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{item.title}</Text>
+          {item.technologies && (
+            <Text style={styles.jobDate}>{item.technologies}</Text>
+          )}
+        </View>
+        {item.link && (
+          <Text style={{ ...styles.company, color: "#2563eb" }}>
+            {item.link}
+          </Text>
+        )}
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const AchievementsSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconTrophy />
+      <Text style={styles.sectionTitle}>Achievements</Text>
+    </View>
+    {data.map((item, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{item.title}</Text>
+          <Text style={styles.jobDate}>{item.date}</Text>
+        </View>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ExtracurricularSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconActivity />
+      <Text style={styles.sectionTitle}>Extracurricular</Text>
+    </View>
+    {data.map((item, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{item.role}</Text>
+          <Text style={styles.jobDate}>{item.date}</Text>
+        </View>
+        <Text style={styles.company}>{item.organization}</Text>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+// --- MAIN DOCUMENT ---
+const CVDocument = ({ data, activeSections = [] }) => {
   const hasBioData =
     data.personalInfo.address ||
     data.personalInfo.dob ||
@@ -487,6 +788,19 @@ const CVDocument = ({ data, breaks = {} }) => {
     data.personalInfo.nationality ||
     data.personalInfo.maritalStatus ||
     data.personalInfo.idNumber;
+
+  const RENDER_MAP = {
+    experience: (d) => <ExperienceSection data={d.experience} />,
+    education: (d) => <EducationSection data={d.education} />,
+    skills: (d) => <SkillsSection data={d.skills} />,
+    certificates: (d) => <CertificatesSection data={d.certificates} />,
+    references: (d) => <ReferencesSection data={d.references} />,
+    // 🆕 MAP NEW SECTIONS
+    languages: (d) => <LanguagesSection data={d.languages} />,
+    projects: (d) => <ProjectsSection data={d.projects} />,
+    achievements: (d) => <AchievementsSection data={d.achievements} />,
+    extracurricular: (d) => <ExtracurricularSection data={d.extracurricular} />,
+  };
 
   return (
     <Document>
@@ -504,11 +818,10 @@ const CVDocument = ({ data, breaks = {} }) => {
               <Text style={styles.role}>
                 {data.personalInfo.role || "Job Title"}
               </Text>
-
               <View style={styles.contactRow}>
                 {data.personalInfo.email && (
                   <View style={styles.contactItem}>
-                    <IconMail />
+                    <IconMail style={{ transform: "translateY(-0.5)" }} />
                     <Text style={{ marginLeft: 4 }}>
                       {data.personalInfo.email}
                     </Text>
@@ -516,7 +829,7 @@ const CVDocument = ({ data, breaks = {} }) => {
                 )}
                 {data.personalInfo.phone && (
                   <View style={styles.contactItem}>
-                    <IconPhone />
+                    <IconPhone style={{ transform: "translateY(-0.5)" }} />
                     <Text style={{ marginLeft: 4 }}>
                       {data.personalInfo.phone}
                     </Text>
@@ -524,7 +837,7 @@ const CVDocument = ({ data, breaks = {} }) => {
                 )}
                 {data.personalInfo.linkedin && (
                   <View style={styles.contactItem}>
-                    <IconLinkedin />
+                    <IconLinkedin style={{ transform: "translateY(-0.5)" }} />
                     <Link
                       src={data.personalInfo.linkedin}
                       style={{ marginLeft: 4, ...styles.link }}
@@ -535,7 +848,7 @@ const CVDocument = ({ data, breaks = {} }) => {
                 )}
                 {data.personalInfo.github && (
                   <View style={styles.contactItem}>
-                    <IconGithub />
+                    <IconGithub style={{ transform: "translateY(-0.5)" }} />
                     <Link
                       src={data.personalInfo.github}
                       style={{ marginLeft: 4, ...styles.link }}
@@ -549,10 +862,9 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         </View>
 
-        {/* SUMMARY (Wraps Whole Section) */}
+        {/* SUMMARY */}
         {data.personalInfo.summary && (
           <View wrap={false} style={styles.section}>
-            {breaks["summary"] && <View break />}
             <View style={styles.sectionTitleRow}>
               <IconSummary />
               <Text style={styles.sectionTitle}>Professional Summary</Text>
@@ -561,201 +873,18 @@ const CVDocument = ({ data, breaks = {} }) => {
           </View>
         )}
 
-        {/* EXPERIENCE (Embedded Header Strategy) */}
-        {data.experience?.length > 0 && (
-          <View style={styles.section}>
-            {data.experience.map((job, index) => (
-              <View key={index} style={styles.jobBlock} wrap={false}>
-                {/* Manual Breaks */}
-                {index === 0 && breaks["exp-header"] && <View break />}
-                {index > 0 && breaks[`exp-${index}`] && <View break />}
+        {/* 🔀 DYNAMIC SECTIONS */}
+        {activeSections.map((section) => {
+          const renderFunc = RENDER_MAP[section.id];
+          if (renderFunc && data[section.id] && data[section.id].length > 0) {
+            return <View key={section.id}>{renderFunc(data)}</View>;
+          }
+          return null;
+        })}
 
-                {/* 🔒 HEADER EMBEDDED IN FIRST ITEM */}
-                {index === 0 && (
-                  <View style={styles.sectionTitleRow}>
-                    <IconExperience />
-                    <Text style={styles.sectionTitle}>Experience</Text>
-                  </View>
-                )}
-
-                <View style={styles.jobHeader}>
-                  <Text style={styles.jobRole}>{job.role}</Text>
-                  <Text style={styles.jobDate}>
-                    {job.startDate} — {job.endDate}
-                  </Text>
-                </View>
-                <Text style={styles.company}>{job.company}</Text>
-                <Text style={styles.description}>{job.description}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* EDUCATION (Embedded Header Strategy) */}
-        {data.education?.length > 0 && (
-          <View style={styles.section}>
-            {data.education.map((edu, index) => (
-              <View key={index} style={styles.jobBlock} wrap={false}>
-                {index === 0 && breaks["edu-header"] && <View break />}
-                {index > 0 && breaks[`edu-${index}`] && <View break />}
-
-                {/* 🔒 HEADER EMBEDDED IN FIRST ITEM */}
-                {index === 0 && (
-                  <View style={styles.sectionTitleRow}>
-                    <IconEducation />
-                    <Text style={styles.sectionTitle}>Education</Text>
-                  </View>
-                )}
-
-                <View style={styles.jobHeader}>
-                  <Text style={styles.jobRole}>{edu.school}</Text>
-                  <Text style={styles.jobDate}>{edu.date}</Text>
-                </View>
-                <Text style={styles.description}>{edu.degree}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* SKILLS (Wraps Whole Section) */}
-        {data.skills?.length > 0 && (
-          <View wrap={false} style={styles.section}>
-            {breaks["skills"] && <View break />}
-            <View style={styles.sectionTitleRow}>
-              <IconSkills />
-              <Text style={styles.sectionTitle}>Skills</Text>
-            </View>
-            <View style={styles.skillsContainer}>
-              {data.skills.map((skill, index) => (
-                <View key={index} style={styles.skillBadge}>
-                  <Text style={styles.skillText}>{skill.name}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* CERTIFICATES (Embedded Header Strategy) */}
-        {data.certificates?.length > 0 && (
-          <View style={styles.section}>
-            {data.certificates.map((cert, index) => (
-              <View key={index} style={styles.jobBlock} wrap={false}>
-                {index === 0 && breaks["cert-header"] && <View break />}
-                {index > 0 && breaks[`cert-${index}`] && <View break />}
-
-                {/* 🔒 HEADER EMBEDDED IN FIRST ITEM */}
-                {index === 0 && (
-                  <View style={styles.sectionTitleRow}>
-                    <IconCert />
-                    <Text style={styles.sectionTitle}>Certificates</Text>
-                  </View>
-                )}
-
-                <View style={styles.jobHeader}>
-                  <Text style={styles.jobRole}>{cert.name}</Text>
-                  <Text style={styles.jobDate}>{cert.date}</Text>
-                </View>
-                <Text style={styles.description}>{cert.issuer}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* REFERENCES (Wraps Whole Section) */}
-        {data.references?.length > 0 && (
-          <View style={styles.section} wrap={false}>
-            {breaks["ref-header"] && <View break />}
-            <View style={styles.sectionTitleRow}>
-              <IconUsers />
-              <Text style={styles.sectionTitle}>References</Text>
-            </View>
-            <View style={styles.refGrid}>
-              {data.references.map((ref, index) => (
-                <View key={index} style={styles.refItem}>
-                  {breaks[`ref-${index}`] && <View break />}
-                  <Text
-                    style={{ fontWeight: "bold", fontSize: 10, color: "#000" }}
-                  >
-                    {ref.name}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 9,
-                      fontWeight: "medium",
-                      color: "#1f2937",
-                    }}
-                  >
-                    {ref.position}
-                  </Text>
-                  <Text style={{ fontSize: 9, color: "#374151" }}>
-                    {ref.company}
-                  </Text>
-
-                  {ref.location && (
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginTop: 1,
-                      }}
-                    >
-                      <IconMapPin style={styles.refIcon} />
-                      <Text
-                        style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}
-                      >
-                        {ref.location}
-                      </Text>
-                    </View>
-                  )}
-
-                  <View style={{ marginTop: 4 }}>
-                    {ref.phone && (
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          marginBottom: 1,
-                        }}
-                      >
-                        <IconPhone style={styles.refIcon} />
-                        <Text
-                          style={{
-                            fontSize: 9,
-                            color: "#374151",
-                            marginLeft: 4,
-                          }}
-                        >
-                          {ref.phone}
-                        </Text>
-                      </View>
-                    )}
-                    {ref.email && (
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <IconMail style={styles.refIcon} />
-                        <Text
-                          style={{
-                            fontSize: 9,
-                            color: "#374151",
-                            marginLeft: 4,
-                          }}
-                        >
-                          {ref.email}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* PERSONAL INFO (Wraps Whole Section) */}
+        {/* PERSONAL INFO */}
         {hasBioData && (
           <View wrap={false} style={styles.section}>
-            {breaks["personal"] && <View break />}
             <View style={styles.sectionTitleRow}>
               <IconUser />
               <Text style={styles.sectionTitle}>Personal Information</Text>
@@ -786,14 +915,6 @@ const CVDocument = ({ data, breaks = {} }) => {
                     </Text>
                   </View>
                 )}
-                {data.personalInfo.maritalStatus && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Status</Text>
-                    <Text style={styles.infoValue}>
-                      {data.personalInfo.maritalStatus}
-                    </Text>
-                  </View>
-                )}
               </View>
               <View style={{ width: "50%", paddingLeft: 10 }}>
                 {data.personalInfo.nationality && (
@@ -820,5 +941,4 @@ const CVDocument = ({ data, breaks = {} }) => {
     </Document>
   );
 };
-
 export default CVDocument;

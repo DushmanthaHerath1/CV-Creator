@@ -9,14 +9,20 @@ const FormSection = ({
 }) => {
   return (
     <div className="p-6 transition-shadow duration-300 bg-white border border-gray-200 shadow-sm rounded-xl hover:shadow-md">
-      {/* 🟢 Header Area */}
+      {/* 🟢 Header Area (Title & Icon Only) */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="flex items-center gap-3 text-lg font-bold tracking-wide text-gray-800 uppercase">
           {Icon && <Icon size={20} className="text-blue-600" />}
           {title}
         </h2>
+      </div>
 
-        {onAdd && (
+      {/* 🟢 Content Area */}
+      <div className="space-y-6">{children}</div>
+
+      {/* 🟢 Footer Area (Add Button Moved Here) */}
+      {onAdd && (
+        <div className="mt-6">
           <button
             type="button"
             onClick={onAdd}
@@ -25,11 +31,8 @@ const FormSection = ({
             <span className="text-lg leading-none">+</span>
             {addButtonLabel || "Add"}
           </button>
-        )}
-      </div>
-
-      {/* 🟢 Content Area - This is where your schools/jobs go */}
-      <div className="space-y-6">{children}</div>
+        </div>
+      )}
     </div>
   );
 };

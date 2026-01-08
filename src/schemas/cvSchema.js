@@ -43,6 +43,7 @@ export const cvSchema = z.object({
         school: z.string().min(2, "School required"),
         degree: z.string().min(2, "Degree required"),
         date: z.string().optional(),
+        description: z.string().optional(),
       })
     )
     .optional(),
@@ -73,6 +74,44 @@ export const cvSchema = z.object({
         location: z.string().optional(), // New
         phone: z.string().optional(),
         email: z.string().email("Invalid email").or(z.literal("")).optional(),
+      })
+    )
+    .optional(),
+
+  languages: z
+    .array(
+      z.object({
+        language: z.string().min(2, "Language required"),
+        proficiency: z.string().optional(),
+      })
+    )
+    .optional(),
+  projects: z
+    .array(
+      z.object({
+        title: z.string().min(2, "Title required"),
+        link: z.string().optional(),
+        technologies: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+  achievements: z
+    .array(
+      z.object({
+        title: z.string().min(2, "Title required"),
+        date: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+  extracurricular: z
+    .array(
+      z.object({
+        role: z.string().min(2, "Role required"),
+        organization: z.string().optional(),
+        date: z.string().optional(),
+        description: z.string().optional(),
       })
     )
     .optional(),

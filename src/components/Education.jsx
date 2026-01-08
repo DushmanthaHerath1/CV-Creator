@@ -3,6 +3,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { Trash2, GraduationCap } from "lucide-react";
 import FormSection from "./ui/FormSection.jsx";
 import FormInput from "./ui/FormInput.jsx";
+import FormTextArea from "./ui/FormTextArea.jsx";
 
 const Education = () => {
   const { control } = useFormContext();
@@ -53,6 +54,14 @@ const Education = () => {
               name={`education.${index}.date`}
               label="Graduation Year"
               placeholder="e.g. 2024"
+            />
+
+            <FormTextArea
+              name={`education.${index}.description`}
+              label="Description (Optional)"
+              placeholder="e.g. First Class Honours, GPA 3.8, Thesis on AI..."
+              rows={3}
+              className="md:col-span-2"
             />
           </div>
         </div>

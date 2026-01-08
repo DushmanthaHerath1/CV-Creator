@@ -4234,7 +4234,3371 @@ const FormTextArea = ({
 
 export default FormTextArea;
 
+```
 
+You are absolutely right. This is the **most critical step** in software development: **The Save Point.** 💾
 
+We have successfully rebuilt the engine with a "PDF-First" architecture, fixed the preview bugs, and implemented professional drag-and-drop reordering.
 
+Here is your updated **Project Manifest**. Copy and paste this entirely into `project-menifest.md`.
+
+---
+
+### 💾 PROJECT MANIFEST (Save Point: "The Phoenix Update")
+
+**Date:** 2026-01-08
+**Status:** ✅ STABLE (Production Ready)
+**Architecture:** Type C (PDF-First Engine) + Atomic UI + Dynamic Reordering.
+
+---
+
+#### 1. Tech Stack & Dependencies
+
+- **Core:** React + Vite
+- **Styling:** Tailwind CSS
+- **State:** React Hook Form
+- **Validation:** Zod
+- **PDF Generation:** `@react-pdf/renderer` (The Engine)
+- **PDF Rendering:** `react-pdf` (The Preview)
+- **Drag & Drop:** `@dnd-kit/core`, `@dnd-kit/sortable`
+- **Icons:** Lucide React (UI) + Custom SVG Paths (PDF)
+
+#### 2. The File Structure
+
+```
+src/
+├── components/
+│   ├── pdf/
+│   │   └── CVDocument.jsx      (The Master PDF Template)
+│   ├── preview/
+│   │   └── CVPreview.jsx       (The Preview Orchestrator) 🆕
+│   ├── ui/
+│   │   ├── FormSection.jsx     (Standardized Card Wrapper)
+│   │   ├── SortableSection.jsx (Draggable Wrapper)
+│   │   ├── FormInput.jsx       (Standard Input)
+│   │   ├── FormTextArea.jsx    (Standard Text Area)
+│   │   └── FormSelect.jsx      (Standard Dropdown)
+│   ├── PersonalDetails.jsx
+│   ├── Experience.jsx
+│   ├── Education.jsx
+│   ├── Skills.jsx
+│   ├── Certificates.jsx
+│   ├── References.jsx
+│   └── PhotoUpload.jsx
+├── pages/
+│   └── BuilderPage.jsx         (The Controller Page)
+├── schemas/
+│   └── cvSchema.js             (Zod Validation Rules)
+├── db.js                       (IndexedDB Storage)
+├── App.jsx                     (Router)
+└── main.jsx
+
+```
+
+---
+
+#### 3. CRITICAL ENGINE FILES
+
+**A. The PDF Template (`src/components/pdf/CVDocument.jsx`)**
+_Handles layout, "Pure Path" icons to prevent crashes, and dynamic reordering._
+
+```jsx
+import React from "react";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+  Link,
+  Svg,
+  Path,
+} from "@react-pdf/renderer";
+
+// --- 🛠️ ICON LIBRARY (Standardized Size 10x10 & Uniform Colors) ---
+
+const IconMail = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
+    <Path
+      d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M4 4 h16 a2 2 0 0 1 2 2 v12 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-12 a2 2 0 0 1 2 -2 z"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconPhone = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
+    <Path
+      d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconLinkedin = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
+    <Path
+      d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M2 9 h4 v12 h-4 z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M4 2 a2 2 0 1 1 0 4 a2 2 0 0 1 0 -4 z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconGithub = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
+    <Path
+      d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 18c-4.51 2-5-2-7-2"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconMapPin = ({ style }) => (
+  <Svg
+    width={10}
+    height={10}
+    viewBox="0 0 24 24"
+    style={style || { transform: "translateY(-0.5)" }}
+  >
+    <Path
+      d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M12 7 a3 3 0 1 1 0 6 a3 3 0 0 1 0 -6 z"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// SECTION ICONS
+const IconSummary = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M12 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconExperience = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M12 12h.01"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 13a18.15 18.15 0 0 1-20 0"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M4 6 h16 a2 2 0 0 1 2 2 v10 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-10 a2 2 0 0 1 2 -2 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconEducation = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 10v6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconSkills = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 18h6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M10 22h4"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconCert = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="m9 12 2 2 4-4"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconUsers = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 3.128a4 4 0 0 1 0 7.744"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 21v-2a4 4 0 0 0-3-3.87"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconUser = IconSummary;
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 30,
+    fontSize: 10,
+    lineHeight: 1.5,
+    fontFamily: "Helvetica",
+    color: "#374151",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1f2937",
+    paddingBottom: 15,
+  },
+  photo: { width: 100, height: 100, borderRadius: 50, objectFit: "cover" },
+  headerRight: { marginLeft: 30, flex: 1 },
+  name: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    color: "#111827",
+    marginBottom: 4,
+    lineHeight: 1.2,
+  },
+  role: {
+    fontSize: 11,
+    color: "#4b5563",
+    marginBottom: 6,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  contactRow: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  contactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    fontSize: 9,
+    color: "#374151",
+    lineHeight: 1.2,
+  },
+  link: { color: "#2563eb", textDecoration: "none" },
+  section: { marginBottom: 10 },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    paddingBottom: 4,
+    marginBottom: 8,
+    marginTop: 5,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    color: "#1f2937",
+    marginLeft: 6,
+  },
+  jobBlock: { marginBottom: 10 },
+  jobHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  jobRole: {
+    fontWeight: "bold",
+    fontSize: 10,
+    color: "#000000",
+    maxWidth: "70%",
+  },
+  jobDate: { fontSize: 9, color: "#6b7280", textAlign: "right" },
+  company: {
+    color: "#2563eb",
+    fontWeight: "bold",
+    fontSize: 9,
+    marginTop: 1,
+    marginBottom: 3,
+  },
+  description: { fontSize: 9, textAlign: "justify", color: "#4b5563" },
+  skillBadge: {
+    backgroundColor: "#f3f4f6",
+    borderRadius: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 14,
+    marginRight: 6,
+    marginBottom: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  skillText: {
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#374151",
+    lineHeight: 1,
+  },
+  skillsContainer: { flexDirection: "row", flexWrap: "wrap" },
+  refGrid: { flexDirection: "row", flexWrap: "wrap", gap: 15 },
+  refItem: { width: "45%", marginBottom: 10 },
+  infoRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
+    paddingVertical: 4,
+    alignItems: "center",
+    lineHeight: 1.2,
+  },
+  infoLabel: {
+    width: "30%",
+    fontSize: 8,
+    color: "#6b7280",
+    textTransform: "uppercase",
+    fontWeight: "bold",
+  },
+  infoValue: { width: "70%", fontSize: 9, color: "#111827" },
+  refIcon: { transform: "translateY(-1.5)" },
+});
+
+// --- HELPER COMPONENTS FOR DYNAMIC RENDERING ---
+const ExperienceSection = ({ data }) => (
+  <View style={styles.section}>
+    {data.map((job, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sectionTitleRow}>
+            <IconExperience />
+            <Text style={styles.sectionTitle}>Experience</Text>
+          </View>
+        )}
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{job.role}</Text>
+          <Text style={styles.jobDate}>
+            {job.startDate} — {job.endDate}
+          </Text>
+        </View>
+        <Text style={styles.company}>{job.company}</Text>
+        <Text style={styles.description}>{job.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const EducationSection = ({ data }) => (
+  <View style={styles.section}>
+    {data.map((edu, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sectionTitleRow}>
+            <IconEducation />
+            <Text style={styles.sectionTitle}>Education</Text>
+          </View>
+        )}
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{edu.school}</Text>
+          <Text style={styles.jobDate}>{edu.date}</Text>
+        </View>
+        <Text style={styles.description}>{edu.degree}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const SkillsSection = ({ data }) => (
+  <View wrap={false} style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconSkills />
+      <Text style={styles.sectionTitle}>Skills</Text>
+    </View>
+    <View style={styles.skillsContainer}>
+      {data.map((skill, index) => (
+        <View key={index} style={styles.skillBadge}>
+          <Text style={styles.skillText}>{skill.name}</Text>
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+const CertificatesSection = ({ data }) => (
+  <View style={styles.section}>
+    {data.map((cert, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sectionTitleRow}>
+            <IconCert />
+            <Text style={styles.sectionTitle}>Certificates</Text>
+          </View>
+        )}
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{cert.name}</Text>
+          <Text style={styles.jobDate}>{cert.date}</Text>
+        </View>
+        <Text style={styles.description}>{cert.issuer}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ReferencesSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <View style={styles.sectionTitleRow}>
+      <IconUsers />
+      <Text style={styles.sectionTitle}>References</Text>
+    </View>
+    <View style={styles.refGrid}>
+      {data.map((ref, index) => (
+        <View key={index} style={styles.refItem}>
+          <Text style={{ fontWeight: "bold", fontSize: 10, color: "#000" }}>
+            {ref.name}
+          </Text>
+          <Text style={{ fontSize: 9, fontWeight: "medium", color: "#1f2937" }}>
+            {ref.position}
+          </Text>
+          <Text style={{ fontSize: 9, color: "#374151" }}>{ref.company}</Text>
+          {ref.location && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 1,
+              }}
+            >
+              <IconMapPin style={styles.refIcon} />
+              <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                {ref.location}
+              </Text>
+            </View>
+          )}
+          <View style={{ marginTop: 4 }}>
+            {ref.phone && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 1,
+                }}
+              >
+                <IconPhone style={styles.refIcon} />
+                <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                  {ref.phone}
+                </Text>
+              </View>
+            )}
+            {ref.email && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <IconMail style={styles.refIcon} />
+                <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                  {ref.email}
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+// --- MAIN DOCUMENT ---
+const CVDocument = ({ data, activeSections = [] }) => {
+  const hasBioData =
+    data.personalInfo.address ||
+    data.personalInfo.dob ||
+    data.personalInfo.gender ||
+    data.personalInfo.nationality ||
+    data.personalInfo.maritalStatus ||
+    data.personalInfo.idNumber;
+
+  const RENDER_MAP = {
+    experience: (d) => <ExperienceSection data={d.experience} />,
+    education: (d) => <EducationSection data={d.education} />,
+    skills: (d) => <SkillsSection data={d.skills} />,
+    certificates: (d) => <CertificatesSection data={d.certificates} />,
+    references: (d) => <ReferencesSection data={d.references} />,
+  };
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* HEADER (Always Top) */}
+        <View wrap={false}>
+          <View style={styles.header}>
+            {data.personalInfo.photo && (
+              <Image src={data.personalInfo.photo} style={styles.photo} />
+            )}
+            <View style={styles.headerRight}>
+              <Text style={styles.name}>
+                {data.personalInfo.fullName || "Your Name"}
+              </Text>
+              <Text style={styles.role}>
+                {data.personalInfo.role || "Job Title"}
+              </Text>
+              <View style={styles.contactRow}>
+                {data.personalInfo.email && (
+                  <View style={styles.contactItem}>
+                    <IconMail />
+                    <Text style={{ marginLeft: 4 }}>
+                      {data.personalInfo.email}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.phone && (
+                  <View style={styles.contactItem}>
+                    <IconPhone />
+                    <Text style={{ marginLeft: 4 }}>
+                      {data.personalInfo.phone}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.linkedin && (
+                  <View style={styles.contactItem}>
+                    <IconLinkedin />
+                    <Link
+                      src={data.personalInfo.linkedin}
+                      style={{ marginLeft: 4, ...styles.link }}
+                    >
+                      LinkedIn
+                    </Link>
+                  </View>
+                )}
+                {data.personalInfo.github && (
+                  <View style={styles.contactItem}>
+                    <IconGithub />
+                    <Link
+                      src={data.personalInfo.github}
+                      style={{ marginLeft: 4, ...styles.link }}
+                    >
+                      GitHub
+                    </Link>
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* SUMMARY (Always Second) */}
+        {data.personalInfo.summary && (
+          <View wrap={false} style={styles.section}>
+            <View style={styles.sectionTitleRow}>
+              <IconSummary />
+              <Text style={styles.sectionTitle}>Professional Summary</Text>
+            </View>
+            <Text style={styles.description}>{data.personalInfo.summary}</Text>
+          </View>
+        )}
+
+        {/* DYNAMIC SECTIONS */}
+        {activeSections.map((section) => {
+          const renderFunc = RENDER_MAP[section.id];
+          if (renderFunc && data[section.id] && data[section.id].length > 0) {
+            return <View key={section.id}>{renderFunc(data)}</View>;
+          }
+          return null;
+        })}
+
+        {/* PERSONAL INFO (Always Last) */}
+        {hasBioData && (
+          <View wrap={false} style={styles.section}>
+            <View style={styles.sectionTitleRow}>
+              <IconUser />
+              <Text style={styles.sectionTitle}>Personal Information</Text>
+            </View>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <View style={{ width: "50%", paddingRight: 10 }}>
+                {data.personalInfo.address && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Address</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.address}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.dob && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>DOB</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.dob}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.gender && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Gender</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.gender}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.maritalStatus && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Status</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.maritalStatus}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <View style={{ width: "50%", paddingLeft: 10 }}>
+                {data.personalInfo.nationality && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Nationality</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.nationality}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.idNumber && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>NIC/ID</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.idNumber}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+        )}
+      </Page>
+    </Document>
+  );
+};
+export default CVDocument;
+```
+
+**B. The Preview Manager (`src/components/CVPreview.jsx`)**
+_Handles Blob generation, Toolbars, Download, and Pagination._
+
+```jsx
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useFormContext } from "react-hook-form";
+import { useDebounce } from "use-debounce";
+import { pdf } from "@react-pdf/renderer";
+import { Document, Page, pdfjs } from "react-pdf";
+import CVDocument from "./pdf/CVDocument";
+import { Download, Loader2, ZoomIn, ZoomOut, CheckCircle2 } from "lucide-react";
+
+// ✅ WORKER SETUP
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+import "react-pdf/dist/Page/TextLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+
+const PDF_OPTIONS = {
+  cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+  cMapPacked: true,
+};
+
+const CVPreview = ({ activeSections = [] }) => {
+  const { watch } = useFormContext();
+  const formData = watch();
+
+  // Debounce (1s)
+  const [debouncedDataString] = useDebounce(JSON.stringify(formData), 1000);
+  const debouncedData = useMemo(
+    () => JSON.parse(debouncedDataString),
+    [debouncedDataString]
+  );
+
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [numPages, setNumPages] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [scale, setScale] = useState(1.0);
+
+  // Responsive Width
+  const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(600);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current)
+        setContainerWidth(containerRef.current.offsetWidth - 40);
+    };
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  // ⚡ GENERATE PDF ENGINE
+  useEffect(() => {
+    let isMounted = true;
+    const generatePdf = async () => {
+      setIsGenerating(true);
+      try {
+        // 🔑 PASS activeSections TO THE PDF ENGINE
+        const blob = await pdf(
+          <CVDocument data={debouncedData} activeSections={activeSections} />
+        ).toBlob();
+        if (isMounted) {
+          const url = URL.createObjectURL(blob);
+          setPdfUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return url;
+          });
+        }
+      } catch (error) {
+        console.error("PDF Gen Error:", error);
+      } finally {
+        if (isMounted) setIsGenerating(false);
+      }
+    };
+    if (debouncedData) generatePdf();
+    return () => {
+      isMounted = false;
+    };
+  }, [debouncedData, activeSections]);
+
+  const handleDownload = () => {
+    if (!pdfUrl) return;
+    const link = document.createElement("a");
+    link.href = pdfUrl;
+    link.download = `${debouncedData.personalInfo.fullName || "CV"}.pdf`;
+    link.click();
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-100 border-l border-gray-300">
+      {/* 🛠️ INTEGRATED TOOLBAR */}
+      <div className="z-10 flex items-center justify-between p-3 bg-white border-b border-gray-200 shadow-sm">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-bold tracking-wide text-gray-700 uppercase">
+            Preview
+          </h2>
+          {isGenerating ? (
+            <span className="flex items-center gap-1 text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full animate-pulse">
+              <Loader2 size={10} className="animate-spin" /> Updating...
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">
+              <CheckCircle2 size={10} /> Ready
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setScale((s) => Math.max(0.5, s - 0.1))}
+            className="p-1.5 hover:bg-gray-100 rounded text-gray-600"
+          >
+            <ZoomOut size={16} />
+          </button>
+          <span className="w-12 font-mono text-xs text-center">
+            {(scale * 100).toFixed(0)}%
+          </span>
+          <button
+            onClick={() => setScale((s) => Math.min(2.0, s + 0.1))}
+            className="p-1.5 hover:bg-gray-100 rounded text-gray-600"
+          >
+            <ZoomIn size={16} />
+          </button>
+          <div className="w-px h-4 mx-1 bg-gray-300"></div>
+          <button
+            onClick={handleDownload}
+            disabled={!pdfUrl}
+            className="flex items-center gap-1.5 bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded text-sm font-bold transition disabled:opacity-50"
+          >
+            <Download size={14} /> Download PDF
+          </button>
+        </div>
+      </div>
+
+      {/* 📄 PDF VIEWER */}
+      <div
+        ref={containerRef}
+        className="flex justify-center flex-1 p-8 overflow-y-auto bg-slate-200 scroll-smooth"
+      >
+        {pdfUrl ? (
+          <Document
+            file={pdfUrl}
+            options={PDF_OPTIONS}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            loading={null}
+            className="flex flex-col gap-6"
+          >
+            {Array.from(new Array(numPages), (_, index) => (
+              <div key={`page_${index + 1}`} className="shadow-xl">
+                <Page
+                  pageNumber={index + 1}
+                  width={containerWidth * scale}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={false}
+                  className="bg-white"
+                />
+                <div className="text-center mt-2 text-[10px] text-gray-400 font-bold tracking-widest uppercase">
+                  Page {index + 1}
+                </div>
+              </div>
+            ))}
+          </Document>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+            <Loader2 className="mb-3 animate-spin" size={32} />
+            <p className="text-sm font-medium">Initializing Engine...</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+export default CVPreview;
+```
+
+**C. The Page Controller (`src/pages/BuilderPage.jsx`)**
+_Manages the Layout State, Drag-and-Drop, and Data Persistence._
+
+```jsx
+import React, { useEffect, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
+import {
+  Loader2,
+  ArrowLeft,
+  Plus,
+  Briefcase,
+  GraduationCap,
+  Lightbulb,
+  BadgeCheck,
+  Users,
+} from "lucide-react";
+
+// 🏎️ Drag & Drop Imports
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+
+// 🧱 Internal Imports
+import { cvSchema } from "../schemas/cvSchema";
+import { saveCVData, loadCVData } from "../db";
+import SortableSection from "../components/ui/SortableSection";
+import CVPreview from "../components/CVPreview";
+
+// 📝 Form Sections
+import PersonalDetails from "../components/PersonalDetails";
+import Experience from "../components/Experience";
+import Education from "../components/Education";
+import Skills from "../components/Skills";
+import Certificates from "../components/Certificates";
+import References from "../components/References";
+
+const BuilderPage = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // 1️⃣ State for Dynamic Sections
+  // This state controls the visual order in BOTH the Form and the PDF
+  const [activeSections, setActiveSections] = useState([
+    { id: "experience" },
+    { id: "education" },
+    { id: "skills" },
+    { id: "certificates" },
+    { id: "references" },
+  ]);
+
+  // 2️⃣ Section Configuration (The "Database" of sections)
+  // Maps IDs to Titles, Icons, and actual Input Components
+  const SECTION_CONFIG = {
+    experience: {
+      component: <Experience />,
+      title: "Work Experience",
+      icon: Briefcase,
+    },
+    education: {
+      component: <Education />,
+      title: "Education",
+      icon: GraduationCap,
+    },
+    skills: { component: <Skills />, title: "Skills", icon: Lightbulb },
+    certificates: {
+      component: <Certificates />,
+      title: "Certificates",
+      icon: BadgeCheck,
+    },
+    references: { component: <References />, title: "References", icon: Users },
+  };
+
+  // 3️⃣ Available Sections List
+  const allOptionalSections = Object.keys(SECTION_CONFIG).map((id) => ({
+    id,
+    title: SECTION_CONFIG[id].title,
+  }));
+
+  const methods = useForm({
+    resolver: zodResolver(cvSchema),
+    mode: "onChange",
+    defaultValues: {
+      personalInfo: {
+        fullName: "",
+        email: "",
+        phone: "",
+        role: "",
+        summary: "",
+        photo: "",
+      },
+      experience: [],
+      education: [],
+      skills: [],
+      certificates: [],
+      references: [],
+    },
+  });
+
+  const { watch, reset } = methods;
+
+  // 4️⃣ DnD Sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  // 5️⃣ Handle Drag End (Reorder Logic)
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) return; // 🛡️ Crash protection
+
+    if (active.id !== over.id) {
+      setActiveSections((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  // 6️⃣ Add/Remove Logic
+  const addSection = (sectionId) => {
+    if (!activeSections.find((s) => s.id === sectionId)) {
+      setActiveSections([...activeSections, { id: sectionId }]);
+    }
+  };
+
+  const removeSection = (sectionId) => {
+    if (confirm("Are you sure you want to remove this section?")) {
+      setActiveSections(activeSections.filter((s) => s.id !== sectionId));
+    }
+  };
+
+  // --- Data Loading & Saving ---
+  useEffect(() => {
+    const initData = async () => {
+      const savedData = await loadCVData();
+      if (savedData) reset(savedData);
+      setIsLoaded(true);
+    };
+    initData();
+  }, [reset]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    // Auto-save logic
+    const subscription = watch((value) => {
+      saveCVData(value);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch, isLoaded]);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-gray-500 bg-gray-100">
+        <Loader2 className="text-blue-600 animate-spin" size={48} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <FormProvider {...methods}>
+        <div className="flex flex-col h-screen overflow-hidden md:flex-row">
+          {/* =========================================================
+              LEFT COLUMN: EDITOR
+          =========================================================== */}
+          <div className="w-full h-full p-8 pb-32 overflow-y-auto md:w-1/2 scrollbar-hide bg-gray-50/50">
+            <div className="flex items-center justify-between mb-6">
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600"
+              >
+                <ArrowLeft size={16} /> Back to Home
+              </Link>
+              <h1 className="text-xl font-bold text-gray-800">CV Builder</h1>
+            </div>
+
+            <form className="space-y-6">
+              {/* 🔒 FIXED SECTION: Personal Details */}
+              <PersonalDetails />
+
+              {/* 🔀 DYNAMIC SECTIONS */}
+              <div className="pt-6 border-t border-gray-200">
+                <h3 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  Sections (Drag to Reorder)
+                </h3>
+
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={activeSections.map((s) => s.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {activeSections.map((section) => {
+                      const config = SECTION_CONFIG[section.id];
+                      return (
+                        <SortableSection
+                          key={section.id}
+                          id={section.id}
+                          title={config.title}
+                          icon={config.icon}
+                          onRemove={() => removeSection(section.id)}
+                        >
+                          {config.component}
+                        </SortableSection>
+                      );
+                    })}
+                  </SortableContext>
+                </DndContext>
+              </div>
+
+              {/* ➕ ADD SECTION MENU */}
+              <div className="pt-2">
+                <div className="flex flex-wrap gap-3">
+                  {allOptionalSections.map((section) => {
+                    const isActive = activeSections.find(
+                      (s) => s.id === section.id
+                    );
+                    if (isActive) return null;
+
+                    return (
+                      <button
+                        key={section.id}
+                        type="button"
+                        onClick={() => addSection(section.id)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 transition-all bg-white border border-gray-300 border-dashed rounded-full shadow-sm hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600"
+                      >
+                        <Plus size={16} /> Add {section.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* =========================================================
+              RIGHT COLUMN: PREVIEW WORKSPACE
+          =========================================================== */}
+          <div className="flex flex-col w-full h-full bg-gray-100 border-l border-gray-200 md:w-1/2">
+            {/* We pass activeSections to CVPreview.
+                CVPreview (Brick 9) now handles the PDF Generation, Toolbars, and Downloading.
+            */}
+            <CVPreview activeSections={activeSections} />
+          </div>
+        </div>
+      </FormProvider>
+    </div>
+  );
+};
+
+export default BuilderPage;
+```
+
+### 💾 PROJECT MANIFEST (Save Point: "The Expanded Universe")
+
+**Date:** 2026-01-09
+**Status:** ✅ STABLE (Phoenix Architecture + Extended Sections)
+**Architecture:** Type C (PDF-First) + Atomic UI + Smart State Management.
+
+---
+
+#### 1. The File Structure
+
+```text
+src/
+├── components/
+│   ├── pdf/
+│   │   └── CVDocument.jsx      (The Master PDF Template - Updated with New Sections)
+│   ├── preview/
+│   │   └── CVPreview.jsx       (The Preview Orchestrator)
+│   ├── ui/
+│   │   ├── FormSection.jsx     (Card Wrapper - Add Button at Bottom)
+│   │   ├── SortableSection.jsx (Accordion Wrapper - Fixed Submit Bug)
+│   │   ├── FormInput.jsx       (Standard Input)
+│   │   ├── FormTextArea.jsx    (Standard Text Area)
+│   │   └── FormSelect.jsx      (Standard Dropdown)
+│   ├── PersonalDetails.jsx
+│   ├── Experience.jsx
+│   ├── Education.jsx           (Updated with Description)
+│   ├── Skills.jsx
+│   ├── Certificates.jsx
+│   ├── References.jsx
+│   ├── Languages.jsx           (NEW)
+│   ├── Projects.jsx            (NEW)
+│   ├── Achievements.jsx        (NEW)
+│   └── Extracurricular.jsx     (NEW)
+├── pages/
+│   └── BuilderPage.jsx         (The Controller - Smart Init, Capsules, Logic)
+├── schemas/
+│   └── cvSchema.js             (Zod Validation Rules - Updated)
+├── db.js                       (IndexedDB Storage)
+├── App.jsx                     (Router)
+└── main.jsx
+
+```
+
+---
+
+#### 3. CRITICAL SOURCE CODE
+
+**A. The Controller (`src/pages/BuilderPage.jsx`)**
+_Handles Smart Init, Capsules, Accordion Logic, and Data Persistence (Order + Content)._
+
+```jsx
+import React, { useEffect, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
+import {
+  Loader2,
+  ArrowLeft,
+  Plus,
+  Briefcase,
+  GraduationCap,
+  Lightbulb,
+  BadgeCheck,
+  Users,
+  Globe,
+  FolderGit2,
+  Trophy,
+  Tent,
+} from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+
+import { cvSchema } from "../schemas/cvSchema";
+import { saveCVData, loadCVData } from "../db";
+import SortableSection from "../components/ui/SortableSection";
+import CVPreview from "../components/preview/CVPreview";
+
+import PersonalDetails from "../components/PersonalDetails";
+import Experience from "../components/Experience";
+import Education from "../components/Education";
+import Skills from "../components/Skills";
+import Certificates from "../components/Certificates";
+import References from "../components/References";
+import Languages from "../components/Languages";
+import Projects from "../components/Projects";
+import Achievements from "../components/Achievements";
+import Extracurricular from "../components/Extracurricular";
+
+const BuilderPage = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [activeSections, setActiveSections] = useState([
+    { id: "experience" },
+    { id: "education" },
+  ]);
+  const [expandedSection, setExpandedSection] = useState("experience");
+
+  const SECTION_CONFIG = {
+    experience: {
+      component: <Experience />,
+      title: "Work Experience",
+      icon: Briefcase,
+    },
+    education: {
+      component: <Education />,
+      title: "Education",
+      icon: GraduationCap,
+    },
+    skills: { component: <Skills />, title: "Skills", icon: Lightbulb },
+    certificates: {
+      component: <Certificates />,
+      title: "Certificates",
+      icon: BadgeCheck,
+    },
+    references: { component: <References />, title: "References", icon: Users },
+    languages: { component: <Languages />, title: "Languages", icon: Globe },
+    projects: { component: <Projects />, title: "Projects", icon: FolderGit2 },
+    achievements: {
+      component: <Achievements />,
+      title: "Achievements",
+      icon: Trophy,
+    },
+    extracurricular: {
+      component: <Extracurricular />,
+      title: "Activities",
+      icon: Tent,
+    },
+  };
+
+  const allOptionalSections = Object.keys(SECTION_CONFIG).map((id) => ({
+    id,
+    title: SECTION_CONFIG[id].title,
+    icon: SECTION_CONFIG[id].icon,
+  }));
+
+  const methods = useForm({
+    resolver: zodResolver(cvSchema),
+    mode: "onChange",
+    defaultValues: {
+      personalInfo: {
+        fullName: "",
+        email: "",
+        phone: "",
+        role: "",
+        summary: "",
+        photo: "",
+      },
+      experience: [],
+      education: [],
+      skills: [],
+      certificates: [],
+      references: [],
+      languages: [],
+      projects: [],
+      achievements: [],
+      extracurricular: [],
+    },
+  });
+
+  const { watch, reset, setValue, getValues } = methods;
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setActiveSections((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  };
+
+  const addSection = (sectionId) => {
+    if (!activeSections.find((s) => s.id === sectionId)) {
+      setActiveSections([...activeSections, { id: sectionId }]);
+      setExpandedSection(sectionId);
+    }
+  };
+
+  const removeSection = (sectionId) => {
+    if (confirm("Remove this section? All data in it will be lost.")) {
+      setActiveSections(activeSections.filter((s) => s.id !== sectionId));
+      setValue(sectionId, []); // Wipe data
+    }
+  };
+
+  useEffect(() => {
+    const initData = async () => {
+      const savedData = await loadCVData();
+      if (savedData) {
+        const { sectionOrder, ...formData } = savedData;
+        reset(formData);
+        if (sectionOrder?.length > 0) {
+          setActiveSections(sectionOrder);
+        } else {
+          // Smart Init Fallback
+          const sectionsToActivate = ["experience", "education"];
+          [
+            "skills",
+            "certificates",
+            "references",
+            "languages",
+            "projects",
+            "achievements",
+            "extracurricular",
+          ].forEach((id) => {
+            if (savedData[id]?.length > 0 && !sectionsToActivate.includes(id))
+              sectionsToActivate.push(id);
+          });
+          setActiveSections(sectionsToActivate.map((id) => ({ id })));
+        }
+      }
+      setIsLoaded(true);
+    };
+    initData();
+  }, [reset]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    const save = () =>
+      saveCVData({ ...getValues(), sectionOrder: activeSections });
+    const sub = watch(save);
+    save(); // Also save on order change
+    return () => sub.unsubscribe();
+  }, [watch, isLoaded, activeSections, getValues]);
+
+  if (!isLoaded)
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="animate-spin" />
+      </div>
+    );
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <FormProvider {...methods}>
+        <div className="flex flex-col md:flex-row h-screen overflow-hidden">
+          <div className="w-full md:w-1/2 h-full overflow-y-auto p-8 pb-32 scrollbar-hide bg-gray-50/50">
+            <div className="flex items-center justify-between mb-6">
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-sm text-gray-500"
+              >
+                <ArrowLeft size={16} /> Back
+              </Link>
+              <h1 className="text-xl font-bold">CV Builder</h1>
+            </div>
+            <form className="space-y-6">
+              <PersonalDetails />
+              <div className="pt-6 border-t border-gray-200">
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={activeSections.map((s) => s.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {activeSections.map((section) => (
+                      <SortableSection
+                        key={section.id}
+                        id={section.id}
+                        title={SECTION_CONFIG[section.id].title}
+                        icon={SECTION_CONFIG[section.id].icon}
+                        onRemove={() => removeSection(section.id)}
+                        isOpen={expandedSection === section.id}
+                        onToggle={() =>
+                          setExpandedSection((prev) =>
+                            prev === section.id ? null : section.id
+                          )
+                        }
+                      >
+                        {SECTION_CONFIG[section.id].component}
+                      </SortableSection>
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              </div>
+              <div className="pt-4 flex flex-wrap gap-3">
+                {allOptionalSections.map(
+                  (sec) =>
+                    !activeSections.find((s) => s.id === sec.id) && (
+                      <button
+                        key={sec.id}
+                        type="button"
+                        onClick={() => addSection(sec.id)}
+                        className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-full hover:bg-blue-100"
+                      >
+                        <Plus size={16} className="text-blue-500" /> {sec.title}
+                      </button>
+                    )
+                )}
+              </div>
+            </form>
+          </div>
+          <div className="w-full md:w-1/2 h-full bg-gray-100 border-l border-gray-200">
+            <CVPreview activeSections={activeSections} />
+          </div>
+        </div>
+      </FormProvider>
+    </div>
+  );
+};
+export default BuilderPage;
+```
+
+**B. The PDF Engine (`src/components/pdf/CVDocument.jsx`)**
+_Handles rendering of ALL sections (Core + New)._
+
+```jsx
+import React from "react";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+  Link,
+  Svg,
+  Path,
+} from "@react-pdf/renderer";
+
+// ... (ICON DEFINITIONS: Mail, Phone, Linkedin, Github, MapPin, Experience, Education, Skills, Cert, Users) ...
+// ... (NEW ICONS: Globe, Project, Trophy, Activity/Tent) ...
+
+// ... (STYLES OBJECT) ...
+
+// RENDER MAP
+const RENDER_MAP = {
+  experience: (d) => <ExperienceSection data={d.experience} />,
+  education: (d) => <EducationSection data={d.education} />,
+  skills: (d) => <SkillsSection data={d.skills} />,
+  certificates: (d) => <CertificatesSection data={d.certificates} />,
+  references: (d) => <ReferencesSection data={d.references} />,
+  languages: (d) => <LanguagesSection data={d.languages} />,
+  projects: (d) => <ProjectsSection data={d.projects} />,
+  achievements: (d) => <AchievementsSection data={d.achievements} />,
+  extracurricular: (d) => <ExtracurricularSection data={d.extracurricular} />,
+};
+
+const CVDocument = ({ data, activeSections = [] }) => {
+  // ... (Header, Summary, Dynamic Rendering Loop, Personal Info) ...
+};
+export default CVDocument;
+```
+
+**C. The Validation Schema (`src/schemas/cvSchema.js`)**
+_Updated for new sections and Education Description._
+
+```javascript
+import { z } from "zod";
+
+export const cvSchema = z.object({
+  personalInfo: z.object({
+    /* ... */
+  }),
+  experience: z
+    .array(
+      z.object({
+        /* ... */
+      })
+    )
+    .optional(),
+  education: z
+    .array(
+      z.object({
+        school: z.string().min(2, "School required"),
+        degree: z.string().min(2, "Degree required"),
+        date: z.string().optional(),
+        description: z.string().optional(), // 🆕 Added
+      })
+    )
+    .optional(),
+  // ... (Skills, Certs, References) ...
+  languages: z
+    .array(
+      z.object({
+        language: z.string().min(2),
+        proficiency: z.string().optional(),
+      })
+    )
+    .optional(),
+  projects: z
+    .array(
+      z.object({
+        title: z.string().min(2),
+        link: z.string().optional(),
+        technologies: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+  achievements: z
+    .array(
+      z.object({
+        title: z.string().min(2),
+        date: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+  extracurricular: z
+    .array(
+      z.object({
+        role: z.string().min(2),
+        organization: z.string().optional(),
+        date: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+});
+```
+
+**D. The UI Wrapper (`src/components/ui/FormSection.jsx`)**
+_Add button moved to footer._
+
+```jsx
+import React from "react";
+
+const FormSection = ({
+  icon: Icon,
+  title,
+  children,
+  onAdd,
+  addButtonLabel,
+}) => {
+  return (
+    <div className="p-6 transition-shadow duration-300 bg-white border border-gray-200 shadow-sm rounded-xl hover:shadow-md">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="flex items-center gap-3 text-lg font-bold tracking-wide text-gray-800 uppercase">
+          {Icon && <Icon size={20} className="text-blue-600" />} {title}
+        </h2>
+      </div>
+      <div className="space-y-6">{children}</div>
+      {onAdd && (
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={onAdd}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+          >
+            <span className="text-lg leading-none">+</span>{" "}
+            {addButtonLabel || "Add"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+export default FormSection;
+```
+
+## other updated files
+
+**`src/components/preview/CVPreview.jsx`**
+
+```jsx
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useFormContext } from "react-hook-form";
+import { useDebounce } from "use-debounce";
+import { pdf } from "@react-pdf/renderer";
+import { Document, Page, pdfjs } from "react-pdf";
+import CVDocument from "./pdf/CVDocument.jsx"; // 👈 Ensure this path is correct!
+import { Download, Loader2, ZoomIn, ZoomOut, CheckCircle2 } from "lucide-react";
+
+// ✅ WORKER SETUP
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+import "react-pdf/dist/Page/TextLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+
+const PDF_OPTIONS = {
+  cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+  cMapPacked: true,
+};
+
+const CVPreview = ({ activeSections = [] }) => {
+  const { watch } = useFormContext();
+  const formData = watch();
+
+  const [debouncedDataString] = useDebounce(JSON.stringify(formData), 1000);
+  const debouncedData = useMemo(
+    () => JSON.parse(debouncedDataString),
+    [debouncedDataString]
+  );
+
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [numPages, setNumPages] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [scale, setScale] = useState(1.0);
+  const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(600);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current)
+        setContainerWidth(containerRef.current.offsetWidth - 40);
+    };
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  // 📝 PDF ENGINE
+  useEffect(() => {
+    let isMounted = true;
+    const generatePdf = async () => {
+      setIsGenerating(true);
+      try {
+        const blob = await pdf(
+          <CVDocument data={debouncedData} activeSections={activeSections} />
+        ).toBlob();
+        if (isMounted) {
+          const url = URL.createObjectURL(blob);
+          setPdfUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return url;
+          });
+        }
+      } catch (error) {
+        console.error("PDF Gen Error:", error);
+      } finally {
+        if (isMounted) setIsGenerating(false);
+      }
+    };
+    if (debouncedData) generatePdf();
+    return () => {
+      isMounted = false;
+    };
+  }, [debouncedData, activeSections]);
+
+  const handleDownload = () => {
+    if (!pdfUrl) return;
+    const link = document.createElement("a");
+    link.href = pdfUrl;
+    link.download = `${debouncedData.personalInfo.fullName || "CV"}.pdf`;
+    link.click();
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-100 border-l border-gray-300">
+      {/* TOOLBAR */}
+      <div className="z-10 flex items-center justify-between p-3 bg-white border-b border-gray-200 shadow-sm">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-bold tracking-wide text-gray-700 uppercase">
+            Preview
+          </h2>
+          {isGenerating ? (
+            <span className="flex items-center gap-1 text-xs text-blue-600 font-medium bg-blue-50 px-2 py-0.5 rounded-full animate-pulse">
+              <Loader2 size={10} className="animate-spin" /> Updating...
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">
+              <CheckCircle2 size={10} /> Ready
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setScale((s) => Math.max(0.5, s - 0.1))}
+            className="p-1.5 hover:bg-gray-100 rounded text-gray-600"
+          >
+            <ZoomOut size={16} />
+          </button>
+          <span className="w-12 font-mono text-xs text-center">
+            {(scale * 100).toFixed(0)}%
+          </span>
+          <button
+            onClick={() => setScale((s) => Math.min(2.0, s + 0.1))}
+            className="p-1.5 hover:bg-gray-100 rounded text-gray-600"
+          >
+            <ZoomIn size={16} />
+          </button>
+          <div className="w-px h-4 mx-1 bg-gray-300"></div>
+          <button
+            onClick={handleDownload}
+            disabled={!pdfUrl}
+            className="flex items-center gap-1.5 bg-gray-900 hover:bg-black text-white px-4 py-1.5 rounded text-sm font-bold transition disabled:opacity-50"
+          >
+            <Download size={14} /> Download PDF
+          </button>
+        </div>
+      </div>
+
+      {/* PDF VIEWER */}
+      <div
+        ref={containerRef}
+        className="flex justify-center flex-1 p-8 overflow-y-auto bg-slate-200 scroll-smooth"
+      >
+        {pdfUrl ? (
+          <Document
+            file={pdfUrl}
+            options={PDF_OPTIONS}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            loading={null}
+            className="flex flex-col gap-6"
+          >
+            {Array.from(new Array(numPages), (_, index) => (
+              <div key={`page_${index + 1}`} className="shadow-xl">
+                <Page
+                  pageNumber={index + 1}
+                  width={containerWidth * scale}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={false}
+                  className="bg-white"
+                />
+                <div className="text-center mt-2 text-[10px] text-gray-400 font-bold tracking-widest uppercase">
+                  Page {index + 1}
+                </div>
+              </div>
+            ))}
+          </Document>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400">
+            <Loader2 className="mb-3 animate-spin" size={32} />
+            <p className="text-sm font-medium">Initializing Engine...</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+export default CVPreview;
+```
+
+**`src/components/pdf/CVDocument.jsx`**
+
+```jsx
+import React from "react";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+  Link,
+  Svg,
+  Path,
+} from "@react-pdf/renderer";
+
+// --- 🛠️ ICONS (Core) ---
+const IconMail = ({ style }) => (
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+    <Path
+      d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M4 4 h16 a2 2 0 0 1 2 2 v12 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-12 a2 2 0 0 1 2 -2 z"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconPhone = ({ style }) => (
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+    <Path
+      d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconLinkedin = ({ style }) => (
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+    <Path
+      d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M2 9 h4 v12 h-4 z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M4 2 a2 2 0 1 1 0 4 a2 2 0 0 1 0 -4 z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconGithub = ({ style }) => (
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+    <Path
+      d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 18c-4.51 2-5-2-7-2"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconMapPin = ({ style }) => (
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+    <Path
+      d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M12 7 a3 3 0 1 1 0 6 a3 3 0 0 1 0 -6 z"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// --- 🛠️ ICONS (Sections) ---
+const IconSummary = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M12 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconExperience = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M12 12h.01"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 13a18.15 18.15 0 0 1-20 0"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M4 6 h16 a2 2 0 0 1 2 2 v10 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-10 a2 2 0 0 1 2 -2 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconEducation = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 10v6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconSkills = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 18h6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M10 22h4"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconCert = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="m9 12 2 2 4-4"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconUsers = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 3.128a4 4 0 0 1 0 7.744"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 21v-2a4 4 0 0 0-3-3.87"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// 🆕 NEW ICONS
+const IconGlobe = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="M2 12h20" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path
+      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+  </Svg>
+);
+const IconProject = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="m12 10 2 2-2 2" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path d="m17 10-2 2 2 2" stroke="#1f2937" strokeWidth={2} fill="none" />
+  </Svg>
+);
+const IconTrophy = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="M4 22h16" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path
+      d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M18 2H6v7a6 6 0 0 0 12 0V2Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+  </Svg>
+);
+const IconActivity = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M3.5 21 14 3"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M20.5 21 10 3"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M15.5 21 12 15l-3.5 6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M2 21h20"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconUser = IconSummary;
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 30,
+    fontSize: 10,
+    lineHeight: 1.5,
+    fontFamily: "Helvetica",
+    color: "#374151",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1f2937",
+    paddingBottom: 15,
+  },
+  photo: { width: 100, height: 100, borderRadius: 50, objectFit: "cover" },
+  headerRight: { marginLeft: 30, flex: 1 },
+  name: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    color: "#111827",
+    marginBottom: 4,
+    lineHeight: 1.2,
+  },
+  role: {
+    fontSize: 11,
+    color: "#4b5563",
+    marginBottom: 6,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  contactRow: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  contactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    fontSize: 9,
+    color: "#374151",
+    lineHeight: 1.2,
+  },
+  link: { color: "#2563eb", textDecoration: "none" },
+  section: { marginBottom: 10 },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    paddingBottom: 4,
+    marginBottom: 8,
+    marginTop: 5,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    color: "#1f2937",
+    marginLeft: 6,
+  },
+  jobBlock: { marginBottom: 10 },
+  jobHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  jobRole: {
+    fontWeight: "bold",
+    fontSize: 10,
+    color: "#000000",
+    maxWidth: "70%",
+  },
+  jobDate: { fontSize: 9, color: "#6b7280", textAlign: "right" },
+  company: {
+    color: "#2563eb",
+    fontWeight: "bold",
+    fontSize: 9,
+    marginTop: 1,
+    marginBottom: 3,
+  },
+  description: { fontSize: 9, textAlign: "justify", color: "#4b5563" },
+  skillBadge: {
+    backgroundColor: "#f3f4f6",
+    borderRadius: 12,
+    paddingVertical: 5,
+    paddingHorizontal: 14,
+    marginRight: 6,
+    marginBottom: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  skillText: {
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#374151",
+    lineHeight: 1,
+  },
+  skillsContainer: { flexDirection: "row", flexWrap: "wrap" },
+  refGrid: { flexDirection: "row", flexWrap: "wrap", gap: 15 },
+  refItem: { width: "45%", marginBottom: 10 },
+  infoRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
+    paddingVertical: 4,
+    alignItems: "center",
+    lineHeight: 1.2,
+  },
+  infoLabel: {
+    width: "30%",
+    fontSize: 8,
+    color: "#6b7280",
+    textTransform: "uppercase",
+    fontWeight: "bold",
+  },
+  infoValue: { width: "70%", fontSize: 9, color: "#111827" },
+  refIcon: { transform: "translateY(-1.5)" },
+});
+
+// --- RENDER HELPERS ---
+const ExperienceSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconExperience />
+      <Text style={styles.sectionTitle}>Experience</Text>
+    </View>
+    {data.map((job, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{job.role}</Text>
+          <Text style={styles.jobDate}>
+            {job.startDate} — {job.endDate}
+          </Text>
+        </View>
+        <Text style={styles.company}>{job.company}</Text>
+        <Text style={styles.description}>{job.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const EducationSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconEducation />
+      <Text style={styles.sectionTitle}>Education</Text>
+    </View>
+    {data.map((edu, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{edu.school}</Text>
+          <Text style={styles.jobDate}>{edu.date}</Text>
+        </View>
+
+        {/* Upgrade Degree to "Company Style" (Blue) for better hierarchy */}
+        <Text style={styles.company}>{edu.degree}</Text>
+
+        {/* Render the new Description */}
+        {edu.description && (
+          <Text style={styles.description}>{edu.description}</Text>
+        )}
+      </View>
+    ))}
+  </View>
+);
+
+const SkillsSection = ({ data }) => (
+  <View wrap={false} style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconSkills />
+      <Text style={styles.sectionTitle}>Skills</Text>
+    </View>
+    <View style={styles.skillsContainer}>
+      {data.map((skill, index) => (
+        <Text key={index} style={styles.skillBadge}>
+          {skill.name}
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
+const CertificatesSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconCert />
+      <Text style={styles.sectionTitle}>Certificates</Text>
+    </View>
+    {data.map((cert, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{cert.name}</Text>
+          <Text style={styles.jobDate}>{cert.date}</Text>
+        </View>
+        <Text style={styles.description}>{cert.issuer}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ReferencesSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <View style={styles.sectionTitleRow}>
+      <IconUsers />
+      <Text style={styles.sectionTitle}>References</Text>
+    </View>
+    <View style={styles.refGrid}>
+      {data.map((ref, index) => (
+        <View key={index} style={styles.refItem}>
+          <Text style={{ fontWeight: "bold", fontSize: 10, color: "#000" }}>
+            {ref.name}
+          </Text>
+          <Text style={{ fontSize: 9, fontWeight: "medium", color: "#1f2937" }}>
+            {ref.position}
+          </Text>
+          <Text style={{ fontSize: 9, color: "#374151" }}>{ref.company}</Text>
+          {ref.location && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 1,
+              }}
+            >
+              <IconMapPin style={styles.refIcon} />
+              <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                {ref.location}
+              </Text>
+            </View>
+          )}
+          {ref.phone && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 2,
+              }}
+            >
+              <IconPhone style={styles.refIcon} />
+              <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                {ref.phone}
+              </Text>
+            </View>
+          )}
+          {ref.email && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 1,
+              }}
+            >
+              <IconMail style={styles.refIcon} />
+              <Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+                {ref.email}
+              </Text>
+            </View>
+          )}
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+// 🆕 NEW SECTIONS RENDERING LOGIC
+const LanguagesSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <View style={styles.sectionTitleRow}>
+      <IconGlobe />
+      <Text style={styles.sectionTitle}>Languages</Text>
+    </View>
+    <View style={styles.skillsContainer}>
+      {data.map((lang, index) => (
+        <Text key={index} style={styles.skillBadge}>
+          {lang.language} {lang.proficiency ? `(${lang.proficiency})` : ""}
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
+const ProjectsSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconProject />
+      <Text style={styles.sectionTitle}>Projects</Text>
+    </View>
+    {data.map((item, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{item.title}</Text>
+          {item.technologies && (
+            <Text style={styles.jobDate}>{item.technologies}</Text>
+          )}
+        </View>
+        {item.link && (
+          <Text style={{ ...styles.company, color: "#2563eb" }}>
+            {item.link}
+          </Text>
+        )}
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const AchievementsSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconTrophy />
+      <Text style={styles.sectionTitle}>Achievements</Text>
+    </View>
+    {data.map((item, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{item.title}</Text>
+          <Text style={styles.jobDate}>{item.date}</Text>
+        </View>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ExtracurricularSection = ({ data }) => (
+  <View style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconActivity />
+      <Text style={styles.sectionTitle}>Extracurricular</Text>
+    </View>
+    {data.map((item, index) => (
+      <View key={index} style={styles.jobBlock} wrap={false}>
+        <View style={styles.jobHeader}>
+          <Text style={styles.jobRole}>{item.role}</Text>
+          <Text style={styles.jobDate}>{item.date}</Text>
+        </View>
+        <Text style={styles.company}>{item.organization}</Text>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+// --- MAIN DOCUMENT ---
+const CVDocument = ({ data, activeSections = [] }) => {
+  const hasBioData =
+    data.personalInfo.address ||
+    data.personalInfo.dob ||
+    data.personalInfo.gender ||
+    data.personalInfo.nationality ||
+    data.personalInfo.maritalStatus ||
+    data.personalInfo.idNumber;
+
+  const RENDER_MAP = {
+    experience: (d) => <ExperienceSection data={d.experience} />,
+    education: (d) => <EducationSection data={d.education} />,
+    skills: (d) => <SkillsSection data={d.skills} />,
+    certificates: (d) => <CertificatesSection data={d.certificates} />,
+    references: (d) => <ReferencesSection data={d.references} />,
+    // 🆕 MAP NEW SECTIONS
+    languages: (d) => <LanguagesSection data={d.languages} />,
+    projects: (d) => <ProjectsSection data={d.projects} />,
+    achievements: (d) => <AchievementsSection data={d.achievements} />,
+    extracurricular: (d) => <ExtracurricularSection data={d.extracurricular} />,
+  };
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {/* HEADER */}
+        <View wrap={false}>
+          <View style={styles.header}>
+            {data.personalInfo.photo && (
+              <Image src={data.personalInfo.photo} style={styles.photo} />
+            )}
+            <View style={styles.headerRight}>
+              <Text style={styles.name}>
+                {data.personalInfo.fullName || "Your Name"}
+              </Text>
+              <Text style={styles.role}>
+                {data.personalInfo.role || "Job Title"}
+              </Text>
+              <View style={styles.contactRow}>
+                {data.personalInfo.email && (
+                  <View style={styles.contactItem}>
+                    <IconMail style={{ transform: "translateY(-0.5)" }} />
+                    <Text style={{ marginLeft: 4 }}>
+                      {data.personalInfo.email}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.phone && (
+                  <View style={styles.contactItem}>
+                    <IconPhone style={{ transform: "translateY(-0.5)" }} />
+                    <Text style={{ marginLeft: 4 }}>
+                      {data.personalInfo.phone}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.linkedin && (
+                  <View style={styles.contactItem}>
+                    <IconLinkedin style={{ transform: "translateY(-0.5)" }} />
+                    <Link
+                      src={data.personalInfo.linkedin}
+                      style={{ marginLeft: 4, ...styles.link }}
+                    >
+                      LinkedIn
+                    </Link>
+                  </View>
+                )}
+                {data.personalInfo.github && (
+                  <View style={styles.contactItem}>
+                    <IconGithub style={{ transform: "translateY(-0.5)" }} />
+                    <Link
+                      src={data.personalInfo.github}
+                      style={{ marginLeft: 4, ...styles.link }}
+                    >
+                      GitHub
+                    </Link>
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* SUMMARY */}
+        {data.personalInfo.summary && (
+          <View wrap={false} style={styles.section}>
+            <View style={styles.sectionTitleRow}>
+              <IconSummary />
+              <Text style={styles.sectionTitle}>Professional Summary</Text>
+            </View>
+            <Text style={styles.description}>{data.personalInfo.summary}</Text>
+          </View>
+        )}
+
+        {/* 🔀 DYNAMIC SECTIONS */}
+        {activeSections.map((section) => {
+          const renderFunc = RENDER_MAP[section.id];
+          if (renderFunc && data[section.id] && data[section.id].length > 0) {
+            return <View key={section.id}>{renderFunc(data)}</View>;
+          }
+          return null;
+        })}
+
+        {/* PERSONAL INFO */}
+        {hasBioData && (
+          <View wrap={false} style={styles.section}>
+            <View style={styles.sectionTitleRow}>
+              <IconUser />
+              <Text style={styles.sectionTitle}>Personal Information</Text>
+            </View>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <View style={{ width: "50%", paddingRight: 10 }}>
+                {data.personalInfo.address && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Address</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.address}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.dob && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>DOB</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.dob}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.gender && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Gender</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.gender}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <View style={{ width: "50%", paddingLeft: 10 }}>
+                {data.personalInfo.nationality && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Nationality</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.nationality}
+                    </Text>
+                  </View>
+                )}
+                {data.personalInfo.idNumber && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>NIC/ID</Text>
+                    <Text style={styles.infoValue}>
+                      {data.personalInfo.idNumber}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+        )}
+      </Page>
+    </Document>
+  );
+};
+export default CVDocument;
+```
+
+**Newly created**
+**`src/components/ui/SortableSection.jsx`**
+
+```jsx
+import React from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, Trash2, ChevronDown } from "lucide-react";
+
+const SortableSection = ({
+  id,
+  title,
+  icon: Icon,
+  children,
+  onRemove,
+  isOpen,
+  onToggle,
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : "auto",
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-white border rounded-xl shadow-sm transition-all duration-200 mb-4 overflow-hidden ${
+        isOpen
+          ? "border-blue-500 ring-1 ring-blue-500 shadow-md"
+          : "border-gray-200 hover:border-gray-300"
+      }`}
+    >
+      {/* HEADER (Click to Toggle) */}
+      <div
+        className="flex items-center justify-between p-4 bg-white cursor-pointer select-none group"
+        onClick={onToggle}
+      >
+        <div className="flex items-center gap-3">
+          {/* 1. DRAG HANDLE (Fixed) */}
+          <button
+            type="button" // 👈 CRITICAL FIX
+            {...attributes}
+            {...listeners}
+            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded cursor-grab active:cursor-grabbing touch-none"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GripVertical size={18} />
+          </button>
+
+          {/* Icon & Title */}
+          <div className="flex items-center gap-2">
+            {Icon && (
+              <Icon
+                size={18}
+                className={isOpen ? "text-blue-600" : "text-gray-500"}
+              />
+            )}
+            <span
+              className={`font-bold text-sm uppercase tracking-wide ${
+                isOpen ? "text-gray-900" : "text-gray-600"
+              }`}
+            >
+              {title}
+            </span>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {/* 2. CHEVRON (Fixed) */}
+          <button
+            type="button" // 👈 CRITICAL FIX
+            className={`p-1 rounded-full transition-transform duration-200 ${
+              isOpen ? "rotate-180 bg-gray-100 text-gray-900" : "text-gray-400"
+            }`}
+          >
+            <ChevronDown size={18} />
+          </button>
+
+          {/* 3. REMOVE BUTTON (Fixed) */}
+          <button
+            type="button" // 👈 CRITICAL FIX
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+            title="Remove Section"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* BODY (Accordion Content) */}
+      {isOpen && (
+        <div
+          className="p-4 duration-200 border-t border-gray-100 cursor-default animate-in slide-in-from-top-2 fade-in"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SortableSection;
+```
+
+**`src/components/Archivements.jsx`**
+
+```jsx
+import React from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { Trophy, Trash2 } from "lucide-react";
+import FormSection from "./ui/FormSection.jsx";
+import FormInput from "./ui/FormInput.jsx";
+import FormTextArea from "./ui/FormTextArea.jsx";
+
+const Achievements = () => {
+  const { control } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "achievements",
+  });
+
+  return (
+    <FormSection
+      title="Achievements & Awards"
+      icon={Trophy}
+      onAdd={() => append({ title: "", date: "", description: "" })}
+      addButtonLabel="Add Achievement"
+    >
+      {fields.map((item, index) => (
+        <div
+          key={item.id}
+          className="relative p-4 border border-gray-200 rounded-lg bg-gray-50 group"
+        >
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="absolute text-gray-400 transition-colors top-4 right-4 hover:text-red-500"
+          >
+            <Trash2 size={16} />
+          </button>
+
+          <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
+            <div className="md:col-span-2">
+              <FormInput
+                name={`achievements.${index}.title`}
+                label="Achievement Title"
+                placeholder="e.g. Best Developer Award"
+              />
+            </div>
+            <FormInput
+              name={`achievements.${index}.date`}
+              label="Date"
+              placeholder="e.g. 2024"
+            />
+          </div>
+
+          <FormTextArea
+            name={`achievements.${index}.description`}
+            label="Description (Optional)"
+            placeholder="Brief details about the award..."
+            rows={2}
+          />
+        </div>
+      ))}
+    </FormSection>
+  );
+};
+
+export default Achievements;
+```
+
+**`src/components/Extracurricular.jsx`**
+
+```jsx
+import React from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { Tent, Trash2 } from "lucide-react";
+import FormSection from "./ui/FormSection.jsx";
+import FormInput from "./ui/FormInput.jsx";
+import FormTextArea from "./ui/FormTextArea.jsx";
+
+const Extracurricular = () => {
+  const { control } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "extracurricular",
+  });
+
+  return (
+    <FormSection
+      title="Extracurricular Activities"
+      icon={Tent}
+      onAdd={() =>
+        append({ role: "", organization: "", date: "", description: "" })
+      }
+      addButtonLabel="Add Activity"
+    >
+      {fields.map((item, index) => (
+        <div
+          key={item.id}
+          className="relative p-4 border border-gray-200 rounded-lg bg-gray-50 group"
+        >
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="absolute text-gray-400 transition-colors top-4 right-4 hover:text-red-500"
+          >
+            <Trash2 size={16} />
+          </button>
+
+          <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+            <FormInput
+              name={`extracurricular.${index}.role`}
+              label="Role"
+              placeholder="e.g. Volunteer"
+            />
+            <FormInput
+              name={`extracurricular.${index}.organization`}
+              label="Organization"
+              placeholder="e.g. Red Cross"
+            />
+            <div className="md:col-span-2">
+              <FormInput
+                name={`extracurricular.${index}.date`}
+                label="Date / Duration"
+                placeholder="e.g. 2023 - Present"
+              />
+            </div>
+          </div>
+
+          <FormTextArea
+            name={`extracurricular.${index}.description`}
+            label="Description"
+            placeholder="What did you do?"
+            rows={3}
+          />
+        </div>
+      ))}
+    </FormSection>
+  );
+};
+
+export default Extracurricular;
+```
+
+**`src/components/Projects.jsx`**
+
+```jsx
+import React from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { FolderGit2, Trash2 } from "lucide-react";
+import FormSection from "./ui/FormSection.jsx";
+import FormInput from "./ui/FormInput.jsx";
+import FormTextArea from "./ui/FormTextArea.jsx";
+
+const Projects = () => {
+  const { control } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "projects",
+  });
+
+  return (
+    <FormSection
+      title="Projects"
+      icon={FolderGit2}
+      onAdd={() =>
+        append({ title: "", link: "", technologies: "", description: "" })
+      }
+      addButtonLabel="Add Project"
+    >
+      {fields.map((item, index) => (
+        <div
+          key={item.id}
+          className="relative p-4 border border-gray-200 rounded-lg bg-gray-50 group"
+        >
+          <button
+            type="button"
+            onClick={() => remove(index)}
+            className="absolute text-gray-400 transition-colors top-4 right-4 hover:text-red-500"
+          >
+            <Trash2 size={16} />
+          </button>
+
+          <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+            <FormInput
+              name={`projects.${index}.title`}
+              label="Project Title"
+              placeholder="e.g. E-Commerce App"
+            />
+            <FormInput
+              name={`projects.${index}.link`}
+              label="Project Link"
+              placeholder="github.com/my-project"
+            />
+            <div className="md:col-span-2">
+              <FormInput
+                name={`projects.${index}.technologies`}
+                label="Technologies Used"
+                placeholder="e.g. React, Node.js, MongoDB"
+              />
+            </div>
+          </div>
+
+          <FormTextArea
+            name={`projects.${index}.description`}
+            label="Description"
+            placeholder="Describe what you built..."
+            rows={3}
+          />
+        </div>
+      ))}
+    </FormSection>
+  );
+};
+
+export default Projects;
+```
+
+**`src/components/Languages.jsx`**
+
+```jsx
+import React from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { Globe, Trash2 } from "lucide-react";
+import FormSection from "./ui/FormSection";
+import FormInput from "./ui/FormInput.jsx";
+import FormSelect from "./ui/FormSelect.jsx";
+
+const Languages = () => {
+  const { control } = useFormContext();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "languages",
+  });
+
+  return (
+    <FormSection
+      title="Languages"
+      icon={Globe}
+      onAdd={() => append({ language: "", proficiency: "" })}
+      addButtonLabel="Add Language"
+    >
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {fields.map((item, index) => (
+          <div
+            key={item.id}
+            className="relative p-4 border border-gray-200 rounded-lg bg-gray-50 group"
+          >
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              className="absolute text-gray-400 transition-colors top-2 right-2 hover:text-red-500"
+            >
+              <Trash2 size={14} />
+            </button>
+            <div className="space-y-3">
+              <FormInput
+                name={`languages.${index}.language`}
+                label="Language"
+                placeholder="e.g. English"
+              />
+              <FormSelect
+                name={`languages.${index}.proficiency`}
+                label="Proficiency"
+                placeholder="Select Level"
+                options={[
+                  "Native",
+                  "Fluent",
+                  "Professional",
+                  "Intermediate",
+                  "Basic",
+                ]}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </FormSection>
+  );
+};
+
+export default Languages;
+```
+
+**`src/pages/LandingPage.jsx`**
+
+```jsx
+import React from "react";
+import { Link } from "react-router-dom";
+import { FileText, CheckCircle, Zap } from "lucide-react";
+
+const LandingPage = () => {
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navbar */}
+      <nav className="flex items-center justify-between px-8 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-2 text-2xl font-bold text-blue-600">
+          <FileText /> CVGenius
+        </div>
+        <div className="space-x-6 text-sm font-medium text-gray-600">
+          <a href="#" className="hover:text-blue-600">
+            Features
+          </a>
+          <a href="#" className="hover:text-blue-600">
+            Pricing
+          </a>
+          <Link
+            to="/app"
+            className="px-4 py-2 text-white bg-blue-600 rounded-full hover:bg-blue-700"
+          >
+            Open App
+          </Link>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="flex flex-col items-center justify-center px-6 py-20 text-center">
+        <h1 className="mb-6 text-5xl font-extrabold tracking-tight text-gray-900">
+          Build a Professional CV <br />
+          <span className="text-blue-600">in Minutes, Not Hours.</span>
+        </h1>
+        <p className="max-w-2xl mx-auto mb-10 text-lg text-gray-500">
+          Our AI-powered engine formats your resume perfectly. No design skills
+          needed. Just fill in the blanks and export to PDF.
+        </p>
+
+        <div className="flex gap-4">
+          <Link
+            to="/app"
+            className="px-8 py-4 text-lg font-bold text-white transition-all bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-xl"
+          >
+            Start Building for Free
+          </Link>
+          <button className="px-8 py-4 text-lg font-bold text-gray-700 transition-all bg-gray-100 rounded-lg hover:bg-gray-200">
+            View Templates
+          </button>
+        </div>
+
+        {/* Trust Signals */}
+        <div className="grid grid-cols-1 gap-8 mt-16 text-left md:grid-cols-3">
+          <div className="flex flex-col items-center p-4">
+            <Zap className="mb-2 text-yellow-500" size={32} />
+            <h3 className="font-bold">Lightning Fast</h3>
+            <p className="text-sm text-center text-gray-500">
+              Real-time preview updates as you type.
+            </p>
+          </div>
+          <div className="flex flex-col items-center p-4">
+            <CheckCircle className="mb-2 text-green-500" size={32} />
+            <h3 className="font-bold">ATS Friendly</h3>
+            <p className="text-sm text-center text-gray-500">
+              Optimized layouts for hiring algorithms.
+            </p>
+          </div>
+          <div className="flex flex-col items-center p-4">
+            <FileText className="mb-2 text-purple-500" size={32} />
+            <h3 className="font-bold">PDF Export</h3>
+            <p className="text-sm text-center text-gray-500">
+              High-quality vector exports.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LandingPage;
 ```
