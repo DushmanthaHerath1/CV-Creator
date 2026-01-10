@@ -434,7 +434,33 @@ const IconActivity = () => (
     />
   </Svg>
 );
-const IconUser = IconSummary;
+
+// 🆕 BIO ICON (Proper User Icon)
+const IconUser = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
 
 const styles = StyleSheet.create({
   page: {
@@ -589,11 +615,7 @@ const EducationSection = ({ data }) => (
           <Text style={styles.jobRole}>{edu.school}</Text>
           <Text style={styles.jobDate}>{edu.date}</Text>
         </View>
-
-        {/* Upgrade Degree to "Company Style" (Blue) for better hierarchy */}
         <Text style={styles.company}>{edu.degree}</Text>
-
-        {/* Render the new Description */}
         {edu.description && (
           <Text style={styles.description}>{edu.description}</Text>
         )}
@@ -700,7 +722,6 @@ const ReferencesSection = ({ data }) => (
   </View>
 );
 
-// 🆕 NEW SECTIONS RENDERING LOGIC
 const LanguagesSection = ({ data }) => (
   <View style={styles.section} wrap={false}>
     <View style={styles.sectionTitleRow}>
@@ -779,8 +800,61 @@ const ExtracurricularSection = ({ data }) => (
   </View>
 );
 
+// 🆕 BIO SECTION RENDERER (Previously hardcoded at bottom)
+const BioSection = ({ data }) => (
+  <View wrap={false} style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconUser />
+      <Text style={styles.sectionTitle}>Personal Details</Text>
+    </View>
+    <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+      <View style={{ width: "50%", paddingRight: 10 }}>
+        {data.address && (
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Address</Text>
+            <Text style={styles.infoValue}>{data.address}</Text>
+          </View>
+        )}
+        {data.dob && (
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>DOB</Text>
+            <Text style={styles.infoValue}>{data.dob}</Text>
+          </View>
+        )}
+        {data.gender && (
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Gender</Text>
+            <Text style={styles.infoValue}>{data.gender}</Text>
+          </View>
+        )}
+      </View>
+      <View style={{ width: "50%", paddingLeft: 10 }}>
+        {data.nationality && (
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Nationality</Text>
+            <Text style={styles.infoValue}>{data.nationality}</Text>
+          </View>
+        )}
+        {data.maritalStatus && (
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Marital Status</Text>
+            <Text style={styles.infoValue}>{data.maritalStatus}</Text>
+          </View>
+        )}
+        {data.idNumber && (
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>NIC/ID</Text>
+            <Text style={styles.infoValue}>{data.idNumber}</Text>
+          </View>
+        )}
+      </View>
+    </View>
+  </View>
+);
+
 // --- MAIN DOCUMENT ---
 const CVDocument = ({ data, activeSections = [] }) => {
+  // Check if bio data actually exists to determine if we should render 'bio'
   const hasBioData =
     data.personalInfo.address ||
     data.personalInfo.dob ||
@@ -795,11 +869,12 @@ const CVDocument = ({ data, activeSections = [] }) => {
     skills: (d) => <SkillsSection data={d.skills} />,
     certificates: (d) => <CertificatesSection data={d.certificates} />,
     references: (d) => <ReferencesSection data={d.references} />,
-    // 🆕 MAP NEW SECTIONS
     languages: (d) => <LanguagesSection data={d.languages} />,
     projects: (d) => <ProjectsSection data={d.projects} />,
     achievements: (d) => <AchievementsSection data={d.achievements} />,
     extracurricular: (d) => <ExtracurricularSection data={d.extracurricular} />,
+    // 🆕 Add Bio to the Map (Pass personalInfo object)
+    bio: (d) => <BioSection data={d.personalInfo} />,
   };
 
   return (
@@ -873,72 +948,26 @@ const CVDocument = ({ data, activeSections = [] }) => {
           </View>
         )}
 
-        {/* 🔀 DYNAMIC SECTIONS */}
+        {/* 🔀 DYNAMIC SECTIONS (Now includes Bio) */}
         {activeSections.map((section) => {
           const renderFunc = RENDER_MAP[section.id];
+
+          // SPECIAL CHECK: Bio is an Object, others are Arrays
+          if (section.id === "bio") {
+            return hasBioData ? (
+              <View key={section.id}>{renderFunc(data)}</View>
+            ) : null;
+          }
+
+          // STANDARD CHECK: Arrays
           if (renderFunc && data[section.id] && data[section.id].length > 0) {
             return <View key={section.id}>{renderFunc(data)}</View>;
           }
           return null;
         })}
-
-        {/* PERSONAL INFO */}
-        {hasBioData && (
-          <View wrap={false} style={styles.section}>
-            <View style={styles.sectionTitleRow}>
-              <IconUser />
-              <Text style={styles.sectionTitle}>Personal Information</Text>
-            </View>
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-              <View style={{ width: "50%", paddingRight: 10 }}>
-                {data.personalInfo.address && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Address</Text>
-                    <Text style={styles.infoValue}>
-                      {data.personalInfo.address}
-                    </Text>
-                  </View>
-                )}
-                {data.personalInfo.dob && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>DOB</Text>
-                    <Text style={styles.infoValue}>
-                      {data.personalInfo.dob}
-                    </Text>
-                  </View>
-                )}
-                {data.personalInfo.gender && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Gender</Text>
-                    <Text style={styles.infoValue}>
-                      {data.personalInfo.gender}
-                    </Text>
-                  </View>
-                )}
-              </View>
-              <View style={{ width: "50%", paddingLeft: 10 }}>
-                {data.personalInfo.nationality && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Nationality</Text>
-                    <Text style={styles.infoValue}>
-                      {data.personalInfo.nationality}
-                    </Text>
-                  </View>
-                )}
-                {data.personalInfo.idNumber && (
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>NIC/ID</Text>
-                    <Text style={styles.infoValue}>
-                      {data.personalInfo.idNumber}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
-          </View>
-        )}
       </Page>
     </Document>
   );
 };
+
 export default CVDocument;

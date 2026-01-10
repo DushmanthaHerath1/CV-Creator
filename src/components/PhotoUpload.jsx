@@ -8,7 +8,7 @@ const PhotoUpload = () => {
   const photoURL = watch("personalInfo.photo");
   const [isCompressing, setIsCompressing] = useState(false);
 
-  // 1. THE COMPRESSOR ENGINE ⚙️
+  // ⚙️ THE COMPRESSOR ENGINE
   const compressImage = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -19,9 +19,9 @@ const PhotoUpload = () => {
         img.src = event.target.result;
 
         img.onload = () => {
-          // Create a canvas to do the resizing
+          // Resize to max 300px
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 300; // 300px is plenty for a CV avatar
+          const MAX_WIDTH = 300;
           const scaleSize = MAX_WIDTH / img.width;
 
           canvas.width = MAX_WIDTH;
@@ -30,8 +30,7 @@ const PhotoUpload = () => {
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          // Convert back to Base64 (JPEG at 70% quality)
-          // This turns a 17MB file into ~20KB!
+          // Convert to JPEG at 70% quality (~20KB)
           const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
           resolve(compressedBase64);
         };
@@ -44,13 +43,10 @@ const PhotoUpload = () => {
     if (file) {
       setIsCompressing(true);
       try {
-        // Run the compressor
         const compressedPhoto = await compressImage(file);
-
-        // Save the tiny version
         setValue("personalInfo.photo", compressedPhoto);
       } catch (error) {
-        console.error("Image compression error:", error); // 👈 Now we use the variable!
+        console.error("Image compression error:", error);
         alert("Failed to process image. Try a different file.");
       } finally {
         setIsCompressing(false);
@@ -64,7 +60,7 @@ const PhotoUpload = () => {
   };
 
   return (
-    <div className="flex items-center gap-4 mb-6">
+    <div className="flex items-center gap-4">
       <input
         type="file"
         accept="image/*"

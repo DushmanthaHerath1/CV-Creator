@@ -15,6 +15,7 @@ import {
   FolderGit2,
   Trophy,
   Tent,
+  User,
 } from "lucide-react";
 
 // 🏎️ Drag & Drop Imports
@@ -37,10 +38,13 @@ import {
 import { cvSchema } from "../schemas/cvSchema.js";
 import { saveCVData, loadCVData } from "../db.js";
 import SortableSection from "../components/ui/SortableSection.jsx";
-import CVPreview from "../components/CVPreview.jsx";
+import CVPreview from "../components/CVPreview.jsx"; // 👈 Updated Path
 
-// 📝 Form Sections
-import PersonalDetails from "../components/PersonalDetails.jsx";
+// 📝 NEW Form Sections
+import HeaderSection from "../components/HeaderSection.jsx"; // 🆕 Fixed Top
+import SummarySection from "../components/SummarySection.jsx"; // 🆕 Fixed Top
+import BioSection from "../components/BioSection.jsx"; // 🆕 Dynamic Capsule
+
 import Experience from "../components/Experience.jsx";
 import Education from "../components/Education.jsx";
 import Skills from "../components/Skills.jsx";
@@ -55,6 +59,7 @@ const BuilderPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   // 1️⃣ INITIAL STATE
+  // "Bio" is optional, so we start with just Experience & Education
   const [activeSections, setActiveSections] = useState([
     { id: "experience" },
     { id: "education" },
@@ -64,6 +69,9 @@ const BuilderPage = () => {
 
   // 2️⃣ Section Configuration
   const SECTION_CONFIG = {
+    // 🆕 Bio is now a dynamic section!
+    bio: { component: <BioSection />, title: "Personal Details", icon: User },
+
     experience: {
       component: <Experience />,
       title: "Work Experience",
@@ -112,6 +120,13 @@ const BuilderPage = () => {
         role: "",
         summary: "",
         photo: "",
+        // Bio fields
+        address: "",
+        dob: "",
+        gender: "",
+        nationality: "",
+        maritalStatus: "",
+        idNumber: "",
       },
       experience: [],
       education: [],
@@ -127,6 +142,7 @@ const BuilderPage = () => {
 
   const { watch, reset, setValue, getValues } = methods;
 
+  // 4️⃣ DnD Sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -134,14 +150,13 @@ const BuilderPage = () => {
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
-    if (!over) return;
-    if (active.id !== over.id) {
-      setActiveSections((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
+    if (!over || active.id === over.id) return;
+
+    setActiveSections((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
   };
 
   const addSection = (sectionId) => {
@@ -151,14 +166,23 @@ const BuilderPage = () => {
     }
   };
 
+  // ⚡ UPDATED REMOVE LOGIC
   const removeSection = (sectionId) => {
-    if (
-      confirm(
-        "Are you sure you want to remove this section? All data in it will be lost."
-      )
-    ) {
+    if (confirm("Remove this section? All data in it will be lost.")) {
       setActiveSections(activeSections.filter((s) => s.id !== sectionId));
-      setValue(sectionId, []);
+
+      // Special logic for "Bio" because it's not an array
+      if (sectionId === "bio") {
+        setValue("personalInfo.address", "");
+        setValue("personalInfo.dob", "");
+        setValue("personalInfo.gender", "");
+        setValue("personalInfo.nationality", "");
+        setValue("personalInfo.maritalStatus", "");
+        setValue("personalInfo.idNumber", "");
+      } else {
+        // Standard Array Wipe for other sections
+        setValue(sectionId, []);
+      }
     }
   };
 
@@ -171,12 +195,10 @@ const BuilderPage = () => {
     const initData = async () => {
       const savedData = await loadCVData();
       if (savedData) {
-        // Separating UI Metadata (order) from Form Data
         const { sectionOrder, ...formData } = savedData;
-
         reset(formData);
 
-        // 1. Check if we have a saved Custom Order
+        // 1. Check for Saved Order
         if (
           sectionOrder &&
           Array.isArray(sectionOrder) &&
@@ -184,10 +206,12 @@ const BuilderPage = () => {
         ) {
           setActiveSections(sectionOrder);
         }
-        // 2. Fallback: Use "Smart Init" based on data presence
+        // 2. Smart Init Fallback
         else {
           const sectionsToActivate = ["experience", "education"];
-          const optionalSections = [
+
+          // Check standard array sections
+          [
             "skills",
             "certificates",
             "references",
@@ -195,15 +219,28 @@ const BuilderPage = () => {
             "projects",
             "achievements",
             "extracurricular",
-          ];
-          optionalSections.forEach((sectionID) => {
-            if (
-              savedData[sectionID]?.length > 0 &&
-              !sectionsToActivate.includes(sectionID)
-            ) {
-              sectionsToActivate.push(sectionID);
+          ].forEach((id) => {
+            if (savedData[id]?.length > 0 && !sectionsToActivate.includes(id)) {
+              sectionsToActivate.push(id);
             }
           });
+
+          // 🆕 Check Bio Fields (If any bio field has data, activate the section)
+          const bioFields = [
+            "address",
+            "dob",
+            "gender",
+            "nationality",
+            "maritalStatus",
+            "idNumber",
+          ];
+          const hasBioData = bioFields.some(
+            (field) => savedData.personalInfo?.[field]
+          );
+          if (hasBioData) {
+            sectionsToActivate.push("bio");
+          }
+
           setActiveSections(sectionsToActivate.map((id) => ({ id })));
         }
       }
@@ -212,38 +249,31 @@ const BuilderPage = () => {
     initData();
   }, [reset]);
 
-  // --- 💾 AUTO-SAVE LOGIC (Updated) ---
-
-  // 1. Save when FORM DATA changes (Typing)
+  // --- 💾 AUTO-SAVE LOGIC ---
   useEffect(() => {
     if (!isLoaded) return;
-    const subscription = watch((value) => {
-      // Inject the current activeSections order into the saved object
-      saveCVData({ ...value, sectionOrder: activeSections });
-    });
+    const save = () =>
+      saveCVData({ ...getValues(), sectionOrder: activeSections });
+
+    const subscription = watch(save);
+    save(); // Also save immediately on order change
+
     return () => subscription.unsubscribe();
-  }, [watch, isLoaded, activeSections]);
+  }, [watch, isLoaded, activeSections, getValues]);
 
-  // 2. Save when ORDER changes (Drag & Drop / Add / Remove)
-  // This ensures that if you just move sections without typing, it still saves!
-  useEffect(() => {
-    if (!isLoaded) return;
-    const currentFormData = getValues();
-    saveCVData({ ...currentFormData, sectionOrder: activeSections });
-  }, [activeSections, isLoaded, getValues]);
-
-  if (!isLoaded)
+  if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen text-gray-500 bg-gray-100">
-        <Loader2 className="animate-spin" size={48} />
+        <Loader2 className="text-blue-600 animate-spin" size={48} />
       </div>
     );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
       <FormProvider {...methods}>
         <div className="flex flex-col h-screen overflow-hidden md:flex-row">
-          {/* EDITOR */}
+          {/* EDITOR COLUMN */}
           <div className="w-full h-full p-8 pb-32 overflow-y-auto md:w-1/2 scrollbar-hide bg-gray-50/50">
             <div className="flex items-center justify-between mb-6">
               <Link
@@ -256,12 +286,16 @@ const BuilderPage = () => {
             </div>
 
             <form className="space-y-6">
-              <PersonalDetails />
+              {/* 🔒 1. FIXED SECTIONS (Always Visible) */}
+              <HeaderSection />
+              <SummarySection />
 
+              {/* 🔀 2. DYNAMIC SECTIONS (Draggable) */}
               <div className="pt-6 border-t border-gray-200">
                 <h3 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
                   Sections (Drag to Reorder)
                 </h3>
+
                 <DndContext
                   sensors={sensors}
                   collisionDetection={closestCenter}
@@ -291,17 +325,19 @@ const BuilderPage = () => {
                 </DndContext>
               </div>
 
-              {/* Capsules */}
+              {/* ➕ 3. CAPSULES (Add Options) */}
               <div className="pt-4">
                 <h4 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
                   Add More Sections
                 </h4>
                 <div className="flex flex-wrap gap-3">
                   {allOptionalSections.map((section) => {
+                    // Hide if already active
                     const isActive = activeSections.find(
                       (s) => s.id === section.id
                     );
                     if (isActive) return null;
+
                     return (
                       <button
                         key={section.id}
@@ -312,7 +348,7 @@ const BuilderPage = () => {
                         <Plus
                           size={16}
                           className="text-blue-500 group-hover:text-blue-700"
-                        />{" "}
+                        />
                         {section.title}
                       </button>
                     );
@@ -322,7 +358,7 @@ const BuilderPage = () => {
             </form>
           </div>
 
-          {/* PREVIEW */}
+          {/* PREVIEW COLUMN */}
           <div className="flex flex-col w-full h-full bg-gray-100 border-l border-gray-200 md:w-1/2">
             <CVPreview activeSections={activeSections} />
           </div>
