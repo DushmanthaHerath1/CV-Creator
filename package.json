@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -23,9 +23,11 @@
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.69.0",
     "react-pdf": "^10.3.0",
     "react-router-dom": "^7.11.0",
+    "react-zoom-pan-pinch": "^3.7.0",
     "tailwind-merge": "^3.4.0",
     "use-debounce": "^10.0.6",
     "zod": "^4.2.1"

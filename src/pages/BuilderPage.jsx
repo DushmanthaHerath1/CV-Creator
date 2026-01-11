@@ -16,6 +16,8 @@ import {
   Trophy,
   Tent,
   User,
+  Eye, // 🆕 For FAB
+  Pencil, // 🆕 For FAB
 } from "lucide-react";
 
 // 🏎️ Drag & Drop Imports
@@ -38,12 +40,12 @@ import {
 import { cvSchema } from "../schemas/cvSchema.js";
 import { saveCVData, loadCVData } from "../db.js";
 import SortableSection from "../components/ui/SortableSection.jsx";
-import CVPreview from "../components/CVPreview.jsx"; // 👈 Updated Path
+import CVPreview from "../components/preview/CVPreview.jsx"; // 👈 Ensure file is in /preview folder
 
-// 📝 NEW Form Sections
-import HeaderSection from "../components/HeaderSection.jsx"; // 🆕 Fixed Top
-import SummarySection from "../components/SummarySection.jsx"; // 🆕 Fixed Top
-import BioSection from "../components/BioSection.jsx"; // 🆕 Dynamic Capsule
+// 📝 Form Sections
+import HeaderSection from "../components/HeaderSection.jsx";
+import SummarySection from "../components/SummarySection.jsx";
+import BioSection from "../components/BioSection.jsx";
 
 import Experience from "../components/Experience.jsx";
 import Education from "../components/Education.jsx";
@@ -57,9 +59,9 @@ import Extracurricular from "../components/Extracurricular.jsx";
 
 const BuilderPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false); // 📱 1. Mobile State
 
   // 1️⃣ INITIAL STATE
-  // "Bio" is optional, so we start with just Experience & Education
   const [activeSections, setActiveSections] = useState([
     { id: "experience" },
     { id: "education" },
@@ -69,9 +71,7 @@ const BuilderPage = () => {
 
   // 2️⃣ Section Configuration
   const SECTION_CONFIG = {
-    // 🆕 Bio is now a dynamic section!
     bio: { component: <BioSection />, title: "Personal Details", icon: User },
-
     experience: {
       component: <Experience />,
       title: "Work Experience",
@@ -142,7 +142,6 @@ const BuilderPage = () => {
 
   const { watch, reset, setValue, getValues } = methods;
 
-  // 4️⃣ DnD Sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -166,12 +165,10 @@ const BuilderPage = () => {
     }
   };
 
-  // ⚡ UPDATED REMOVE LOGIC
   const removeSection = (sectionId) => {
     if (confirm("Remove this section? All data in it will be lost.")) {
       setActiveSections(activeSections.filter((s) => s.id !== sectionId));
 
-      // Special logic for "Bio" because it's not an array
       if (sectionId === "bio") {
         setValue("personalInfo.address", "");
         setValue("personalInfo.dob", "");
@@ -180,7 +177,6 @@ const BuilderPage = () => {
         setValue("personalInfo.maritalStatus", "");
         setValue("personalInfo.idNumber", "");
       } else {
-        // Standard Array Wipe for other sections
         setValue(sectionId, []);
       }
     }
@@ -190,7 +186,6 @@ const BuilderPage = () => {
     setExpandedSection((prev) => (prev === id ? null : id));
   };
 
-  // --- 🧠 SMART DATA LOADING ---
   useEffect(() => {
     const initData = async () => {
       const savedData = await loadCVData();
@@ -198,19 +193,14 @@ const BuilderPage = () => {
         const { sectionOrder, ...formData } = savedData;
         reset(formData);
 
-        // 1. Check for Saved Order
         if (
           sectionOrder &&
           Array.isArray(sectionOrder) &&
           sectionOrder.length > 0
         ) {
           setActiveSections(sectionOrder);
-        }
-        // 2. Smart Init Fallback
-        else {
+        } else {
           const sectionsToActivate = ["experience", "education"];
-
-          // Check standard array sections
           [
             "skills",
             "certificates",
@@ -225,7 +215,6 @@ const BuilderPage = () => {
             }
           });
 
-          // 🆕 Check Bio Fields (If any bio field has data, activate the section)
           const bioFields = [
             "address",
             "dob",
@@ -237,9 +226,7 @@ const BuilderPage = () => {
           const hasBioData = bioFields.some(
             (field) => savedData.personalInfo?.[field]
           );
-          if (hasBioData) {
-            sectionsToActivate.push("bio");
-          }
+          if (hasBioData) sectionsToActivate.push("bio");
 
           setActiveSections(sectionsToActivate.map((id) => ({ id })));
         }
@@ -249,15 +236,12 @@ const BuilderPage = () => {
     initData();
   }, [reset]);
 
-  // --- 💾 AUTO-SAVE LOGIC ---
   useEffect(() => {
     if (!isLoaded) return;
     const save = () =>
       saveCVData({ ...getValues(), sectionOrder: activeSections });
-
     const subscription = watch(save);
-    save(); // Also save immediately on order change
-
+    save();
     return () => subscription.unsubscribe();
   }, [watch, isLoaded, activeSections, getValues]);
 
@@ -273,8 +257,13 @@ const BuilderPage = () => {
     <div className="min-h-screen bg-gray-100">
       <FormProvider {...methods}>
         <div className="flex flex-col h-screen overflow-hidden md:flex-row">
-          {/* EDITOR COLUMN */}
-          <div className="w-full h-full p-8 pb-32 overflow-y-auto md:w-1/2 scrollbar-hide bg-gray-50/50">
+          {/* 🟢 EDITOR COLUMN */}
+          {/* Mobile Logic: Hidden if showing preview, Block if showing editor. Always block on Desktop. */}
+          <div
+            className={`w-full h-full p-4 md:p-8 pb-32 overflow-y-auto md:w-1/2 scrollbar-hide bg-gray-50/50 ${
+              showMobilePreview ? "hidden md:block" : "block"
+            }`}
+          >
             <div className="flex items-center justify-between mb-6">
               <Link
                 to="/"
@@ -286,11 +275,9 @@ const BuilderPage = () => {
             </div>
 
             <form className="space-y-6">
-              {/* 🔒 1. FIXED SECTIONS (Always Visible) */}
               <HeaderSection />
               <SummarySection />
 
-              {/* 🔀 2. DYNAMIC SECTIONS (Draggable) */}
               <div className="pt-6 border-t border-gray-200">
                 <h3 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
                   Sections (Drag to Reorder)
@@ -325,14 +312,13 @@ const BuilderPage = () => {
                 </DndContext>
               </div>
 
-              {/* ➕ 3. CAPSULES (Add Options) */}
-              <div className="pt-4">
+              {/* Added pb-20 for FAB clearance on mobile */}
+              <div className="pt-4 pb-24 md:pb-0">
                 <h4 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
                   Add More Sections
                 </h4>
                 <div className="flex flex-wrap gap-3">
                   {allOptionalSections.map((section) => {
-                    // Hide if already active
                     const isActive = activeSections.find(
                       (s) => s.id === section.id
                     );
@@ -358,9 +344,33 @@ const BuilderPage = () => {
             </form>
           </div>
 
-          {/* PREVIEW COLUMN */}
-          <div className="flex flex-col w-full h-full bg-gray-100 border-l border-gray-200 md:w-1/2">
+          {/* 🟢 PREVIEW COLUMN */}
+          {/* Mobile Logic: Flex if showing preview, Hidden if showing editor. Always flex on Desktop. */}
+          <div
+            className={`w-full h-full bg-gray-100 border-l border-gray-200 md:w-1/2 flex-col ${
+              showMobilePreview ? "flex" : "hidden md:flex"
+            }`}
+          >
             <CVPreview activeSections={activeSections} />
+          </div>
+
+          {/* 📱 3. FLOATING ACTION BUTTON (Visible only on Mobile) */}
+          <div className="fixed z-50 bottom-6 right-6 md:hidden">
+            <button
+              type="button"
+              onClick={() => setShowMobilePreview(!showMobilePreview)}
+              className="flex items-center justify-center gap-2 px-6 py-3 font-bold text-white transition-all bg-gray-900 rounded-full shadow-lg active:scale-95 hover:bg-black hover:shadow-xl"
+            >
+              {showMobilePreview ? (
+                <>
+                  <Pencil size={20} /> Edit Editor
+                </>
+              ) : (
+                <>
+                  <Eye size={20} /> Preview PDF
+                </>
+              )}
+            </button>
           </div>
         </div>
       </FormProvider>

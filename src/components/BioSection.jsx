@@ -8,8 +8,8 @@ const BioSection = () => {
       {/* Helper Text (Styled like your sub-headers) */}
       <div className="p-3 border border-blue-100 rounded-lg bg-blue-50">
         <p className="text-xs font-medium text-blue-700">
-          ℹ️ These details (Age, Gender, Address) are optional but often
-          required for some CV formats.
+          ℹ These details (Age, Gender, Address) are optional but often required
+          for some CV formats.
         </p>
       </div>
 
