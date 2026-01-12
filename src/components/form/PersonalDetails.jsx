@@ -1,10 +1,10 @@
 import React from "react";
 import { User } from "lucide-react";
 import PhotoUpload from "./PhotoUpload.jsx";
-import FormSection from "./ui/FormSection.jsx";
-import FormInput from "./ui/FormInput.jsx";
-import FormTextArea from "./ui/FormTextArea.jsx";
-import FormSelect from "./ui/FormSelect.jsx";
+import FormSection from "../ui/FormSection.jsx";
+import FormInput from "../ui/FormInput.jsx";
+import FormTextArea from "../ui/FormTextArea.jsx";
+import FormSelect from "../ui/FormSelect.jsx";
 
 const PersonalDetails = () => {
   return (

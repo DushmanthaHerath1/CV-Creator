@@ -1,6 +1,6 @@
 import React from "react";
 import { User } from "lucide-react"; // Matching style
-import FormInput from "./ui/FormInput.jsx";
+import FormInput from "../ui/FormInput.jsx";
 import PhotoUpload from "./PhotoUpload.jsx";
 
 const HeaderSection = () => {

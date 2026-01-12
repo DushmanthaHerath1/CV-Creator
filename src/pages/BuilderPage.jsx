@@ -16,8 +16,9 @@ import {
   Trophy,
   Tent,
   User,
-  Eye, // 🆕 For FAB
-  Pencil, // 🆕 For FAB
+  Eye,
+  Pencil,
+  LayoutTemplate,
 } from "lucide-react";
 
 // 🏎️ Drag & Drop Imports
@@ -40,29 +41,33 @@ import {
 import { cvSchema } from "../schemas/cvSchema.js";
 import { saveCVData, loadCVData } from "../db.js";
 import SortableSection from "../components/ui/SortableSection.jsx";
-import CVPreview from "../components/preview/CVPreview.jsx";
-import ConfirmDialog from "../components/ui/ConfirmDialog.jsx"; // 🆕 IMPORT DIALOG
+import ConfirmDialog from "../components/ui/ConfirmDialog.jsx";
+import TemplateGallery from "./TemplateGallery.jsx";
 
-// 📝 Form Sections
-import HeaderSection from "../components/HeaderSection.jsx";
-import SummarySection from "../components/SummarySection.jsx";
-import BioSection from "../components/BioSection.jsx";
-import Experience from "../components/Experience.jsx";
-import Education from "../components/Education.jsx";
-import Skills from "../components/Skills.jsx";
-import Certificates from "../components/Certificates.jsx";
-import References from "../components/References.jsx";
-import Languages from "../components/Languages.jsx";
-import Projects from "../components/Projects.jsx";
-import Achievements from "../components/Achievements.jsx";
-import Extracurricular from "../components/Extracurricular.jsx";
+// 📂 UPDATED IMPORT PATHS (Preview)
+import CVPreview from "../components/preview/CVPreview.jsx";
+
+// 📂 UPDATED IMPORT PATHS (Form Sections)
+import HeaderSection from "../components/form/HeaderSection.jsx";
+import SummarySection from "../components/form/SummarySection.jsx";
+import BioSection from "../components/form/BioSection.jsx";
+import Experience from "../components/form/Experience.jsx";
+import Education from "../components/form/Education.jsx";
+import Skills from "../components/form/Skills.jsx";
+import Certificates from "../components/form/Certificates.jsx";
+import References from "../components/form/References.jsx";
+import Languages from "../components/form/Languages.jsx";
+import Projects from "../components/form/Projects.jsx";
+import Achievements from "../components/form/Achievements.jsx";
+import Extracurricular from "../components/form/Extracurricular.jsx";
 
 const BuilderPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
 
-  // 🆕 STATE FOR DELETE DIALOG
+  // 🆕 STATE FOR DIALOGS
   const [sectionToDelete, setSectionToDelete] = useState(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   // 1️⃣ INITIAL STATE
   const [activeSections, setActiveSections] = useState([
@@ -116,6 +121,7 @@ const BuilderPage = () => {
     resolver: zodResolver(cvSchema),
     mode: "onChange",
     defaultValues: {
+      templateId: "modern", // Default Template
       personalInfo: {
         fullName: "",
         email: "",
@@ -123,7 +129,6 @@ const BuilderPage = () => {
         role: "",
         summary: "",
         photo: "",
-        // Bio fields
         address: "",
         dob: "",
         gender: "",
@@ -168,12 +173,11 @@ const BuilderPage = () => {
     }
   };
 
-  // 🗑️ STEP 1: TRIGGER DIALOG (Replaces old direct delete)
+  // 🗑️ Delete Logic (Triggered by Dialog)
   const initiateRemoveSection = (sectionId) => {
-    setSectionToDelete(sectionId); // This opens the modal
+    setSectionToDelete(sectionId);
   };
 
-  // 🗑️ STEP 2: ACTUAL DELETE LOGIC (Called by Dialog)
   const confirmRemoveSection = () => {
     if (!sectionToDelete) return;
 
@@ -188,11 +192,10 @@ const BuilderPage = () => {
       setValue("personalInfo.maritalStatus", "");
       setValue("personalInfo.idNumber", "");
     } else {
-      // Standard Array Wipe for other sections
       setValue(sectionToDelete, []);
     }
 
-    setSectionToDelete(null); // Close modal
+    setSectionToDelete(null);
   };
 
   const toggleSection = (id) => {
@@ -213,35 +216,8 @@ const BuilderPage = () => {
         ) {
           setActiveSections(sectionOrder);
         } else {
-          const sectionsToActivate = ["experience", "education"];
-          [
-            "skills",
-            "certificates",
-            "references",
-            "languages",
-            "projects",
-            "achievements",
-            "extracurricular",
-          ].forEach((id) => {
-            if (savedData[id]?.length > 0 && !sectionsToActivate.includes(id)) {
-              sectionsToActivate.push(id);
-            }
-          });
-
-          const bioFields = [
-            "address",
-            "dob",
-            "gender",
-            "nationality",
-            "maritalStatus",
-            "idNumber",
-          ];
-          const hasBioData = bioFields.some(
-            (field) => savedData.personalInfo?.[field]
-          );
-          if (hasBioData) sectionsToActivate.push("bio");
-
-          setActiveSections(sectionsToActivate.map((id) => ({ id })));
+          // Fallback Default Sections
+          setActiveSections([{ id: "experience" }, { id: "education" }]);
         }
       }
       setIsLoaded(true);
@@ -276,14 +252,27 @@ const BuilderPage = () => {
               showMobilePreview ? "hidden md:block" : "block"
             }`}
           >
+            {/* HEADER AREA */}
             <div className="flex items-center justify-between mb-6">
-              <Link
-                to="/"
-                className="flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600"
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600"
+                >
+                  <ArrowLeft size={16} /> Back
+                </Link>
+              </div>
+
+              {/* 🎨 CHANGE TEMPLATE BUTTON */}
+              <button
+                type="button"
+                onClick={() => setIsGalleryOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-bold transition-all bg-white border border-gray-300 rounded-full shadow-sm text-slate-700 hover:bg-slate-50 hover:shadow-md"
               >
-                <ArrowLeft size={16} /> Back to Home
-              </Link>
-              <h1 className="text-xl font-bold text-gray-800">CV Builder</h1>
+                <LayoutTemplate size={16} className="text-blue-600" />
+                <span className="hidden sm:inline">Change Template</span>
+                <span className="sm:hidden">Templates</span>
+              </button>
             </div>
 
             <form className="space-y-6">
@@ -312,7 +301,6 @@ const BuilderPage = () => {
                           id={section.id}
                           title={config.title}
                           icon={config.icon}
-                          // 🔄 UPDATED: CALL THE NEW TRIGGER FUNCTION
                           onRemove={() => initiateRemoveSection(section.id)}
                           isOpen={expandedSection === section.id}
                           onToggle={() => toggleSection(section.id)}
@@ -325,7 +313,7 @@ const BuilderPage = () => {
                 </DndContext>
               </div>
 
-              {/* Added pb-20 for FAB clearance on mobile */}
+              {/* Add Sections Area */}
               <div className="pt-4 pb-24 md:pb-0">
                 <h4 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
                   Add More Sections
@@ -366,8 +354,8 @@ const BuilderPage = () => {
             <CVPreview activeSections={activeSections} />
           </div>
 
-          {/* 📱 3. FLOATING ACTION BUTTON (Visible only on Mobile) */}
-          <div className="fixed z-50 bottom-6 right-6 md:hidden">
+          {/* 📱 FLOATING ACTION BUTTON */}
+          <div className="fixed z-40 bottom-6 right-6 md:hidden">
             <button
               type="button"
               onClick={() => setShowMobilePreview(!showMobilePreview)}
@@ -385,18 +373,23 @@ const BuilderPage = () => {
             </button>
           </div>
         </div>
-      </FormProvider>
 
-      {/* 🔔 4. RENDER THE CONFIRM DIALOG */}
-      <ConfirmDialog
-        isOpen={!!sectionToDelete}
-        onClose={() => setSectionToDelete(null)}
-        onConfirm={confirmRemoveSection}
-        title="Remove Section?"
-        description="Are you sure you want to remove this section? All data entered within it will be permanently lost."
-        confirmText="Yes, Remove it"
-        variant="danger"
-      />
+        {/* 🔔 DIALOGS & MODALS */}
+        <ConfirmDialog
+          isOpen={!!sectionToDelete}
+          onClose={() => setSectionToDelete(null)}
+          onConfirm={confirmRemoveSection}
+          title="Remove Section?"
+          description="Are you sure you want to remove this section? All data entered within it will be permanently lost."
+          confirmText="Yes, Remove it"
+          variant="danger"
+        />
+
+        <TemplateGallery
+          isOpen={isGalleryOpen}
+          onClose={() => setIsGalleryOpen(false)}
+        />
+      </FormProvider>
     </div>
   );
 };

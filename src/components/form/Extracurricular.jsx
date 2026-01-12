@@ -1,9 +1,9 @@
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Tent, Trash2 } from "lucide-react";
-import FormSection from "./ui/FormSection.jsx";
-import FormInput from "./ui/FormInput.jsx";
-import FormTextArea from "./ui/FormTextArea.jsx";
+import FormSection from "../ui/FormSection.jsx";
+import FormInput from "../ui/FormInput.jsx";
+import FormTextArea from "../ui/FormTextArea.jsx";
 
 const Extracurricular = () => {
   const { control } = useFormContext();

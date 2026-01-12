@@ -1,9 +1,9 @@
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Globe, Trash2 } from "lucide-react";
-import FormSection from "./ui/FormSection";
-import FormInput from "./ui/FormInput.jsx";
-import FormSelect from "./ui/FormSelect.jsx";
+import FormSection from "../ui/FormSection";
+import FormInput from "../ui/FormInput.jsx";
+import FormSelect from "../ui/FormSelect.jsx";
 
 const Languages = () => {
   const { control } = useFormContext();

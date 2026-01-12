@@ -86,6 +86,7 @@ export const cvSchema = z.object({
       })
     )
     .optional(),
+
   projects: z
     .array(
       z.object({
@@ -96,6 +97,7 @@ export const cvSchema = z.object({
       })
     )
     .optional(),
+
   achievements: z
     .array(
       z.object({
@@ -105,6 +107,7 @@ export const cvSchema = z.object({
       })
     )
     .optional(),
+
   extracurricular: z
     .array(
       z.object({
@@ -115,4 +118,6 @@ export const cvSchema = z.object({
       })
     )
     .optional(),
+
+  templateId: z.string().default("modern"),
 });

@@ -1,9 +1,9 @@
 import React from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Trash2, Briefcase } from "lucide-react"; // 👈 Using Briefcase icon
-import FormSection from "./ui/FormSection.jsx";
-import FormInput from "./ui/FormInput.jsx.jsx";
-import FormTextArea from "./ui/FormTextArea.jsx";
+import FormSection from "../ui/FormSection.jsx";
+import FormInput from "../ui/FormInput.jsx.jsx";
+import FormTextArea from "../ui/FormTextArea.jsx";
 
 const Experience = () => {
   const { control } = useFormContext();

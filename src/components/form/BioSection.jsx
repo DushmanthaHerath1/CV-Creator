@@ -1,6 +1,6 @@
 import React from "react";
-import FormInput from "./ui/FormInput.jsx";
-import FormSelect from "./ui/FormSelect.jsx";
+import FormInput from "../ui/FormInput.jsx";
+import FormSelect from "../ui/FormSelect.jsx";
 
 const BioSection = () => {
   return (

@@ -10678,3 +10678,2061 @@ const ConfirmDialog = ({
 
 export default ConfirmDialog;
 ```
+
+## Date: 12/01/2026 at 03.52AM
+
+## key updates
+
+**created template library and roughly tested. woking properly**
+**cleaned up folder sturcture a bit**
+
+```text
+src/
+├── components/
+│   ├── form/                # 📝 FORM INPUT SECTIONS
+│   │   ├── BioSection.jsx
+│   │   ├── Experience.jsx
+│   │   ├── Education.jsx
+│   │   └── ... (Skills, Projects, etc.)
+│   ├── preview/             # 👁️ PREVIEW ENGINE
+│   │   └── CVPreview.jsx    (The PDF Viewer Container)
+│   ├── ui/                  # 🎨 SHARED UI
+│   │   ├── ConfirmDialog.jsx (Glassmorphism Alert)
+│   │   └── SortableSection.jsx (Drag & Drop Wrapper)
+│   ├── HeaderSection.jsx
+│   └── TemplateGallery.jsx  # 🆕 Template Picker Modal
+│
+├── pdf/                     # 📄 PDF LOGIC
+│   ├── templates/           # 🎨 TEMPLATE DESIGNS
+│   │   ├── index.js         (Registry / Config)
+│   │   ├── ModernTemplate.jsx (Blue/Sidebar style)
+│   │   └── MinimalTemplate.jsx (ATS/Black & White style)
+│   └── CVDocument.jsx       (The Logic Switcher)
+│
+├── pages/
+│   └── BuilderPage.jsx      (Main Controller / State Hub)
+│
+├── schemas/
+│   └── cvSchema.js          (Zod Validation + templateId field)
+│
+└── db.js                    (IndexedDB/LocalStorage Logic)
+
+```
+
+## Updated and newly created components and other files
+
+- `src/schemas/cvSchema.js`
+
+```js
+import { z } from "zod";
+
+export const cvSchema = z.object({
+  personalInfo: z.object({
+    fullName: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().min(10, "Phone number is too short"),
+    role: z.string().min(2, "Job title is required"),
+    summary: z.string().optional(),
+    photo: z.string().optional(),
+
+    // --- 🧱 NEW BRICK 6 FIELDS ---
+    // Location
+    address: z.string().optional(),
+    city: z.string().optional(),
+
+    // Socials (Modern CV)
+    linkedin: z.string().optional(),
+    github: z.string().optional(),
+
+    // Bio Details (Regional/SL Standard)
+    dob: z.string().optional(),
+    gender: z.string().optional(),
+    nationality: z.string().optional(),
+    maritalStatus: z.string().optional(),
+    idNumber: z.string().optional(), // NIC or Passport
+  }),
+  // ... rest of the schema (experience, education, etc) remains the same
+  experience: z
+    .array(
+      z.object({
+        role: z.string().min(2, "Role required"),
+        company: z.string().min(2, "Company required"),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+  education: z
+    .array(
+      z.object({
+        school: z.string().min(2, "School required"),
+        degree: z.string().min(2, "Degree required"),
+        date: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+  skills: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Skill cannot be empty"),
+      })
+    )
+    .optional(),
+
+  certificates: z
+    .array(
+      z.object({
+        name: z.string().min(2, "Certificate name required"),
+        issuer: z.string().optional(),
+        date: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  references: z
+    .array(
+      z.object({
+        name: z.string().min(2, "Name required"),
+        position: z.string().optional(), // New
+        company: z.string().optional(),
+        location: z.string().optional(), // New
+        phone: z.string().optional(),
+        email: z.string().email("Invalid email").or(z.literal("")).optional(),
+      })
+    )
+    .optional(),
+
+  languages: z
+    .array(
+      z.object({
+        language: z.string().min(2, "Language required"),
+        proficiency: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  projects: z
+    .array(
+      z.object({
+        title: z.string().min(2, "Title required"),
+        link: z.string().optional(),
+        technologies: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  achievements: z
+    .array(
+      z.object({
+        title: z.string().min(2, "Title required"),
+        date: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  extracurricular: z
+    .array(
+      z.object({
+        role: z.string().min(2, "Role required"),
+        organization: z.string().optional(),
+        date: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  templateId: z.string().default("modern"),
+});
+```
+
+- `src/pages/BuilderPage.jsx`
+
+```jsx
+import React, { useEffect, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
+import {
+  Loader2,
+  ArrowLeft,
+  Plus,
+  Briefcase,
+  GraduationCap,
+  Lightbulb,
+  BadgeCheck,
+  Users,
+  Globe,
+  FolderGit2,
+  Trophy,
+  Tent,
+  User,
+  Eye,
+  Pencil,
+  LayoutTemplate,
+} from "lucide-react";
+
+// 🏎️ Drag & Drop Imports
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+
+// 🧱 Internal Imports
+import { cvSchema } from "../schemas/cvSchema.js";
+import { saveCVData, loadCVData } from "../db.js";
+import SortableSection from "../components/ui/SortableSection.jsx";
+import ConfirmDialog from "../components/ui/ConfirmDialog.jsx";
+import TemplateGallery from "./TemplateGallery.jsx";
+
+// 📂 UPDATED IMPORT PATHS (Preview)
+import CVPreview from "../components/preview/CVPreview.jsx";
+
+// 📂 UPDATED IMPORT PATHS (Form Sections)
+import HeaderSection from "../components/form/HeaderSection.jsx";
+import SummarySection from "../components/form/SummarySection.jsx";
+import BioSection from "../components/form/BioSection.jsx";
+import Experience from "../components/form/Experience.jsx";
+import Education from "../components/form/Education.jsx";
+import Skills from "../components/form/Skills.jsx";
+import Certificates from "../components/form/Certificates.jsx";
+import References from "../components/form/References.jsx";
+import Languages from "../components/form/Languages.jsx";
+import Projects from "../components/form/Projects.jsx";
+import Achievements from "../components/form/Achievements.jsx";
+import Extracurricular from "../components/form/Extracurricular.jsx";
+
+const BuilderPage = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
+
+  // 🆕 STATE FOR DIALOGS
+  const [sectionToDelete, setSectionToDelete] = useState(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+
+  // 1️⃣ INITIAL STATE
+  const [activeSections, setActiveSections] = useState([
+    { id: "experience" },
+    { id: "education" },
+  ]);
+
+  const [expandedSection, setExpandedSection] = useState("experience");
+
+  // 2️⃣ Section Configuration
+  const SECTION_CONFIG = {
+    bio: { component: <BioSection />, title: "Personal Details", icon: User },
+    experience: {
+      component: <Experience />,
+      title: "Work Experience",
+      icon: Briefcase,
+    },
+    education: {
+      component: <Education />,
+      title: "Education",
+      icon: GraduationCap,
+    },
+    skills: { component: <Skills />, title: "Skills", icon: Lightbulb },
+    certificates: {
+      component: <Certificates />,
+      title: "Certificates",
+      icon: BadgeCheck,
+    },
+    references: { component: <References />, title: "References", icon: Users },
+    languages: { component: <Languages />, title: "Languages", icon: Globe },
+    projects: { component: <Projects />, title: "Projects", icon: FolderGit2 },
+    achievements: {
+      component: <Achievements />,
+      title: "Achievements",
+      icon: Trophy,
+    },
+    extracurricular: {
+      component: <Extracurricular />,
+      title: "Activities",
+      icon: Tent,
+    },
+  };
+
+  const allOptionalSections = Object.keys(SECTION_CONFIG).map((id) => ({
+    id,
+    title: SECTION_CONFIG[id].title,
+    icon: SECTION_CONFIG[id].icon,
+  }));
+
+  const methods = useForm({
+    resolver: zodResolver(cvSchema),
+    mode: "onChange",
+    defaultValues: {
+      templateId: "modern", // Default Template
+      personalInfo: {
+        fullName: "",
+        email: "",
+        phone: "",
+        role: "",
+        summary: "",
+        photo: "",
+        address: "",
+        dob: "",
+        gender: "",
+        nationality: "",
+        maritalStatus: "",
+        idNumber: "",
+      },
+      experience: [],
+      education: [],
+      skills: [],
+      certificates: [],
+      references: [],
+      languages: [],
+      projects: [],
+      achievements: [],
+      extracurricular: [],
+    },
+  });
+
+  const { watch, reset, setValue, getValues } = methods;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setActiveSections((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  };
+
+  const addSection = (sectionId) => {
+    if (!activeSections.find((s) => s.id === sectionId)) {
+      setActiveSections([...activeSections, { id: sectionId }]);
+      setExpandedSection(sectionId);
+    }
+  };
+
+  // 🗑️ Delete Logic (Triggered by Dialog)
+  const initiateRemoveSection = (sectionId) => {
+    setSectionToDelete(sectionId);
+  };
+
+  const confirmRemoveSection = () => {
+    if (!sectionToDelete) return;
+
+    setActiveSections(activeSections.filter((s) => s.id !== sectionToDelete));
+
+    // Clear data based on type
+    if (sectionToDelete === "bio") {
+      setValue("personalInfo.address", "");
+      setValue("personalInfo.dob", "");
+      setValue("personalInfo.gender", "");
+      setValue("personalInfo.nationality", "");
+      setValue("personalInfo.maritalStatus", "");
+      setValue("personalInfo.idNumber", "");
+    } else {
+      setValue(sectionToDelete, []);
+    }
+
+    setSectionToDelete(null);
+  };
+
+  const toggleSection = (id) => {
+    setExpandedSection((prev) => (prev === id ? null : id));
+  };
+
+  useEffect(() => {
+    const initData = async () => {
+      const savedData = await loadCVData();
+      if (savedData) {
+        const { sectionOrder, ...formData } = savedData;
+        reset(formData);
+
+        if (
+          sectionOrder &&
+          Array.isArray(sectionOrder) &&
+          sectionOrder.length > 0
+        ) {
+          setActiveSections(sectionOrder);
+        } else {
+          // Fallback Default Sections
+          setActiveSections([{ id: "experience" }, { id: "education" }]);
+        }
+      }
+      setIsLoaded(true);
+    };
+    initData();
+  }, [reset]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    const save = () =>
+      saveCVData({ ...getValues(), sectionOrder: activeSections });
+    const subscription = watch(save);
+    save();
+    return () => subscription.unsubscribe();
+  }, [watch, isLoaded, activeSections, getValues]);
+
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-gray-500 bg-gray-100">
+        <Loader2 className="text-blue-600 animate-spin" size={48} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <FormProvider {...methods}>
+        <div className="flex flex-col h-screen overflow-hidden md:flex-row">
+          {/* 🟢 EDITOR COLUMN */}
+          <div
+            className={`w-full h-full p-4 md:p-8 pb-32 overflow-y-auto md:w-1/2 scrollbar-hide bg-gray-50/50 ${
+              showMobilePreview ? "hidden md:block" : "block"
+            }`}
+          >
+            {/* HEADER AREA */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600"
+                >
+                  <ArrowLeft size={16} /> Back
+                </Link>
+              </div>
+
+              {/* 🎨 CHANGE TEMPLATE BUTTON */}
+              <button
+                type="button"
+                onClick={() => setIsGalleryOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-bold transition-all bg-white border border-gray-300 rounded-full shadow-sm text-slate-700 hover:bg-slate-50 hover:shadow-md"
+              >
+                <LayoutTemplate size={16} className="text-blue-600" />
+                <span className="hidden sm:inline">Change Template</span>
+                <span className="sm:hidden">Templates</span>
+              </button>
+            </div>
+
+            <form className="space-y-6">
+              <HeaderSection />
+              <SummarySection />
+
+              <div className="pt-6 border-t border-gray-200">
+                <h3 className="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  Sections (Drag to Reorder)
+                </h3>
+
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={activeSections.map((s) => s.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {activeSections.map((section) => {
+                      const config = SECTION_CONFIG[section.id];
+                      return (
+                        <SortableSection
+                          key={section.id}
+                          id={section.id}
+                          title={config.title}
+                          icon={config.icon}
+                          onRemove={() => initiateRemoveSection(section.id)}
+                          isOpen={expandedSection === section.id}
+                          onToggle={() => toggleSection(section.id)}
+                        >
+                          {config.component}
+                        </SortableSection>
+                      );
+                    })}
+                  </SortableContext>
+                </DndContext>
+              </div>
+
+              {/* Add Sections Area */}
+              <div className="pt-4 pb-24 md:pb-0">
+                <h4 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
+                  Add More Sections
+                </h4>
+                <div className="flex flex-wrap gap-3">
+                  {allOptionalSections.map((section) => {
+                    const isActive = activeSections.find(
+                      (s) => s.id === section.id
+                    );
+                    if (isActive) return null;
+
+                    return (
+                      <button
+                        key={section.id}
+                        type="button"
+                        onClick={() => addSection(section.id)}
+                        className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-blue-700 transition-all border border-blue-200 rounded-full shadow-sm bg-blue-50 hover:bg-blue-100 hover:shadow-md hover:scale-105 active:scale-95 group"
+                      >
+                        <Plus
+                          size={16}
+                          className="text-blue-500 group-hover:text-blue-700"
+                        />
+                        {section.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* 🟢 PREVIEW COLUMN */}
+          <div
+            className={`w-full h-full bg-gray-100 border-l border-gray-200 md:w-1/2 flex-col ${
+              showMobilePreview ? "flex" : "hidden md:flex"
+            }`}
+          >
+            <CVPreview activeSections={activeSections} />
+          </div>
+
+          {/* 📱 FLOATING ACTION BUTTON */}
+          <div className="fixed z-40 bottom-6 right-6 md:hidden">
+            <button
+              type="button"
+              onClick={() => setShowMobilePreview(!showMobilePreview)}
+              className="flex items-center justify-center gap-2 px-6 py-3 font-bold text-white transition-all bg-gray-900 rounded-full shadow-lg active:scale-95 hover:bg-black hover:shadow-xl"
+            >
+              {showMobilePreview ? (
+                <>
+                  <Pencil size={20} /> Edit Editor
+                </>
+              ) : (
+                <>
+                  <Eye size={20} /> Preview PDF
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* 🔔 DIALOGS & MODALS */}
+        <ConfirmDialog
+          isOpen={!!sectionToDelete}
+          onClose={() => setSectionToDelete(null)}
+          onConfirm={confirmRemoveSection}
+          title="Remove Section?"
+          description="Are you sure you want to remove this section? All data entered within it will be permanently lost."
+          confirmText="Yes, Remove it"
+          variant="danger"
+        />
+
+        <TemplateGallery
+          isOpen={isGalleryOpen}
+          onClose={() => setIsGalleryOpen(false)}
+        />
+      </FormProvider>
+    </div>
+  );
+};
+
+export default BuilderPage;
+```
+
+- `src/pages/TemplateGallery.jsx`
+
+```jsx
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import { LayoutTemplate, Check, X } from "lucide-react";
+import { TEMPLATES } from "../components/pdf/templates/index.jsx"; // 👈 Ensures we load from your registry
+
+const TemplateGallery = ({ isOpen, onClose }) => {
+  const { setValue, watch } = useFormContext();
+  const currentTemplate = watch("templateId") || "modern";
+
+  if (!isOpen) return null;
+
+  return (
+    // Backdrop
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+      {/* Modal Container */}
+      <div
+        className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95"
+        role="dialog"
+        aria-modal="true"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 bg-white border-b border-gray-100 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+              <LayoutTemplate size={24} />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">
+                Choose Template
+              </h2>
+              <p className="text-sm text-gray-500">
+                Select a layout that fits your style.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 transition-colors rounded-full hover:bg-gray-100"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Gallery Grid (Scrollable) */}
+        <div className="grid grid-cols-1 gap-6 p-8 overflow-y-auto bg-gray-50/50 sm:grid-cols-2 lg:grid-cols-3">
+          {Object.values(TEMPLATES).map((template) => (
+            <button
+              key={template.id}
+              onClick={() => setValue("templateId", template.id)}
+              className={`group relative flex flex-col overflow-hidden rounded-xl border-2 transition-all duration-300 text-left ${
+                currentTemplate === template.id
+                  ? "border-blue-600 ring-4 ring-blue-600/10 shadow-xl scale-[1.02]"
+                  : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-lg hover:-translate-y-1"
+              }`}
+            >
+              {/* Abstract Preview */}
+              <div
+                className={`w-full aspect-[210/297] bg-white relative border-b border-gray-100`}
+              >
+                {/* Visual Mockups of the templates */}
+                {template.id === "modern" ? (
+                  <div className="flex w-full h-full">
+                    <div className="w-[30%] h-full bg-slate-100 border-r border-slate-200"></div>
+                    <div className="w-[70%] h-full p-4 space-y-2">
+                      <div className="w-1/2 h-4 bg-blue-100 rounded"></div>
+                      <div className="w-full h-2 rounded bg-slate-100"></div>
+                      <div className="w-full h-2 rounded bg-slate-100"></div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-full p-6 space-y-3">
+                    <div className="w-full h-px mb-4 bg-slate-300"></div>
+                    <div className="w-1/3 h-4 rounded bg-slate-800"></div>
+                    <div className="w-full h-2 rounded bg-slate-100"></div>
+                  </div>
+                )}
+
+                {/* Selected Badge */}
+                {currentTemplate === template.id && (
+                  <div className="absolute top-3 right-3 bg-blue-600 text-white p-1.5 rounded-full shadow-lg z-10">
+                    <Check size={16} strokeWidth={3} />
+                  </div>
+                )}
+              </div>
+
+              {/* Template Info */}
+              <div className="w-full p-4 bg-white">
+                <div className="flex items-start justify-between mb-1">
+                  <h3 className="font-bold text-gray-900">{template.name}</h3>
+                  {template.isNew && (
+                    <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                      NEW
+                    </span>
+                  )}
+                </div>
+                <p className="mb-3 text-xs text-gray-500 line-clamp-2">
+                  {template.description}
+                </p>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1">
+                  {template.tags?.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-[10px] px-2 py-1 bg-gray-100 text-gray-600 rounded-md font-medium border border-gray-200"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TemplateGallery;
+```
+
+- `src/components/pdf/templates/MinimalTemplate.jsx`
+
+```jsx
+import React from "react";
+import { Page, Text, View, StyleSheet, Link, Font } from "@react-pdf/renderer";
+
+// 🎨 MINIMALIST STYLES (Black & White, High Readability)
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontSize: 11,
+    lineHeight: 1.5,
+    fontFamily: "Times-Roman", // Standard Serif for Classic look
+    color: "#000000",
+  },
+  // Header
+  header: {
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#000000",
+    paddingBottom: 15,
+  },
+  name: {
+    fontSize: 28,
+    fontFamily: "Times-Bold",
+    textTransform: "uppercase",
+    marginBottom: 4,
+  },
+  role: {
+    fontSize: 14,
+    fontFamily: "Times-Italic",
+    color: "#444",
+    marginBottom: 8,
+  },
+  contactLine: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    fontSize: 10,
+    color: "#333",
+  },
+  link: {
+    color: "#000",
+    textDecoration: "none",
+  },
+  // Sections
+  section: {
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontFamily: "Times-Bold",
+    textTransform: "uppercase",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    marginBottom: 8,
+    paddingBottom: 2,
+    marginTop: 5,
+  },
+  // Items
+  itemBlock: {
+    marginBottom: 8,
+  },
+  itemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 2,
+  },
+  itemTitle: {
+    fontFamily: "Times-Bold",
+    fontSize: 11,
+  },
+  itemMeta: {
+    fontFamily: "Times-Italic",
+    fontSize: 10,
+    color: "#444",
+  },
+  itemSubtitle: {
+    fontSize: 11,
+    marginBottom: 2,
+  },
+  description: {
+    fontSize: 10,
+    textAlign: "justify",
+    color: "#222",
+  },
+  // List Styles (Skills/Languages)
+  listRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+  },
+  listItem: {
+    fontSize: 10,
+    marginRight: 10,
+  },
+  // Bio Grid
+  bioRow: {
+    flexDirection: "row",
+    marginBottom: 2,
+  },
+  bioLabel: {
+    width: 100,
+    fontFamily: "Times-Bold",
+    fontSize: 10,
+  },
+  bioValue: {
+    fontSize: 10,
+  },
+});
+
+// --- RENDER HELPERS ---
+
+const ExperienceSection = ({ data }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Experience</Text>
+    {data.map((job, index) => (
+      <View key={index} style={styles.itemBlock} wrap={false}>
+        <View style={styles.itemHeader}>
+          <Text style={styles.itemTitle}>{job.role}</Text>
+          <Text style={styles.itemMeta}>
+            {job.startDate} — {job.endDate}
+          </Text>
+        </View>
+        <Text style={styles.itemSubtitle}>{job.company}</Text>
+        <Text style={styles.description}>{job.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const EducationSection = ({ data }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Education</Text>
+    {data.map((edu, index) => (
+      <View key={index} style={styles.itemBlock} wrap={false}>
+        <View style={styles.itemHeader}>
+          <Text style={styles.itemTitle}>{edu.school}</Text>
+          <Text style={styles.itemMeta}>{edu.date}</Text>
+        </View>
+        <Text style={styles.itemSubtitle}>{edu.degree}</Text>
+        {edu.description && (
+          <Text style={styles.description}>{edu.description}</Text>
+        )}
+      </View>
+    ))}
+  </View>
+);
+
+// Minimal Skills: Comma separated text instead of badges
+const SkillsSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <Text style={styles.sectionTitle}>Skills</Text>
+    <View style={styles.listRow}>
+      <Text style={styles.description}>
+        {data.map((skill) => skill.name).join(" • ")}
+      </Text>
+    </View>
+  </View>
+);
+
+const LanguagesSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <Text style={styles.sectionTitle}>Languages</Text>
+    <View style={styles.listRow}>
+      {data.map((lang, index) => (
+        <Text key={index} style={styles.listItem}>
+          {lang.language} {lang.proficiency ? `(${lang.proficiency})` : ""}
+          {index < data.length - 1 ? "," : ""}
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
+const CertificatesSection = ({ data }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Certificates</Text>
+    {data.map((cert, index) => (
+      <View key={index} style={styles.itemBlock} wrap={false}>
+        <View style={styles.itemHeader}>
+          <Text style={styles.itemTitle}>{cert.name}</Text>
+          <Text style={styles.itemMeta}>{cert.date}</Text>
+        </View>
+        <Text style={styles.itemSubtitle}>{cert.issuer}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ProjectsSection = ({ data }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Projects</Text>
+    {data.map((item, index) => (
+      <View key={index} style={styles.itemBlock} wrap={false}>
+        <View style={styles.itemHeader}>
+          <Text style={styles.itemTitle}>{item.title}</Text>
+          <Text style={styles.itemMeta}>{item.technologies}</Text>
+        </View>
+        {item.link && (
+          <Link src={item.link} style={styles.link}>
+            <Text style={{ fontSize: 10, marginBottom: 2 }}>{item.link}</Text>
+          </Link>
+        )}
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const AchievementsSection = ({ data }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Achievements</Text>
+    {data.map((item, index) => (
+      <View key={index} style={styles.itemBlock} wrap={false}>
+        <View style={styles.itemHeader}>
+          <Text style={styles.itemTitle}>{item.title}</Text>
+          <Text style={styles.itemMeta}>{item.date}</Text>
+        </View>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ExtracurricularSection = ({ data }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Extracurricular</Text>
+    {data.map((item, index) => (
+      <View key={index} style={styles.itemBlock} wrap={false}>
+        <View style={styles.itemHeader}>
+          <Text style={styles.itemTitle}>{item.role}</Text>
+          <Text style={styles.itemMeta}>{item.date}</Text>
+        </View>
+        <Text style={styles.itemSubtitle}>{item.organization}</Text>
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ReferencesSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <Text style={styles.sectionTitle}>References</Text>
+    <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 20 }}>
+      {data.map((ref, index) => (
+        <View key={index} style={{ width: "45%", marginBottom: 8 }}>
+          <Text style={styles.itemTitle}>{ref.name}</Text>
+          <Text style={styles.itemSubtitle}>{ref.position}</Text>
+          <Text style={styles.description}>{ref.company}</Text>
+          <Text style={styles.description}>
+            {ref.email} {ref.phone ? `• ${ref.phone}` : ""}
+          </Text>
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+const BioSection = ({ data }) => (
+  <View style={styles.section} wrap={false}>
+    <Text style={styles.sectionTitle}>Personal Details</Text>
+    <View>
+      {data.address && (
+        <View style={styles.bioRow}>
+          <Text style={styles.bioLabel}>Address:</Text>
+          <Text style={styles.bioValue}>{data.address}</Text>
+        </View>
+      )}
+      {data.dob && (
+        <View style={styles.bioRow}>
+          <Text style={styles.bioLabel}>Date of Birth:</Text>
+          <Text style={styles.bioValue}>{data.dob}</Text>
+        </View>
+      )}
+      {data.gender && (
+        <View style={styles.bioRow}>
+          <Text style={styles.bioLabel}>Gender:</Text>
+          <Text style={styles.bioValue}>{data.gender}</Text>
+        </View>
+      )}
+      {data.nationality && (
+        <View style={styles.bioRow}>
+          <Text style={styles.bioLabel}>Nationality:</Text>
+          <Text style={styles.bioValue}>{data.nationality}</Text>
+        </View>
+      )}
+      {data.maritalStatus && (
+        <View style={styles.bioRow}>
+          <Text style={styles.bioLabel}>Marital Status:</Text>
+          <Text style={styles.bioValue}>{data.maritalStatus}</Text>
+        </View>
+      )}
+      {data.idNumber && (
+        <View style={styles.bioRow}>
+          <Text style={styles.bioLabel}>NIC/ID:</Text>
+          <Text style={styles.bioValue}>{data.idNumber}</Text>
+        </View>
+      )}
+    </View>
+  </View>
+);
+
+// --- MAIN COMPONENT ---
+const MinimalTemplate = ({ data, activeSections = [] }) => {
+  const { personalInfo } = data;
+
+  // Check if bio has data (same logic as Modern)
+  const hasBioData =
+    personalInfo.address ||
+    personalInfo.dob ||
+    personalInfo.gender ||
+    personalInfo.nationality ||
+    personalInfo.maritalStatus ||
+    personalInfo.idNumber;
+
+  const RENDER_MAP = {
+    experience: (d) => <ExperienceSection data={d.experience} />,
+    education: (d) => <EducationSection data={d.education} />,
+    skills: (d) => <SkillsSection data={d.skills} />,
+    certificates: (d) => <CertificatesSection data={d.certificates} />,
+    references: (d) => <ReferencesSection data={d.references} />,
+    languages: (d) => <LanguagesSection data={d.languages} />,
+    projects: (d) => <ProjectsSection data={d.projects} />,
+    achievements: (d) => <AchievementsSection data={d.achievements} />,
+    extracurricular: (d) => <ExtracurricularSection data={d.extracurricular} />,
+    bio: (d) => <BioSection data={d.personalInfo} />,
+  };
+
+  return (
+    <Page size="A4" style={styles.page}>
+      {/* 1. HEADER (Simple, Centered or Left Aligned) */}
+      <View style={styles.header}>
+        <Text style={styles.name}>{personalInfo.fullName}</Text>
+        <Text style={styles.role}>{personalInfo.role}</Text>
+
+        <View style={styles.contactLine}>
+          {personalInfo.email && <Text>{personalInfo.email}</Text>}
+          {personalInfo.phone && <Text>• {personalInfo.phone}</Text>}
+          {personalInfo.linkedin && (
+            <Link src={personalInfo.linkedin} style={styles.link}>
+              <Text>• LinkedIn</Text>
+            </Link>
+          )}
+          {personalInfo.github && (
+            <Link src={personalInfo.github} style={styles.link}>
+              <Text>• GitHub</Text>
+            </Link>
+          )}
+        </View>
+
+        {/* Summary integrated into Header area for Minimal style */}
+        {personalInfo.summary && (
+          <Text style={{ ...styles.description, marginTop: 10 }}>
+            {personalInfo.summary}
+          </Text>
+        )}
+      </View>
+
+      {/* 2. DYNAMIC SECTIONS LOOP (Exact same as Modern) */}
+      {activeSections.map((section) => {
+        const renderFunc = RENDER_MAP[section.id];
+
+        if (section.id === "bio") {
+          return hasBioData ? (
+            <View key={section.id}>{renderFunc(data)}</View>
+          ) : null;
+        }
+
+        if (renderFunc && data[section.id] && data[section.id].length > 0) {
+          return <View key={section.id}>{renderFunc(data)}</View>;
+        }
+        return null;
+      })}
+    </Page>
+  );
+};
+
+export default MinimalTemplate;
+```
+
+- `src/components/pdf/templates/ModernTemplate.jsx`
+  ``jsx
+  import React from "react";
+  import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  Image,
+  Link,
+  Svg,
+  Path,
+  } from "@react-pdf/renderer";
+
+const IconMail = ({ style }) => (
+<Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+<Path
+      d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+<Path
+      d="M4 4 h16 a2 2 0 0 1 2 2 v12 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-12 a2 2 0 0 1 2 -2 z"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+</Svg>
+);
+const IconPhone = ({ style }) => (
+<Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+<Path
+      d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+</Svg>
+);
+const IconLinkedin = ({ style }) => (
+<Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+<Path
+      d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+<Path
+      d="M2 9 h4 v12 h-4 z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+<Path
+      d="M4 2 a2 2 0 1 1 0 4 a2 2 0 0 1 0 -4 z"
+      stroke="#2563eb"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+</Svg>
+);
+const IconGithub = ({ style }) => (
+<Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+<Path
+      d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+<Path
+      d="M9 18c-4.51 2-5-2-7-2"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+</Svg>
+);
+const IconMapPin = ({ style }) => (
+<Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
+<Path
+      d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+<Path
+      d="M12 7 a3 3 0 1 1 0 6 a3 3 0 0 1 0 -6 z"
+      stroke="#374151"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+</Svg>
+);
+
+// --- 🛠️ ICONS (Sections) ---
+const IconSummary = () => (
+<Svg
+width={12}
+height={12}
+viewBox="0 0 24 24"
+style={{ transform: "translateY(-2)" }}
+
+>
+
+    <Path
+      d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M12 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+  </Svg>
+);
+const IconExperience = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M12 12h.01"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 13a18.15 18.15 0 0 1-20 0"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M4 6 h16 a2 2 0 0 1 2 2 v10 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-10 a2 2 0 0 1 2 -2 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconEducation = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 10v6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconSkills = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 18h6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M10 22h4"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconCert = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="m9 12 2 2 4-4"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+const IconUsers = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M16 3.128a4 4 0 0 1 0 7.744"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M22 21v-2a4 4 0 0 0-3-3.87"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 3 a4 4 0 1 1 0 8 a4 4 0 0 1 0 -8 z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// 🆕 NEW ICONS
+const IconGlobe = () => (
+<Svg
+width={12}
+height={12}
+viewBox="0 0 24 24"
+style={{ transform: "translateY(-2)" }}
+
+>
+
+    <Path
+      d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="M2 12h20" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path
+      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+
+  </Svg>
+);
+const IconProject = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="m12 10 2 2-2 2" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path d="m17 10-2 2 2 2" stroke="#1f2937" strokeWidth={2} fill="none" />
+  </Svg>
+);
+const IconTrophy = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path d="M4 22h16" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path
+      d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+    <Path
+      d="M18 2H6v7a6 6 0 0 0 12 0V2Z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+    />
+  </Svg>
+);
+const IconActivity = () => (
+  <Svg
+    width={12}
+    height={12}
+    viewBox="0 0 24 24"
+    style={{ transform: "translateY(-2)" }}
+  >
+    <Path
+      d="M3.5 21 14 3"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M20.5 21 10 3"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M15.5 21 12 15l-3.5 6"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M2 21h20"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+// 🆕 BIO ICON (Proper User Icon)
+const IconUser = () => (
+<Svg
+width={12}
+height={12}
+viewBox="0 0 24 24"
+style={{ transform: "translateY(-2)" }}
+
+>
+
+    <Path
+      d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+  </Svg>
+);
+
+const styles = StyleSheet.create({
+page: {
+padding: 30,
+fontSize: 10,
+lineHeight: 1.5,
+fontFamily: "Helvetica",
+color: "#374151",
+},
+header: {
+flexDirection: "row",
+alignItems: "center",
+marginBottom: 20,
+borderBottomWidth: 1,
+borderBottomColor: "#1f2937",
+paddingBottom: 15,
+},
+photo: { width: 100, height: 100, borderRadius: 50, objectFit: "cover" },
+headerRight: { marginLeft: 30, flex: 1 },
+name: {
+fontSize: 22,
+fontWeight: "bold",
+textTransform: "uppercase",
+color: "#111827",
+marginBottom: 4,
+lineHeight: 1.2,
+},
+role: {
+fontSize: 11,
+color: "#4b5563",
+marginBottom: 6,
+textTransform: "uppercase",
+letterSpacing: 1,
+},
+contactRow: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+contactItem: {
+flexDirection: "row",
+alignItems: "center",
+fontSize: 9,
+color: "#374151",
+lineHeight: 1.2,
+},
+link: { color: "#2563eb", textDecoration: "none" },
+section: { marginBottom: 10 },
+sectionTitleRow: {
+flexDirection: "row",
+alignItems: "center",
+borderBottomWidth: 1,
+borderBottomColor: "#e5e7eb",
+paddingBottom: 4,
+marginBottom: 8,
+marginTop: 5,
+},
+sectionTitle: {
+fontSize: 11,
+fontWeight: "bold",
+textTransform: "uppercase",
+color: "#1f2937",
+marginLeft: 6,
+},
+jobBlock: { marginBottom: 10 },
+jobHeader: {
+flexDirection: "row",
+justifyContent: "space-between",
+alignItems: "flex-start",
+},
+jobRole: {
+fontWeight: "bold",
+fontSize: 10,
+color: "#000000",
+maxWidth: "70%",
+},
+jobDate: { fontSize: 9, color: "#6b7280", textAlign: "right" },
+company: {
+color: "#2563eb",
+fontWeight: "bold",
+fontSize: 9,
+marginTop: 1,
+marginBottom: 3,
+},
+description: { fontSize: 9, textAlign: "justify", color: "#4b5563" },
+skillBadge: {
+backgroundColor: "#f3f4f6",
+borderRadius: 12,
+paddingVertical: 5,
+paddingHorizontal: 14,
+marginRight: 6,
+marginBottom: 6,
+flexDirection: "row",
+alignItems: "center",
+justifyContent: "center",
+},
+skillText: {
+fontSize: 9,
+fontWeight: "bold",
+color: "#374151",
+lineHeight: 1,
+},
+skillsContainer: { flexDirection: "row", flexWrap: "wrap" },
+refGrid: { flexDirection: "row", flexWrap: "wrap", gap: 15 },
+refItem: { width: "45%", marginBottom: 10 },
+infoRow: {
+flexDirection: "row",
+borderBottomWidth: 1,
+borderBottomColor: "#f3f4f6",
+paddingVertical: 4,
+alignItems: "center",
+lineHeight: 1.2,
+},
+infoLabel: {
+width: "30%",
+fontSize: 8,
+color: "#6b7280",
+textTransform: "uppercase",
+fontWeight: "bold",
+},
+infoValue: { width: "70%", fontSize: 9, color: "#111827" },
+refIcon: { transform: "translateY(-1.5)" },
+});
+
+// --- RENDER HELPERS ---
+const ExperienceSection = ({ data }) => (
+<View style={styles.section}>
+<View style={styles.sectionTitleRow}>
+<IconExperience />
+<Text style={styles.sectionTitle}>Experience</Text>
+</View>
+{data.map((job, index) => (
+<View key={index} style={styles.jobBlock} wrap={false}>
+<View style={styles.jobHeader}>
+<Text style={styles.jobRole}>{job.role}</Text>
+<Text style={styles.jobDate}>
+{job.startDate} — {job.endDate}
+</Text>
+</View>
+<Text style={styles.company}>{job.company}</Text>
+<Text style={styles.description}>{job.description}</Text>
+</View>
+))}
+</View>
+);
+
+const EducationSection = ({ data }) => (
+<View style={styles.section}>
+<View style={styles.sectionTitleRow}>
+<IconEducation />
+<Text style={styles.sectionTitle}>Education</Text>
+</View>
+{data.map((edu, index) => (
+<View key={index} style={styles.jobBlock} wrap={false}>
+<View style={styles.jobHeader}>
+<Text style={styles.jobRole}>{edu.school}</Text>
+<Text style={styles.jobDate}>{edu.date}</Text>
+</View>
+<Text style={styles.company}>{edu.degree}</Text>
+{edu.description && (
+<Text style={styles.description}>{edu.description}</Text>
+)}
+</View>
+))}
+</View>
+);
+
+const SkillsSection = ({ data }) => (
+<View wrap={false} style={styles.section}>
+<View style={styles.sectionTitleRow}>
+<IconSkills />
+<Text style={styles.sectionTitle}>Skills</Text>
+</View>
+<View style={styles.skillsContainer}>
+{data.map((skill, index) => (
+<Text key={index} style={styles.skillBadge}>
+{skill.name}
+</Text>
+))}
+</View>
+</View>
+);
+
+const CertificatesSection = ({ data }) => (
+<View style={styles.section}>
+<View style={styles.sectionTitleRow}>
+<IconCert />
+<Text style={styles.sectionTitle}>Certificates</Text>
+</View>
+{data.map((cert, index) => (
+<View key={index} style={styles.jobBlock} wrap={false}>
+<View style={styles.jobHeader}>
+<Text style={styles.jobRole}>{cert.name}</Text>
+<Text style={styles.jobDate}>{cert.date}</Text>
+</View>
+<Text style={styles.description}>{cert.issuer}</Text>
+</View>
+))}
+</View>
+);
+
+const ReferencesSection = ({ data }) => (
+<View style={styles.section} wrap={false}>
+<View style={styles.sectionTitleRow}>
+<IconUsers />
+<Text style={styles.sectionTitle}>References</Text>
+</View>
+<View style={styles.refGrid}>
+{data.map((ref, index) => (
+<View key={index} style={styles.refItem}>
+<Text style={{ fontWeight: "bold", fontSize: 10, color: "#000" }}>
+{ref.name}
+</Text>
+<Text style={{ fontSize: 9, fontWeight: "medium", color: "#1f2937" }}>
+{ref.position}
+</Text>
+<Text style={{ fontSize: 9, color: "#374151" }}>{ref.company}</Text>
+{ref.location && (
+<View
+style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 1,
+              }} >
+<IconMapPin style={styles.refIcon} />
+<Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+{ref.location}
+</Text>
+</View>
+)}
+{ref.phone && (
+<View
+style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 2,
+              }} >
+<IconPhone style={styles.refIcon} />
+<Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+{ref.phone}
+</Text>
+</View>
+)}
+{ref.email && (
+<View
+style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 1,
+              }} >
+<IconMail style={styles.refIcon} />
+<Text style={{ fontSize: 9, color: "#374151", marginLeft: 4 }}>
+{ref.email}
+</Text>
+</View>
+)}
+</View>
+))}
+</View>
+</View>
+);
+
+const LanguagesSection = ({ data }) => (
+<View style={styles.section} wrap={false}>
+<View style={styles.sectionTitleRow}>
+<IconGlobe />
+<Text style={styles.sectionTitle}>Languages</Text>
+</View>
+<View style={styles.skillsContainer}>
+{data.map((lang, index) => (
+<Text key={index} style={styles.skillBadge}>
+{lang.language} {lang.proficiency ? `(${lang.proficiency})` : ""}
+</Text>
+))}
+</View>
+</View>
+);
+
+const ProjectsSection = ({ data }) => (
+<View style={styles.section}>
+<View style={styles.sectionTitleRow}>
+<IconProject />
+<Text style={styles.sectionTitle}>Projects</Text>
+</View>
+{data.map((item, index) => (
+<View key={index} style={styles.jobBlock} wrap={false}>
+<View style={styles.jobHeader}>
+<Text style={styles.jobRole}>{item.title}</Text>
+{item.technologies && (
+<Text style={styles.jobDate}>{item.technologies}</Text>
+)}
+</View>
+{item.link && (
+<Text style={{ ...styles.company, color: "#2563eb" }}>
+{item.link}
+</Text>
+)}
+<Text style={styles.description}>{item.description}</Text>
+</View>
+))}
+</View>
+);
+
+const AchievementsSection = ({ data }) => (
+<View style={styles.section}>
+<View style={styles.sectionTitleRow}>
+<IconTrophy />
+<Text style={styles.sectionTitle}>Achievements</Text>
+</View>
+{data.map((item, index) => (
+<View key={index} style={styles.jobBlock} wrap={false}>
+<View style={styles.jobHeader}>
+<Text style={styles.jobRole}>{item.title}</Text>
+<Text style={styles.jobDate}>{item.date}</Text>
+</View>
+<Text style={styles.description}>{item.description}</Text>
+</View>
+))}
+</View>
+);
+
+const ExtracurricularSection = ({ data }) => (
+<View style={styles.section}>
+<View style={styles.sectionTitleRow}>
+<IconActivity />
+<Text style={styles.sectionTitle}>Extracurricular</Text>
+</View>
+{data.map((item, index) => (
+<View key={index} style={styles.jobBlock} wrap={false}>
+<View style={styles.jobHeader}>
+<Text style={styles.jobRole}>{item.role}</Text>
+<Text style={styles.jobDate}>{item.date}</Text>
+</View>
+<Text style={styles.company}>{item.organization}</Text>
+<Text style={styles.description}>{item.description}</Text>
+</View>
+))}
+</View>
+);
+
+// 🆕 BIO SECTION RENDERER (Previously hardcoded at bottom)
+const BioSection = ({ data }) => (
+<View wrap={false} style={styles.section}>
+<View style={styles.sectionTitleRow}>
+<IconUser />
+<Text style={styles.sectionTitle}>Personal Details</Text>
+</View>
+<View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+<View style={{ width: "50%", paddingRight: 10 }}>
+{data.address && (
+<View style={styles.infoRow}>
+<Text style={styles.infoLabel}>Address</Text>
+<Text style={styles.infoValue}>{data.address}</Text>
+</View>
+)}
+{data.dob && (
+<View style={styles.infoRow}>
+<Text style={styles.infoLabel}>DOB</Text>
+<Text style={styles.infoValue}>{data.dob}</Text>
+</View>
+)}
+{data.gender && (
+<View style={styles.infoRow}>
+<Text style={styles.infoLabel}>Gender</Text>
+<Text style={styles.infoValue}>{data.gender}</Text>
+</View>
+)}
+</View>
+<View style={{ width: "50%", paddingLeft: 10 }}>
+{data.nationality && (
+<View style={styles.infoRow}>
+<Text style={styles.infoLabel}>Nationality</Text>
+<Text style={styles.infoValue}>{data.nationality}</Text>
+</View>
+)}
+{data.maritalStatus && (
+<View style={styles.infoRow}>
+<Text style={styles.infoLabel}>Marital Status</Text>
+<Text style={styles.infoValue}>{data.maritalStatus}</Text>
+</View>
+)}
+{data.idNumber && (
+<View style={styles.infoRow}>
+<Text style={styles.infoLabel}>NIC/ID</Text>
+<Text style={styles.infoValue}>{data.idNumber}</Text>
+</View>
+)}
+</View>
+</View>
+</View>
+);
+
+function ModernTemplate({ data, activeSections = [] }) {
+const hasBioData =
+data.personalInfo.address ||
+data.personalInfo.dob ||
+data.personalInfo.gender ||
+data.personalInfo.nationality ||
+data.personalInfo.maritalStatus ||
+data.personalInfo.idNumber;
+
+const RENDER_MAP = {
+experience: (d) => <ExperienceSection data={d.experience} />,
+education: (d) => <EducationSection data={d.education} />,
+skills: (d) => <SkillsSection data={d.skills} />,
+certificates: (d) => <CertificatesSection data={d.certificates} />,
+references: (d) => <ReferencesSection data={d.references} />,
+languages: (d) => <LanguagesSection data={d.languages} />,
+projects: (d) => <ProjectsSection data={d.projects} />,
+achievements: (d) => <AchievementsSection data={d.achievements} />,
+extracurricular: (d) => <ExtracurricularSection data={d.extracurricular} />,
+// 🆕 Add Bio to the Map (Pass personalInfo object)
+bio: (d) => <BioSection data={d.personalInfo} />,
+};
+
+return (
+<Page size="A4" style={styles.page}>
+{/_ HEADER _/}
+<View wrap={false}>
+<View style={styles.header}>
+{data.personalInfo.photo && (
+<Image src={data.personalInfo.photo} style={styles.photo} />
+)}
+<View style={styles.headerRight}>
+<Text style={styles.name}>
+{data.personalInfo.fullName || "Your Name"}
+</Text>
+<Text style={styles.role}>
+{data.personalInfo.role || "Job Title"}
+</Text>
+<View style={styles.contactRow}>
+{data.personalInfo.email && (
+<View style={styles.contactItem}>
+<IconMail style={{ transform: "translateY(-0.5)" }} />
+<Text style={{ marginLeft: 4 }}>
+{data.personalInfo.email}
+</Text>
+</View>
+)}
+{data.personalInfo.phone && (
+<View style={styles.contactItem}>
+<IconPhone style={{ transform: "translateY(-0.5)" }} />
+<Text style={{ marginLeft: 4 }}>
+{data.personalInfo.phone}
+</Text>
+</View>
+)}
+{data.personalInfo.linkedin && (
+<View style={styles.contactItem}>
+<IconLinkedin style={{ transform: "translateY(-0.5)" }} />
+<Link
+src={data.personalInfo.linkedin}
+style={{ marginLeft: 4, ...styles.link }} >
+LinkedIn
+</Link>
+</View>
+)}
+{data.personalInfo.github && (
+<View style={styles.contactItem}>
+<IconGithub style={{ transform: "translateY(-0.5)" }} />
+<Link
+src={data.personalInfo.github}
+style={{ marginLeft: 4, ...styles.link }} >
+GitHub
+</Link>
+</View>
+)}
+</View>
+</View>
+</View>
+</View>
+
+      {/* SUMMARY */}
+      {data.personalInfo.summary && (
+        <View wrap={false} style={styles.section}>
+          <View style={styles.sectionTitleRow}>
+            <IconSummary />
+            <Text style={styles.sectionTitle}>Professional Summary</Text>
+          </View>
+          <Text style={styles.description}>{data.personalInfo.summary}</Text>
+        </View>
+      )}
+
+      {/* 🔀 DYNAMIC SECTIONS (Now includes Bio) */}
+      {activeSections.map((section) => {
+        const renderFunc = RENDER_MAP[section.id];
+
+        // SPECIAL CHECK: Bio is an Object, others are Arrays
+        if (section.id === "bio") {
+          return hasBioData ? (
+            <View key={section.id}>{renderFunc(data)}</View>
+          ) : null;
+        }
+
+        // STANDARD CHECK: Arrays
+        if (renderFunc && data[section.id] && data[section.id].length > 0) {
+          return <View key={section.id}>{renderFunc(data)}</View>;
+        }
+        return null;
+      })}
+    </Page>
+
+);
+}
+
+export default ModernTemplate;
+
+```
+
+```

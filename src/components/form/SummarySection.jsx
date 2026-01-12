@@ -1,6 +1,6 @@
 import React from "react";
 import { AlignLeft } from "lucide-react"; // Matching style
-import FormTextArea from "./ui/FormTextArea.jsx";
+import FormTextArea from "../ui/FormTextArea.jsx";
 
 const SummarySection = () => {
   return (

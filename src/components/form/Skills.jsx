@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { Lightbulb, X } from "lucide-react"; // 👈 Using Lightbulb icon
-import FormSection from "./ui/FormSection.jsx";
+import FormSection from "../ui/FormSection.jsx";
 
 const Skills = () => {
   const { register, control } = useFormContext();
