@@ -40,13 +40,13 @@ import {
 import { cvSchema } from "../schemas/cvSchema.js";
 import { saveCVData, loadCVData } from "../db.js";
 import SortableSection from "../components/ui/SortableSection.jsx";
-import CVPreview from "../components/preview/CVPreview.jsx"; // 👈 Ensure file is in /preview folder
+import CVPreview from "../components/preview/CVPreview.jsx";
+import ConfirmDialog from "../components/ui/ConfirmDialog.jsx"; // 🆕 IMPORT DIALOG
 
 // 📝 Form Sections
 import HeaderSection from "../components/HeaderSection.jsx";
 import SummarySection from "../components/SummarySection.jsx";
 import BioSection from "../components/BioSection.jsx";
-
 import Experience from "../components/Experience.jsx";
 import Education from "../components/Education.jsx";
 import Skills from "../components/Skills.jsx";
@@ -59,7 +59,10 @@ import Extracurricular from "../components/Extracurricular.jsx";
 
 const BuilderPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [showMobilePreview, setShowMobilePreview] = useState(false); // 📱 1. Mobile State
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
+
+  // 🆕 STATE FOR DELETE DIALOG
+  const [sectionToDelete, setSectionToDelete] = useState(null);
 
   // 1️⃣ INITIAL STATE
   const [activeSections, setActiveSections] = useState([
@@ -165,21 +168,31 @@ const BuilderPage = () => {
     }
   };
 
-  const removeSection = (sectionId) => {
-    if (confirm("Remove this section? All data in it will be lost.")) {
-      setActiveSections(activeSections.filter((s) => s.id !== sectionId));
+  // 🗑️ STEP 1: TRIGGER DIALOG (Replaces old direct delete)
+  const initiateRemoveSection = (sectionId) => {
+    setSectionToDelete(sectionId); // This opens the modal
+  };
 
-      if (sectionId === "bio") {
-        setValue("personalInfo.address", "");
-        setValue("personalInfo.dob", "");
-        setValue("personalInfo.gender", "");
-        setValue("personalInfo.nationality", "");
-        setValue("personalInfo.maritalStatus", "");
-        setValue("personalInfo.idNumber", "");
-      } else {
-        setValue(sectionId, []);
-      }
+  // 🗑️ STEP 2: ACTUAL DELETE LOGIC (Called by Dialog)
+  const confirmRemoveSection = () => {
+    if (!sectionToDelete) return;
+
+    setActiveSections(activeSections.filter((s) => s.id !== sectionToDelete));
+
+    // Clear data based on type
+    if (sectionToDelete === "bio") {
+      setValue("personalInfo.address", "");
+      setValue("personalInfo.dob", "");
+      setValue("personalInfo.gender", "");
+      setValue("personalInfo.nationality", "");
+      setValue("personalInfo.maritalStatus", "");
+      setValue("personalInfo.idNumber", "");
+    } else {
+      // Standard Array Wipe for other sections
+      setValue(sectionToDelete, []);
     }
+
+    setSectionToDelete(null); // Close modal
   };
 
   const toggleSection = (id) => {
@@ -258,7 +271,6 @@ const BuilderPage = () => {
       <FormProvider {...methods}>
         <div className="flex flex-col h-screen overflow-hidden md:flex-row">
           {/* 🟢 EDITOR COLUMN */}
-          {/* Mobile Logic: Hidden if showing preview, Block if showing editor. Always block on Desktop. */}
           <div
             className={`w-full h-full p-4 md:p-8 pb-32 overflow-y-auto md:w-1/2 scrollbar-hide bg-gray-50/50 ${
               showMobilePreview ? "hidden md:block" : "block"
@@ -300,7 +312,8 @@ const BuilderPage = () => {
                           id={section.id}
                           title={config.title}
                           icon={config.icon}
-                          onRemove={() => removeSection(section.id)}
+                          // 🔄 UPDATED: CALL THE NEW TRIGGER FUNCTION
+                          onRemove={() => initiateRemoveSection(section.id)}
                           isOpen={expandedSection === section.id}
                           onToggle={() => toggleSection(section.id)}
                         >
@@ -345,7 +358,6 @@ const BuilderPage = () => {
           </div>
 
           {/* 🟢 PREVIEW COLUMN */}
-          {/* Mobile Logic: Flex if showing preview, Hidden if showing editor. Always flex on Desktop. */}
           <div
             className={`w-full h-full bg-gray-100 border-l border-gray-200 md:w-1/2 flex-col ${
               showMobilePreview ? "flex" : "hidden md:flex"
@@ -374,6 +386,17 @@ const BuilderPage = () => {
           </div>
         </div>
       </FormProvider>
+
+      {/* 🔔 4. RENDER THE CONFIRM DIALOG */}
+      <ConfirmDialog
+        isOpen={!!sectionToDelete}
+        onClose={() => setSectionToDelete(null)}
+        onConfirm={confirmRemoveSection}
+        title="Remove Section?"
+        description="Are you sure you want to remove this section? All data entered within it will be permanently lost."
+        confirmText="Yes, Remove it"
+        variant="danger"
+      />
     </div>
   );
 };
