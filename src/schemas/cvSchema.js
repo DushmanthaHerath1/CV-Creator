@@ -120,4 +120,5 @@ export const cvSchema = z.object({
     .optional(),
 
   templateId: z.string().default("modern"),
+  themeColor: z.string().default("blue"), // 🎨 NEW: Color Theme Persistance
 });

@@ -68,9 +68,9 @@ const useContainerWidth = (ref, isVisible) => {
 
     if (newWidth > 0) {
       // Mobile logic: If screen < 768px, ensure minimum 320px readability
-      // Desktop logic: subtract padding (40px)
+      // Desktop logic: subtract padding (80px for safety)
       const computedWidth =
-        newWidth > 400 ? newWidth - 40 : Math.max(newWidth - 16, 300);
+        newWidth > 400 ? newWidth - 80 : Math.max(newWidth - 16, 300);
       setWidth(computedWidth);
     }
   }, [ref]);
@@ -106,9 +106,18 @@ const useContainerWidth = (ref, isVisible) => {
 // 📄 MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
+// 🎨 Import Themes & Templates
+import { THEMES } from "../../data/themes";
+import { TEMPLATES } from "../pdf/templates/index.jsx";
+
 const CVPreview = ({ activeSections = [], isActive = true }) => {
-  const { watch } = useFormContext();
+  const { watch, setValue } = useFormContext(); // 🟢 Get setValue
   const formData = watch();
+  const themeColor = formData.themeColor || "blue"; // 🟢 Get current theme
+  const templateId = formData.templateId || "modern"; // 🟢 Get current template
+  const currentTemplate = TEMPLATES[templateId] || TEMPLATES.modern;
+  
+  // ... rest of component
 
   const [debouncedDataString] = useDebounce(JSON.stringify(formData), 1000);
   const debouncedData = useMemo(
@@ -130,12 +139,10 @@ const CVPreview = ({ activeSections = [], isActive = true }) => {
   const containerWidth = useContainerWidth(scrollContainerRef, isVisible);
 
   // 🧠 THE FIX: Force Remount key
-  // We increment this whenever the tab becomes visible to wipe glitches.
   const [documentKey, setDocumentKey] = useState(0);
 
   useEffect(() => {
     if (isVisible) {
-      // Force PDF reload when tab becomes visible
       setDocumentKey((prev) => prev + 1);
     }
   }, [isVisible]);
@@ -181,8 +188,8 @@ const CVPreview = ({ activeSections = [], isActive = true }) => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col h-full bg-gray-100 border-l border-gray-300"
-      style={{ contain: "layout style" }} // Optimization
+      className="flex flex-col h-full bg-gray-100 border-l border-gray-300 relative" // 🟢 Relative for floating UI
+      style={{ contain: "layout style" }}
     >
       {/* 🛠️ TOOLBAR */}
       <div className="z-10 flex items-center justify-between p-3 bg-white border-b border-gray-200 shadow-sm shrink-0">
@@ -234,17 +241,19 @@ const CVPreview = ({ activeSections = [], isActive = true }) => {
         ref={scrollContainerRef}
         className="flex-1 p-4 md:p-8 bg-slate-200"
         style={{
-          overflow: "auto", // Allow X and Y scroll
-          WebkitOverflowScrolling: "touch", // Smooth iOS Scroll
-          overscrollBehavior: "contain", // Prevent parent scrolling
-          touchAction: "pan-x pan-y", // Enable finger drag
+          overflow: "auto",
+          WebkitOverflowScrolling: "touch",
+          overscrollBehavior: "contain",
+          touchAction: "pan-x pan-y",
           position: "relative",
         }}
       >
-        <div className="flex justify-center min-w-min">
+        <div className="flex justify-center w-full pb-24">
+          {" "}
+          {/* 🟢 Added padding-bottom for floating picker */}
           {pdfUrl ? (
             <Document
-              key={`pdf-doc-${documentKey}`} // 🔧 KEY FIX: Force Remount on Tab Switch
+              key={`pdf-doc-${documentKey}`}
               file={pdfUrl}
               options={PDF_OPTIONS}
               onLoadSuccess={({ numPages }) => setNumPages(numPages)}
@@ -281,6 +290,37 @@ const CVPreview = ({ activeSections = [], isActive = true }) => {
           )}
         </div>
       </div>
+
+      {/* 🎨 FLOATING COLOR PICKER */}
+      {/* 🎨 FLOATING COLOR PICKER */}
+      {currentTemplate.hasColorVariants && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg border border-gray-200 flex items-center gap-3 z-30 transition-transform hover:scale-105">
+          {Object.values(THEMES).map((theme) => (
+            <button
+              key={theme.id}
+              type="button"
+              onClick={() => setValue("themeColor", theme.id)}
+              className={`w-8 h-8 rounded-full border-2 transition-all ${
+                themeColor === theme.id
+                  ? "border-gray-900 scale-110 shadow-md"
+                  : "border-transparent hover:scale-110"
+              }`}
+              style={{ backgroundColor: theme.colors.sidebarBg }}
+              title={theme.name}
+            >
+              <div
+                className="w-full h-full rounded-full border border-black/5"
+                style={{ backgroundColor: theme.colors.sidebarBg }}
+              >
+                <div
+                  className="w-full h-full rounded-full opacity-40"
+                  style={{ backgroundColor: theme.colors.accent }}
+                />
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

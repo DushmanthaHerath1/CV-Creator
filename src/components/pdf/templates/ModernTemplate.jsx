@@ -544,7 +544,8 @@ const styles = StyleSheet.create({
   skillBadge: {
     backgroundColor: "#f3f4f6",
     borderRadius: 12,
-    paddingVertical: 5,
+    paddingTop: 6,
+    paddingBottom: 3,
     paddingHorizontal: 14,
     marginRight: 6,
     marginBottom: 6,
