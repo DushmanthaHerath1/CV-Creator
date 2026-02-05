@@ -41,7 +41,7 @@ export const TEMPLATES = {
     description: "Sophisticated layout with timeline-style experience section.",
     tags: ["Creative", "Modern", "Design"],
     isNew: true,
-    hasColorVariants: false, // 🚫 Fixed Dark Theme
+    hasColorVariants: true, // ✅ Customizable Dark Theme
   },
   creative: {
     id: "creative",

@@ -9,7 +9,7 @@ import {
   Svg,
   Path,
 } from "@react-pdf/renderer";
-import { THEMES } from "../../../data/themes";
+import { THEMES, ELEGANT_THEMES } from "../../../data/themes";
 
 // --------------------------------------------------------------------------
 // 🛠️ ICONS
@@ -63,30 +63,51 @@ const IconLinkedin = ({ color }) => (
   </Svg>
 );
 
+const IconGithub = ({ color }) => (
+  <Svg viewBox="0 0 24 24" style={{ width: 10, height: 10, marginRight: 8 }}>
+    <Path
+      d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 // --------------------------------------------------------------------------
 // 🎨 DYNAMIC STYLES GENERATOR
 // --------------------------------------------------------------------------
 
-const createStyles = (theme) =>
-  StyleSheet.create({
+// --------------------------------------------------------------------------
+// 🎨 CUSTOM DARK PALETTE (Overrides Global Themes for this Template)
+// --------------------------------------------------------------------------
+
+
+const createStyles = (themeColor) => {
+  const theme = ELEGANT_THEMES[themeColor] || ELEGANT_THEMES.blue;
+  const activeColor = theme.colors;
+
+  return StyleSheet.create({
     page: {
       backgroundColor: "#ffffff",
       fontFamily: "Helvetica",
       fontSize: 10,
       lineHeight: 1.5,
       position: "relative",
-      paddingTop: 30,
-      paddingBottom: 30,
+      paddingTop: 25,
+      paddingBottom: 25,
     },
 
     // 🟢 Sidebar Background
     sidebarBackground: {
       position: "absolute",
-      top: -30,
+      top: -25,
       left: 0,
-      bottom: -30,
+      bottom: -25,
       width: "35%", 
-      backgroundColor: "#0f172a", // Slate 900
+      backgroundColor: activeColor.primary, // 🟢 Dynamic Dark Background
     },
 
     // 🟢 Left Column (Sidebar Content)
@@ -96,7 +117,7 @@ const createStyles = (theme) =>
       left: 0,
       width: "35%", 
       paddingHorizontal: 25,
-      paddingTop: 35,
+      paddingTop: 30,
       height: "100%",
       color: "#ffffff",
     },
@@ -112,7 +133,7 @@ const createStyles = (theme) =>
     headerName: {
       fontSize: 30,
       fontWeight: "bold",
-      color: "#0f172a",
+      color: activeColor.text, // 🟢 Dynamic Title Color
       marginBottom: 4,
       textAlign: "left",
       lineHeight: 1,
@@ -122,8 +143,8 @@ const createStyles = (theme) =>
 
     headerRole: {
       fontSize: 10,
-      color: "#475569", // Slate 600
-      marginBottom: 25,
+      color: activeColor.secondary, // 🟢 Dynamic Subtitle
+      marginBottom: 15,
       fontWeight: "bold",
       textTransform: "uppercase",
       letterSpacing: 4, 
@@ -136,7 +157,7 @@ const createStyles = (theme) =>
       width: 125,
       height: 125,
       borderRadius: 62.5, // Exactly half of 125
-      marginBottom: 35,
+      marginBottom: 25,
       objectFit: "cover",
       alignSelf: "center",
     },
@@ -147,8 +168,8 @@ const createStyles = (theme) =>
       fontWeight: "bold",
       color: "#ffffff",
       textTransform: "uppercase",
-      marginBottom: 12,
-      marginTop: 15,
+      marginBottom: 8,
+      marginTop: 10,
       letterSpacing: 2,
       borderBottomWidth: 1,
       borderBottomColor: "rgba(197, 197, 197, 1)", // 🟢 Keeping User's Gray
@@ -159,26 +180,44 @@ const createStyles = (theme) =>
     contactItem: {
       flexDirection: "row",
       alignItems: "center",
-      marginBottom: 10,
+      marginBottom: 6,
     },
     contactText: {
       fontSize: 8.5,
-      color: "#cbd5e1", // Slate 300
+      color: "#ffffff", // White text for contrast on dark bg
       flex: 1,
       lineHeight: 1.4,
     },
 
     // Sidebar: Reference Block
     referenceBlockSidebar: {
-       marginBottom: 12,
+       marginBottom: 10,
+       paddingBottom: 10,
+    },
+    referenceSeparator: {
+       borderBottomWidth: 0.5,
+       borderBottomColor: "#B8B9BA", // Solid Slate 700 (No opacity/green tint)
     },
     
     // Skills
     skillText: {
       fontSize: 9,
-      color: "#cbd5e1",
-      marginBottom: 5,
+      color: "#ffffff",
       fontWeight: "medium",
+    },
+
+    // 🟢 Modern Glass Tags for Skills
+    skillsContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+    },
+    skillTag: {
+      backgroundColor: "rgba(255, 255, 255, 0.15)", // Slightly stronger bg
+      borderRadius: 12, // Capsule shape
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      marginRight: 6,
+      marginBottom: 6,
     },
 
     // 🟢 TIMELINE STYLES
@@ -187,27 +226,27 @@ const createStyles = (theme) =>
       borderLeftColor: "#e2e8f0", // 🟢 Neutral Light Gray Line
       paddingLeft: 22,
       marginLeft: 4, 
-      marginBottom: 15,
+      marginBottom: 10,
       position: "relative",
     },
 
     mainSectionTitle: {
       fontSize: 14,
       fontWeight: "bold",
-      color: "#0f172a", // Dark Slate
+      color: activeColor.text, // 🟢 Dynamic Section Title
       textTransform: "uppercase",
       letterSpacing: 2.5,
-      marginBottom: 15,
-      marginTop: 5,
+      marginBottom: 10,
+      marginTop: 4,
       borderBottomWidth: 1.5,
-      borderBottomColor: "#0f172a",
+      borderBottomColor: activeColor.text, // 🟢 Dynamic Border
       paddingBottom: 6,
       width: "100%",
     },
 
     // Entry Styles
     entryBlock: {
-      marginBottom: 20,
+      marginBottom: 12,
       position: "relative",
     },
 
@@ -220,27 +259,27 @@ const createStyles = (theme) =>
       borderRadius: 4.5,
       backgroundColor: "#ffffff",
       borderWidth: 2,
-      borderColor: "#0f172a",
+      borderColor: activeColor.primary, // 🟢 Dynamic Dot Border
       zIndex: 10,
     },
     
     entryDate: {
       fontSize: 9.5,
-      color: "#0f172a", 
+      color: activeColor.primary, 
       fontWeight: "bold", 
       marginBottom: 1,
     },
     entryTitle: {
       fontSize: 11.5,
       fontWeight: "extraBold", 
-      color: "#0f172a",
+      color: activeColor.text, // 🟢 Dynamic Entry Title
       marginBottom: 1,
     },
     entrySubtitle: {
       fontSize: 9.5,
       color: "#475569", // Slate 600
       fontWeight: "medium",
-      marginBottom: 4,
+      marginBottom: 2,
       fontStyle: "italic",
     },
     description: {
@@ -254,13 +293,19 @@ const createStyles = (theme) =>
     referencesGrid: {
       flexDirection: "row",
       flexWrap: "wrap",
-      gap: 15,
+      gap: 10,
     },
     referenceItemMain: {
       width: "48%", 
       marginBottom: 10,
     }
   });
+};
+
+const formatUrl = (url) => {
+  if (!url) return "";
+  return url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+};
 
 // --------------------------------------------------------------------------
 // 🧩 RENDER HELPERS
@@ -268,31 +313,39 @@ const createStyles = (theme) =>
 
 // Sidebar
 const ContactSection = ({ data, styles, theme }) => (
-  <View style={{ marginBottom: 30 }}>
+  <View style={{ marginBottom: 20 }}>
     <Text style={styles.sidebarTitle}>Contact</Text>
     {data.phone && (
       <View style={styles.contactItem}>
-        <View style={{ width: 20 }}><IconPhone color={"#94a3b8"} /></View>
+        <View style={{ width: 20 }}><IconPhone color={"#ffffff"} /></View>
         <Text style={styles.contactText}>{data.phone}</Text>
       </View>
     )}
     {data.email && (
       <View style={styles.contactItem}>
-        <View style={{ width: 20 }}><IconMail color={"#94a3b8"} /></View>
+        <View style={{ width: 20 }}><IconMail color={"#ffffff"} /></View>
         <Text style={styles.contactText}>{data.email}</Text>
       </View>
     )}
     {data.address && (
       <View style={styles.contactItem}>
-        <View style={{ width: 20 }}><IconPin color={"#94a3b8"} /></View>
+        <View style={{ width: 20 }}><IconPin color={"#ffffff"} /></View>
         <Text style={styles.contactText}>{data.address}</Text>
       </View>
     )}
     {data.linkedin && (
       <View style={styles.contactItem}>
-        <View style={{ width: 20 }}><IconLinkedin color={"#94a3b8"} /></View>
+        <View style={{ width: 20 }}><IconLinkedin color={"#ffffff"} /></View>
         <Link src={data.linkedin} style={styles.contactText}>
-          LinkedIn
+          {formatUrl(data.linkedin)}
+        </Link>
+      </View>
+    )}
+    {data.github && (
+      <View style={styles.contactItem}>
+        <View style={{ width: 20 }}><IconGithub color={"#ffffff"} /></View>
+        <Link src={data.github} style={styles.contactText}>
+          {formatUrl(data.github)}
         </Link>
       </View>
     )}
@@ -300,32 +353,44 @@ const ContactSection = ({ data, styles, theme }) => (
 );
 
 const SkillsSidebar = ({ data, styles }) => (
-  <View style={{ marginBottom: 30 }}>
+  <View style={{ marginBottom: 20 }}>
     <Text style={styles.sidebarTitle}>Skills</Text>
-    {data.map((skill, i) => (
-      <Text key={i} style={styles.skillText}>
-        •  {skill.name}
-      </Text>
-    ))}
+    <View style={styles.skillsContainer}>
+      {data.map((skill, i) => (
+        <View key={i} style={styles.skillTag}>
+          <Text style={styles.skillText}>{skill.name}</Text>
+        </View>
+      ))}
+    </View>
   </View>
 );
 
 const LanguagesSidebar = ({ data, styles }) => (
-  <View style={{ marginBottom: 30 }}>
+  <View style={{ marginBottom: 20 }}>
     <Text style={styles.sidebarTitle}>Languages</Text>
-    {data.map((lang, i) => (
-      <Text key={i} style={styles.skillText}>
-        •  {lang.language}
-      </Text>
-    ))}
+    <View style={styles.skillsContainer}>
+      {data.map((lang, i) => (
+        <View key={i} style={styles.skillTag}>
+          <Text style={styles.skillText}>
+            {lang.language}
+          </Text>
+        </View>
+      ))}
+    </View>
   </View>
 );
 
 const ReferencesSidebar = ({ data, styles }) => (
-  <View style={{ marginBottom: 30 }}>
+  <View style={{ marginBottom: 20 }}>
     <Text style={styles.sidebarTitle}>References</Text>
     {data.map((ref, i) => (
-      <View key={i} style={styles.referenceBlockSidebar}>
+      <View 
+        key={i} 
+        style={[
+          styles.referenceBlockSidebar,
+          i < data.length - 1 && styles.referenceSeparator // Separator for all except last
+        ]}
+      >
         <Text style={{ ...styles.skillText, fontWeight: 'bold', color: '#fff' }}>{ref.name}</Text>
         <Text style={{ ...styles.skillText, fontSize: 8.5, fontStyle: 'italic' }}>{ref.position}</Text>
         <Text style={{ ...styles.skillText, fontSize: 8.5 }}>{ref.company}</Text>
@@ -410,8 +475,8 @@ const TimelineSection = ({ title, data, type, styles, theme }) => {
 
 const ElegantTemplate = ({ data, activeSections = [] }) => {
   const { personalInfo, themeColor = "blue" } = data;
-  const theme = THEMES[themeColor] || THEMES.blue;
-  const styles = useMemo(() => createStyles(theme), [theme]);
+  const theme = THEMES[themeColor] || THEMES.blue; // Keep for non-color styling if needed
+  const styles = useMemo(() => createStyles(themeColor), [themeColor]);
 
   const SIDEBAR_SECTIONS = ["skills", "languages", "references"];
   const MAIN_SECTIONS = [
@@ -459,7 +524,7 @@ const ElegantTemplate = ({ data, activeSections = [] }) => {
       {/* Right Column (Main) */}
       <View style={styles.rightColumn}>
         {/* Header (Top Left Aligned) */}
-        <View style={{ marginBottom: 30, alignItems: "flex-start" }}> 
+        <View style={{ marginBottom: 20, alignItems: "flex-start" }}> 
           <Text style={styles.headerName}>{personalInfo.fullName}</Text>
           <Text style={styles.headerRole}>{personalInfo.role}</Text>
           {personalInfo.summary && (

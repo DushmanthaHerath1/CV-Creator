@@ -12736,3 +12736,129 @@ export default ModernTemplate;
 ```
 
 ```
+
+## 02/04/2026 - 06.45PM
+
+###  MANIFEST UPDATE (Brick 6: Creative Templates & Engine Stability)
+
+**Status:** Creative, Minimalist, & Professional Templates Implemented. PDF Engine Hardened (Crash Fixes). Color Themes Added.
+
+#### 1. The Theme System (\src/data/themes.js\)
+
+_Centralized color palettes for all templates._
+
+\\\javascript
+export const THEMES = {
+  blue: {
+    id: "blue",
+    name: "Classic Blue",
+    colors: {
+      primary: "#2563eb", // blue-600
+      secondary: "#1e40af", // blue-800
+      accent: "#dbeafe", // blue-100
+      text: "#0f172a", // slate-900
+      icon: "#64748b", // slate-500
+      sidebarBg: "#f8fafc", // slate-50
+    },
+  },
+  emerald: {
+    id: "emerald",
+    name: "Modern Emerald",
+    colors: {
+      primary: "#059669", // emerald-600
+      secondary: "#065f46", // emerald-800
+      accent: "#d1fae5", // emerald-100
+      text: "#064e3b", // emerald-900
+      icon: "#059669", // emerald-600
+      sidebarBg: "#ecfdf5", // emerald-50
+    },
+  },
+  purple: {
+    id: "purple",
+    name: "Creative Purple",
+    colors: {
+      primary: "#7c3aed", // violet-600
+      secondary: "#5b21b6", // violet-800
+      accent: "#ede9fe", // violet-100
+      text: "#4c1d95", // violet-900
+      icon: "#7c3aed", // violet-600
+      sidebarBg: "#f5f3ff", // violet-50
+    },
+  },
+  rose: {
+    id: "rose",
+    name: "Vibrant Rose",
+    colors: {
+      primary: "#e11d48", // rose-600
+      secondary: "#9f1239", // rose-800
+      accent: "#ffe4e6", // rose-100
+      text: "#881337", // rose-900
+      icon: "#e11d48", // rose-600
+      sidebarBg: "#fff1f2", // rose-50
+    },
+  },
+  amber: {
+    id: "amber",
+    name: "Warm Amber",
+    colors: {
+      primary: "#d97706", // amber-600
+      secondary: "#92400e", // amber-800
+      accent: "#fef3c7", // amber-100
+      text: "#78350f", // amber-900
+      icon: "#d97706", // amber-600
+      sidebarBg: "#fffbeb", // amber-50
+    },
+  },
+  gray: {
+    id: "gray",
+    name: "Sleek Gray",
+    colors: {
+      primary: "#475569", // slate-600
+      secondary: "#1e293b", // slate-800
+      accent: "#f1f5f9", // slate-100
+      text: "#0f172a", // slate-900
+      icon: "#64748b", // slate-500
+      sidebarBg: "#f8fafc", // slate-50
+    },
+  },
+};
+\\\
+
+#### 2. The PDF Document Switcher (\src/components/pdf/CVDocument.jsx\)
+
+_Dynamically selects templates based on User Selection._
+
+\\\jsx
+import React from "react";
+import { Document } from "@react-pdf/renderer";
+import { getTemplate } from "./templates";
+
+const CVDocument = ({ data, activeSections }) => {
+  //  THE SWITCHER LOGIC
+  const templateId = data.templateId || "modern";
+  const SelectedTemplate = getTemplate(templateId).component;
+
+  return (
+    <Document>
+      <SelectedTemplate data={data} activeSections={activeSections} />
+    </Document>
+  );
+};
+
+export default CVDocument;
+\\\
+
+#### 3. Known Fixes & Gotchas (CRITICAL)
+
+** Bug: "Initializing Engine..." Freeze (Infinite Loading)**
+*   **Cause 1: Double Document Wrap.** Templates MUST return \<Page>\, NOT \<Document>\. Only \CVDocument.jsx\ contains the root \<Document>\.
+*   **Cause 2: Layout Loops.**
+    *   **Avoid:** \gap: 10\ (in older React-PDF versions). Use \marginRight/marginBottom\ instead.
+    *   **Avoid:** \height: '100%'\ on absolute containers inside relative pages.
+    *   **Avoid:** \wrap={false}\ on large dynamic sections (lists). Let them break naturally.
+*   **Cause 3: Component Mismatch.** Ensuring rendered component names (e.g., \<ContactSection />\) match definitions exactly.
+
+** Bug: Preview Alignment (Sticking to Side)**
+*   **Cause:** \CVPreview.jsx\ width calculation didn't account for full padding.
+*   **Fix:** Subtract **80px** (safety margin) from container width. Use \w-full justify-center\ wrapper.
+

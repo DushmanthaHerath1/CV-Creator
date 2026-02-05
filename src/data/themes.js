@@ -52,3 +52,37 @@ export const THEMES = {
 };
 
 export const DEFAULT_THEME = "blue";
+
+export const ELEGANT_THEMES = {
+  blue: {
+    id: "blue",
+    name: "Classic Blue",
+    colors: { primary: "#1A3263", secondary: "#1e40af", text: "#1A3263", sidebarBg: "#1A3263", accent: "#ffffff" },
+  },
+  /* 🟢 SAVED FOR LATER (Emerald)
+  green: {
+    id: "green",
+    name: "Modern Emerald",
+    colors: { primary: "#005461", secondary: "#065f46", text: "#005461", sidebarBg: "#005461", accent: "#ffffff" },
+  }, */
+  green: {
+    id: "green",
+    name: "Deep Indigo",
+    colors: { primary: "#413C69", secondary: "#2b2845", text: "#413C69", sidebarBg: "#413C69", accent: "#ffffff" },
+  },
+  purple: {
+    id: "purple",
+    name: "Classic Gunmetal",
+    colors: { primary: "#333446", secondary: "#272836", text: "#333446", sidebarBg: "#333446", accent: "#ffffff" },
+  },
+  rose: {
+    id: "rose",
+    name: "Crimson Red",
+    colors: { primary: "#740938", secondary: "#5c072c", text: "#740938", sidebarBg: "#740938", accent: "#ffffff" },
+  },
+  orange: { // Replaces 'amber' key to match ID
+    id: "orange",
+    name: "Deep Cyan",
+    colors: { primary: "#003C43", secondary: "#00282d", text: "#003C43", sidebarBg: "#003C43", accent: "#ffffff" },
+  },
+};

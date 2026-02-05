@@ -11,6 +11,8 @@ import { pdf } from "@react-pdf/renderer";
 import { Document, Page, pdfjs } from "react-pdf";
 import CVDocument from "../pdf/CVDocument.jsx";
 import { Download, Loader2, ZoomIn, ZoomOut, CheckCircle2 } from "lucide-react";
+import { THEMES, ELEGANT_THEMES } from "../../data/themes";
+import { TEMPLATES } from "../pdf/templates/index.jsx";
 
 // ✅ WORKER SETUP
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -106,9 +108,7 @@ const useContainerWidth = (ref, isVisible) => {
 // 📄 MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-// 🎨 Import Themes & Templates
-import { THEMES } from "../../data/themes";
-import { TEMPLATES } from "../pdf/templates/index.jsx";
+
 
 const CVPreview = ({ activeSections = [], isActive = true }) => {
   const { watch, setValue } = useFormContext(); // 🟢 Get setValue
@@ -295,30 +295,32 @@ const CVPreview = ({ activeSections = [], isActive = true }) => {
       {/* 🎨 FLOATING COLOR PICKER */}
       {currentTemplate.hasColorVariants && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg border border-gray-200 flex items-center gap-3 z-30 transition-transform hover:scale-105">
-          {Object.values(THEMES).map((theme) => (
-            <button
-              key={theme.id}
-              type="button"
-              onClick={() => setValue("themeColor", theme.id)}
-              className={`w-8 h-8 rounded-full border-2 transition-all ${
-                themeColor === theme.id
-                  ? "border-gray-900 scale-110 shadow-md"
-                  : "border-transparent hover:scale-110"
-              }`}
-              style={{ backgroundColor: theme.colors.sidebarBg }}
-              title={theme.name}
-            >
-              <div
-                className="w-full h-full rounded-full border border-black/5"
+          {(() => {
+            // 🟢 Select correct themes based on template ID
+            const activeThemes = currentTemplate.id === "elegant" ? ELEGANT_THEMES : THEMES;
+            
+            return Object.values(activeThemes).map((theme) => (
+              <button
+                key={theme.id}
+                type="button"
+                onClick={() => setValue("themeColor", theme.id)}
+                className={`w-8 h-8 rounded-full border-2 transition-all ${
+                  themeColor === theme.id
+                    ? "border-gray-900 scale-110 shadow-md"
+                    : "border-transparent hover:scale-110"
+                }`}
                 style={{ backgroundColor: theme.colors.sidebarBg }}
+                title={theme.name}
               >
+                {/* Inner dot for contrast */}
                 <div
-                  className="w-full h-full rounded-full opacity-40"
-                  style={{ backgroundColor: theme.colors.accent }}
-                />
-              </div>
-            </button>
-          ))}
+                  className="w-full h-full rounded-full border border-black/5 flex items-center justify-center"
+                >
+                   {themeColor === theme.id && <div className="w-2 h-2 rounded-full bg-white shadow-sm" />}
+                </div>
+              </button>
+            ));
+          })()}
         </div>
       )}
     </div>
