@@ -86,3 +86,56 @@ export const ELEGANT_THEMES = {
     colors: { primary: "#003C43", secondary: "#00282d", text: "#003C43", sidebarBg: "#003C43", accent: "#ffffff" },
   },
 };
+
+export const CREATIVE_THEMES = {
+  blue: {
+    id: "blue",
+    name: "Steel Blue",
+    colors: {
+      sidebarBg: "#6594B1",
+      accent: "#ffffff",
+      text: "#163C55",
+      icon: "#222831", // High Contrast
+    },
+  },
+  green: {
+    id: "green",
+    name: "Cool Silver",
+    colors: {
+      sidebarBg: "#ACBAC4",
+      accent: "#ffffff",
+      text: "#2D3748",
+      icon: "#222831", // High Contrast
+    },
+  },
+  purple: {
+    id: "purple",
+    name: "Soft Periwinkle",
+    colors: {
+      sidebarBg: "#B7BDF7",
+      accent: "#ffffff",
+      text: "#2C2857",
+      icon: "#222831", // High Contrast
+    },
+  },
+  rose: {
+    id: "rose",
+    name: "Dusty Rose",
+    colors: {
+      sidebarBg: "#F5AFAF",
+      accent: "#ffffff",
+      text: "#5D1824",
+      icon: "#222831", // High Contrast
+    },
+  },
+  orange: {
+    id: "orange",
+    name: "Warm Sand",
+    colors: {
+      sidebarBg: "#EFE1B5",
+      accent: "#ffffff",
+      text: "#423111",
+      icon: "#222831", // High Contrast
+    },
+  },
+};

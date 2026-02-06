@@ -11,7 +11,7 @@ import { pdf } from "@react-pdf/renderer";
 import { Document, Page, pdfjs } from "react-pdf";
 import CVDocument from "../pdf/CVDocument.jsx";
 import { Download, Loader2, ZoomIn, ZoomOut, CheckCircle2 } from "lucide-react";
-import { THEMES, ELEGANT_THEMES } from "../../data/themes";
+import { THEMES, ELEGANT_THEMES, CREATIVE_THEMES } from "../../data/themes";
 import { TEMPLATES } from "../pdf/templates/index.jsx";
 
 // ✅ WORKER SETUP
@@ -297,8 +297,10 @@ const CVPreview = ({ activeSections = [], isActive = true }) => {
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg border border-gray-200 flex items-center gap-3 z-30 transition-transform hover:scale-105">
           {(() => {
             // 🟢 Select correct themes based on template ID
-            const activeThemes = currentTemplate.id === "elegant" ? ELEGANT_THEMES : THEMES;
-            
+            let activeThemes = THEMES;
+            if (currentTemplate.id === "elegant") activeThemes = ELEGANT_THEMES;
+            if (currentTemplate.id === "creative") activeThemes = CREATIVE_THEMES;
+
             return Object.values(activeThemes).map((theme) => (
               <button
                 key={theme.id}

@@ -9,6 +9,7 @@ import {
   Svg,
   Path,
 } from "@react-pdf/renderer";
+import { THEMES, CREATIVE_THEMES } from "../../../data/themes";
 
 // --------------------------------------------------------------------------
 // 🛠️ ICONS
@@ -32,6 +33,15 @@ const IconMail = ({ color, style }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+  </Svg>
+);
+
+const IconActivity = ({ color, style }) => (
+  <Svg width={11} height={11} viewBox="0 0 24 24" style={style}>
+    <Path d="M3.5 21 14 3" stroke={color || "#374151"} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M20.5 21 10 3" stroke={color || "#374151"} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M15.5 21 12 15l-3.5 6" stroke={color || "#374151"} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M2 21h20" stroke={color || "#374151"} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
   </Svg>
 );
 
@@ -207,11 +217,36 @@ const IconUsers = ({ color, style }) => (
   </Svg>
 );
 
+const IconCert = ({ color, style }) => (
+  <Svg width={13} height={13} viewBox="0 0 24 24" style={style}>
+    <Path
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
+      stroke={color || "#1f2937"}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="m9 12 2 2 4-4"
+      stroke={color || "#1f2937"}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 // --------------------------------------------------------------------------
 // 🎨 STYLES
 // --------------------------------------------------------------------------
 
-const createStyles = () =>
+// --------------------------------------------------------------------------
+// 🎨 STYLES
+// --------------------------------------------------------------------------
+
+const createStyles = (theme) =>
   StyleSheet.create({
     page: {
       backgroundColor: "#ffffff",
@@ -222,32 +257,30 @@ const createStyles = () =>
       paddingBottom: 35,
       paddingLeft: 0,
       paddingRight: 0,
+      flexDirection: "row", // 🟢 Switch to Flex Layout
     },
     
-    // Sidebar background - fixed position
+    // Sidebar background - fixed position (Kept absolute for bleed)
     sidebarBackground: {
       position: "absolute",
-      top: 0,
+      top: -35, // 🟢 Offset padding
       left: 0,
-      bottom: 0,
+      bottom: -35, // 🟢 Offset padding
       width: "35%",
-      backgroundColor: "#f8fafc",
+      backgroundColor: theme.colors.sidebarBg,
     },
 
-    // Left sidebar column
+    // Left sidebar column (Flows naturally now)
     leftColumn: {
-      position: "absolute",
-      top: 0,
-      left: 0,
       width: "35%",
-      paddingTop: 35, 
+      paddingTop: 0, // 🟢 Removed padding to align Photo with Name
       paddingHorizontal: 20,
       paddingBottom: 20,
     },
 
-    // Right main content column
+    // Right main content column (Flows naturally now)
     rightColumn: {
-      marginLeft: "35%",
+      flex: 1, // 🟢 Take remaining space
       paddingLeft: 28,
       paddingRight: 28,
       paddingTop: 0, 
@@ -274,7 +307,7 @@ const createStyles = () =>
     name: {
       fontSize: 26,
       fontWeight: "bold",
-      color: "#0f172a",
+      color: theme.colors.text,
       textTransform: "uppercase",
       letterSpacing: 1.8,
       marginBottom: 6,
@@ -282,7 +315,7 @@ const createStyles = () =>
     },
     role: {
       fontSize: 13,
-      color: "#64748b",
+      color: theme.colors.icon,
       letterSpacing: 0.8,
       marginBottom: 18,
       fontWeight: "medium",
@@ -298,24 +331,26 @@ const createStyles = () =>
       marginBottom: 8,
       paddingBottom: 8,
       borderBottomWidth: 0.5,
-      borderBottomColor: "#e2e8f0",
+      borderBottomColor: theme.colors.text, 
     },
     contactText: {
         fontSize: 8.5,
-        color: "#334155",
+        color: theme.colors.icon,
         lineHeight: 1.4,
-        marginLeft: 6
+        marginLeft: 6,
+        flex: 1, // 🟢 Allow wrapping text to take space
     },
 
+    // Section titles
     // Section titles
     sectionTitle: {
       fontSize: 14,
       fontWeight: "bold",
-      color: "#0f172a",
+      color: theme.colors.text,
       marginBottom: 12,
       paddingBottom: 5,
       borderBottomWidth: 2,
-      borderBottomColor: "#334155",
+      borderBottomColor: theme.colors.text,
       marginTop: 6,
       textTransform: "uppercase",
       letterSpacing: 1.2,
@@ -326,11 +361,11 @@ const createStyles = () =>
     sidebarSectionTitle: {
       fontSize: 11,
       fontWeight: "bold",
-      color: "#0f172a",
+      color: theme.colors.text,
       marginBottom: 10,
       paddingBottom: 4,
       borderBottomWidth: 1.5,
-      borderBottomColor: "#cbd5e1",
+      borderBottomColor: theme.colors.text,
       marginTop: 18,
       textTransform: "uppercase",
       letterSpacing: 0.8,
@@ -341,7 +376,7 @@ const createStyles = () =>
     // Body text
     bodyText: {
       fontSize: 9,
-      color: "#475569",
+      color: theme.colors.icon,
       textAlign: "justify",
       marginBottom: 6,
       lineHeight: 1.6,
@@ -360,7 +395,7 @@ const createStyles = () =>
     entryTitle: {
       fontSize: 11,
       fontWeight: "bold",
-      color: "#0f172a",
+      color: theme.colors.text,
       flex: 1,
       lineHeight: 1.3,
       marginRight: 10,
@@ -368,7 +403,7 @@ const createStyles = () =>
     entryDate: {
       fontSize: 9,
       fontWeight: "bold",
-      color: "#475569",
+      color: theme.colors.icon,
       textAlign: "right",
       flexShrink: 0,
       minWidth: 90,
@@ -376,7 +411,7 @@ const createStyles = () =>
     entrySubtitle: {
       fontSize: 10,
       fontWeight: "medium",
-      color: "#64748b",
+      color: theme.colors.icon,
       marginBottom: 4,
       fontStyle: "italic",
     },
@@ -388,35 +423,37 @@ const createStyles = () =>
     rewardDate: {
       fontSize: 8,
       marginBottom: 1,
-      color: "#94a3b8",
+      color: theme.colors.icon,
       fontStyle: "italic",
     },
     rewardTitle: {
       fontWeight: "bold",
       fontSize: 9.5,
-      color: "#0f172a",
+      color: theme.colors.text,
       marginBottom: 1,
     },
     rewardIssuer: {
       fontSize: 8.5,
-      color: "#64748b",
+      color: theme.colors.icon,
     },
 
-    // Skills - Modern Badges
+    // Skills - Modern Badges (Ported from Professional)
     skillsContainer: {
       flexDirection: "row",
       flexWrap: "wrap",
     },
     skillBadge: {
-      backgroundColor: "#e2e8f0", 
+      backgroundColor: theme.colors.accent, 
       borderRadius: 4,
       paddingHorizontal: 8,
       paddingVertical: 4,
       marginRight: 6,
       marginBottom: 6,
+      alignItems: "center", // 🟢 Fix centering
+      justifyContent: "center", // 🟢 Fix centering
     },
     skillText: {
-      color: "#334155",
+      color: theme.colors.text,
       fontSize: 9,
       fontWeight: "bold",
     },
@@ -426,11 +463,11 @@ const createStyles = () =>
       marginBottom: 5,
       paddingBottom: 5,
       borderBottomWidth: 0.5,
-      borderBottomColor: "#e2e8f0",
+      borderBottomColor: theme.colors.text,
     },
     languageText: {
       fontSize: 9,
-      color: "#475569",
+      color: theme.colors.icon,
       lineHeight: 1.4,
     },
     
@@ -441,17 +478,17 @@ const createStyles = () =>
     referenceName: {
         fontSize: 10,
         fontWeight: 'bold',
-        color: '#0f172a'
+        color: theme.colors.text
     },
     referencePosition: {
         fontSize: 9,
-        color: '#64748b',
+        color: theme.colors.icon,
         fontStyle: 'italic',
         marginBottom: 2
     },
     referenceContact: {
         fontSize: 8.5,
-        color: '#334155'
+        color: theme.colors.icon
     }
   });
 
@@ -459,58 +496,102 @@ const createStyles = () =>
 // 🧩 COMPONENT SECTIONS
 // --------------------------------------------------------------------------
 
-const ContactSection = ({ data, styles }) => (
+const ContactSection = ({ data, styles, theme }) => (
   <View style={styles.contactSection}>
     <View style={styles.sidebarSectionTitle}>
-        <Text>Contact</Text>
+        <IconUser color={theme.colors.text} />
+        <Text style={{ marginLeft: 7 }}>Contact</Text>
     </View>
     {data.phone && (
       <View style={styles.contactItem}>
-        <IconPhone color="#64748b" />
+        <IconPhone color={theme.colors.icon} />
         <Text style={styles.contactText}>{data.phone}</Text>
       </View>
     )}
     {data.email && (
       <View style={styles.contactItem}>
-        <IconMail color="#64748b" />
+        <IconMail color={theme.colors.icon} />
         <Text style={styles.contactText}>{data.email}</Text>
       </View>
     )}
     {data.address && (
       <View style={styles.contactItem}>
-        <IconMapPin color="#64748b" />
+        <IconMapPin color={theme.colors.icon} />
         <Text style={styles.contactText}>{data.address}</Text>
       </View>
     )}
     {data.linkedin && (
       <View style={styles.contactItem}>
-        <IconLinkedin color="#64748b" />
-        <Link src={data.linkedin} style={{...styles.contactText, textDecoration:'none', color:'#334155'}}>LinkedIn</Link>
+        <IconLinkedin color={theme.colors.icon} />
+        <Link src={data.linkedin} style={{...styles.contactText, textDecoration:'none', color: theme.colors.icon }}>
+          {data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}
+        </Link>
       </View>
     )}
     {data.github && (
       <View style={styles.contactItem}>
-        <IconGithub color="#64748b" />
-        <Link src={data.github} style={{...styles.contactText, textDecoration:'none', color:'#334155'}}>GitHub</Link>
+        <IconGithub color={theme.colors.icon} />
+        <Link src={data.github} style={{...styles.contactText, textDecoration:'none', color: theme.colors.icon }}>
+          {data.github.replace(/^https?:\/\/(www\.)?/, '')}
+        </Link>
+      </View>
+    )}
+
+    {/* Bio Details - Regional Requirement (Robust Layout) */}
+    {(data.dob || data.gender || data.nationality || data.maritalStatus || data.idNumber) && (
+      <View style={{ marginTop: 10 }}> {/* 🟢 Reduced margin from 15 */}
+        <View style={styles.sidebarSectionTitle}>
+            <IconUser color={theme.colors.text} />
+            <Text style={{ marginLeft: 7 }}>Personal Details</Text>
+        </View>
+        <View>
+          {data.dob && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 8.5, color: theme.colors.icon }}>DOB: {data.dob}</Text>
+            </View>
+          )}
+          {data.gender && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 8.5, color: theme.colors.icon }}>Gender: {data.gender}</Text>
+            </View>
+          )}
+          {data.nationality && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 8.5, color: theme.colors.icon }}>Nationality: {data.nationality}</Text>
+            </View>
+          )}
+          {data.maritalStatus && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 8.5, color: theme.colors.icon }}>Status: {data.maritalStatus}</Text>
+            </View>
+          )}
+          {data.idNumber && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 8.5, color: theme.colors.icon }}>ID: {data.idNumber}</Text>
+            </View>
+          )}
+        </View>
       </View>
     )}
   </View>
 );
 
-const AboutSection = ({ summary, styles }) => (
+const AboutSection = ({ summary, styles, theme }) => (
     <View style={{ marginBottom: 18 }}>
         <View style={styles.sidebarSectionTitle}>
-            <IconUser color="#0f172a" />
+            <IconUser color={theme.colors.text} />
             <Text style={{ marginLeft: 7 }}>About Me</Text>
         </View>
         <Text style={styles.bodyText}>{summary}</Text>
     </View>
 );
 
-const SkillsSection = ({ skills, styles }) => (
-  <View style={{ marginBottom: 14 }}>
+const SkillsSection = ({ skills, styles, theme }) => (
+  // 🟢 Fixed Layout: Reverted complicated sticky header for badges.
+  // Using wrap={false} for the block is safer for grid items.
+  <View style={{ marginBottom: 14 }} wrap={false}>
     <View style={styles.sidebarSectionTitle}>
-      <IconCode color="#0f172a" />
+      <IconSkills color={theme.colors.text} />
       <Text style={{ marginLeft: 7 }}>Skills</Text>
     </View>
     <View style={styles.skillsContainer}>
@@ -523,14 +604,16 @@ const SkillsSection = ({ skills, styles }) => (
   </View>
 );
 
-const LanguagesSection = ({ languages, styles }) => (
+const LanguagesSection = ({ languages, styles, theme }) => (
   <View style={{ marginBottom: 14 }}>
-    <View style={styles.sidebarSectionTitle}>
-      <IconGlobe color="#0f172a" />
-      <Text style={{ marginLeft: 7 }}>Languages</Text>
-    </View>
     {languages.map((lang, index) => (
-      <View key={index} style={styles.languageItem}>
+      <View key={index} style={styles.languageItem} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sidebarSectionTitle}>
+            <IconGlobe color={theme.colors.text} />
+            <Text style={{ marginLeft: 7 }}>Languages</Text>
+          </View>
+        )}
         <Text style={styles.languageText}>
           {lang.language}{lang.proficiency ? ` (${lang.proficiency})` : ""}
         </Text>
@@ -539,14 +622,16 @@ const LanguagesSection = ({ languages, styles }) => (
   </View>
 );
 
-const AchievementsSection = ({ achievements, styles }) => (
+const AchievementsSection = ({ achievements, styles, theme }) => (
   <View style={{ marginBottom: 14 }}>
-    <View style={styles.sidebarSectionTitle}>
-      <IconTrophy color="#0f172a" />
-      <Text style={{ marginLeft: 7 }}>Awards</Text>
-    </View>
     {achievements.map((item, index) => (
-      <View key={index} style={styles.rewardBlock}>
+      <View key={index} style={styles.rewardBlock} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sidebarSectionTitle}>
+            <IconTrophy color={theme.colors.text} />
+            <Text style={{ marginLeft: 7 }}>Awards</Text>
+          </View>
+        )}
         {item.date && <Text style={styles.rewardDate}>{item.date}</Text>}
         <Text style={styles.rewardTitle}>{item.title}</Text>
         {item.issuer && <Text style={styles.rewardIssuer}>{item.issuer}</Text>}
@@ -555,14 +640,16 @@ const AchievementsSection = ({ achievements, styles }) => (
   </View>
 );
 
-const ExperienceSection = ({ experience, styles }) => (
+const ExperienceSection = ({ experience, styles, theme }) => (
   <View>
-    <View style={styles.sectionTitle}>
-      <IconExperience color="#0f172a" />
-      <Text style={{ marginLeft: 8 }}>Experience</Text>
-    </View>
     {experience.map((job, index) => (
       <View key={index} style={styles.entryBlock} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sectionTitle}>
+            <IconExperience color={theme.colors.text} />
+            <Text style={{ marginLeft: 8 }}>Experience</Text>
+          </View>
+        )}
         <View style={styles.entryHeader}>
           <Text style={styles.entryTitle}>{job.role}</Text>
           <Text style={styles.entryDate}>
@@ -576,14 +663,16 @@ const ExperienceSection = ({ experience, styles }) => (
   </View>
 );
 
-const EducationSection = ({ education, styles }) => (
+const EducationSection = ({ education, styles, theme }) => (
   <View>
-    <View style={styles.sectionTitle}>
-      <IconEducation color="#0f172a" />
-      <Text style={{ marginLeft: 8 }}>Education</Text>
-    </View>
     {education.map((edu, index) => (
       <View key={index} style={styles.entryBlock} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sectionTitle}>
+            <IconEducation color={theme.colors.text} />
+            <Text style={{ marginLeft: 8 }}>Education</Text>
+          </View>
+        )}
         <View style={styles.entryHeader}>
           <Text style={styles.entryTitle}>{edu.degree}</Text>
           <Text style={styles.entryDate}>{edu.date}</Text>
@@ -595,14 +684,16 @@ const EducationSection = ({ education, styles }) => (
   </View>
 );
 
-const ProjectsSection = ({ projects, styles }) => (
+const ProjectsSection = ({ projects, styles, theme }) => (
   <View>
-    <View style={styles.sectionTitle}>
-      <IconCode color="#0f172a" />
-      <Text style={{ marginLeft: 8 }}>Projects</Text>
-    </View>
     {projects.map((item, index) => (
       <View key={index} style={styles.entryBlock} wrap={false}>
+         {index === 0 && (
+          <View style={styles.sectionTitle}>
+            <IconProject color={theme.colors.text} />
+            <Text style={{ marginLeft: 8 }}>Projects</Text>
+          </View>
+         )}
         <View style={styles.entryHeader}>
           <Text style={styles.entryTitle}>{item.title}</Text>
           {item.technologies && (
@@ -610,7 +701,7 @@ const ProjectsSection = ({ projects, styles }) => (
           )}
         </View>
         {item.link && (
-          <Text style={{ ...styles.entrySubtitle, color: "#2563eb", marginBottom: 4 }}>
+          <Text style={{ ...styles.entrySubtitle, color: theme.colors.text, marginBottom: 4 }}>
             {item.link}
           </Text>
         )}
@@ -620,15 +711,58 @@ const ProjectsSection = ({ projects, styles }) => (
   </View>
 );
 
-const ReferencesSection = ({ references, styles }) => (
-  <View style={{ marginTop: 14 }} wrap={false}>
-    <View style={styles.sectionTitle}>
-      <IconUsers color="#0f172a" />
-      <Text style={{ marginLeft: 8 }}>References</Text>
-    </View>
+const CertificatesSection = ({ certificates, styles, theme }) => (
+  <View>
+    {certificates.map((item, index) => (
+      <View key={index} style={styles.entryBlock} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sectionTitle}>
+            <IconCert color={theme.colors.text} />
+            <Text style={{ marginLeft: 8 }}>Certificates</Text>
+          </View>
+        )}
+        <View style={styles.entryHeader}>
+          <Text style={styles.entryTitle}>{item.name}</Text>
+          <Text style={styles.entryDate}>{item.date}</Text>
+        </View>
+        <Text style={styles.entrySubtitle}>{item.issuer}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+const ExtracurricularSection = ({ extracurricular, styles, theme }) => (
+  <View>
+    {extracurricular.map((item, index) => (
+      <View key={index} style={styles.entryBlock} wrap={false}>
+        {index === 0 && (
+          <View style={styles.sectionTitle}>
+            <IconActivity color={theme.colors.text} />
+            <Text style={{ marginLeft: 8 }}>Extracurricular</Text>
+          </View>
+        )}
+        <View style={styles.entryHeader}>
+          <Text style={styles.entryTitle}>{item.role}</Text>
+          <Text style={styles.entryDate}>{item.date}</Text>
+        </View>
+        <Text style={styles.entrySubtitle}>{item.organization}</Text>
+        {item.description && <Text style={styles.bodyText}>{item.description}</Text>}
+      </View>
+    ))}
+  </View>
+);
+
+const ReferencesSection = ({ references, styles, theme }) => (
+  <View style={{ marginTop: 14 }}>
     <View style={{ flexDirection: "column" }}>
       {references.map((ref, index) => (
-        <View key={index} style={styles.referenceItem}>
+        <View key={index} style={styles.referenceItem} wrap={false}>
+          {index === 0 && (
+            <View style={styles.sectionTitle}>
+              <IconUsers color={theme.colors.text} />
+              <Text style={{ marginLeft: 8 }}>References</Text>
+            </View>
+          )}
           <Text style={styles.referenceName}>{ref.name}</Text>
           <Text style={styles.referencePosition}>
             {ref.position} @ {ref.company}
@@ -650,8 +784,9 @@ const ReferencesSection = ({ references, styles }) => (
 // --------------------------------------------------------------------------
 
 const CreativeTemplate = ({ data, activeSections = [] }) => {
-  const { personalInfo } = data;
-  const styles = useMemo(() => createStyles(), []);
+  const { personalInfo, themeColor = "blue" } = data;
+  const theme = CREATIVE_THEMES[themeColor] || CREATIVE_THEMES.blue;
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   // Sections that belong in the Left Sidebar
   const SIDEBAR_IDS = ["skills", "achievements", "languages"];
@@ -672,24 +807,24 @@ const CreativeTemplate = ({ data, activeSections = [] }) => {
 
         {/* About Me */}
         {personalInfo.summary && (
-          <AboutSection summary={personalInfo.summary} styles={styles} />
+          <AboutSection summary={personalInfo.summary} styles={styles} theme={theme} />
         )}
 
         {/* Contact Info (Fixed Name) */}
-        <ContactSection data={personalInfo} styles={styles} />
+        <ContactSection data={personalInfo} styles={styles} theme={theme} />
 
         {/* Sidebar Dynamic Sections */}
         {activeSections.map((section) => {
           if (!SIDEBAR_IDS.includes(section.id)) return null;
           
           if (section.id === "skills" && data.skills?.length > 0) {
-            return <SkillsSection key="skills" skills={data.skills} styles={styles} />;
+            return <SkillsSection key="skills" skills={data.skills} styles={styles} theme={theme} />;
           }
           if (section.id === "achievements" && data.achievements?.length > 0) {
-            return <AchievementsSection key="achievements" achievements={data.achievements} styles={styles} />;
+            return <AchievementsSection key="achievements" achievements={data.achievements} styles={styles} theme={theme} />;
           }
           if (section.id === "languages" && data.languages?.length > 0) {
-            return <LanguagesSection key="languages" languages={data.languages} styles={styles} />;
+            return <LanguagesSection key="languages" languages={data.languages} styles={styles} theme={theme} />;
           }
           return null;
         })}
@@ -707,16 +842,22 @@ const CreativeTemplate = ({ data, activeSections = [] }) => {
           if (SIDEBAR_IDS.includes(section.id)) return null;
 
           if (section.id === "experience" && data.experience?.length > 0) {
-            return <ExperienceSection key="experience" experience={data.experience} styles={styles} />;
+            return <ExperienceSection key="experience" experience={data.experience} styles={styles} theme={theme} />;
           }
           if (section.id === "education" && data.education?.length > 0) {
-            return <EducationSection key="education" education={data.education} styles={styles} />;
+            return <EducationSection key="education" education={data.education} styles={styles} theme={theme} />;
           }
           if (section.id === "projects" && data.projects?.length > 0) {
-            return <ProjectsSection key="projects" projects={data.projects} styles={styles} />;
+            return <ProjectsSection key="projects" projects={data.projects} styles={styles} theme={theme} />;
           }
           if (section.id === "references" && data.references?.length > 0) {
-            return <ReferencesSection key="references" references={data.references} styles={styles} />;
+            return <ReferencesSection key="references" references={data.references} styles={styles} theme={theme} />;
+          }
+          if (section.id === "certificates" && data.certificates?.length > 0) {
+            return <CertificatesSection key="certificates" certificates={data.certificates} styles={styles} theme={theme} />;
+          }
+          if (section.id === "extracurricular" && data.extracurricular?.length > 0) {
+            return <ExtracurricularSection key="extracurricular" extracurricular={data.extracurricular} styles={styles} theme={theme} />;
           }
           return null;
         })}

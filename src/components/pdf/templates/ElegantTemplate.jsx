@@ -95,38 +95,35 @@ const createStyles = (themeColor) => {
       fontFamily: "Helvetica",
       fontSize: 10,
       lineHeight: 1.5,
-      position: "relative",
-      paddingTop: 25,
-      paddingBottom: 25,
+      paddingTop: 35, // 🟢 Standardized Match
+      paddingBottom: 35,
+      flexDirection: "row", // 🟢 Switch to Flexbox
     },
 
-    // 🟢 Sidebar Background
+    // 🟢 Sidebar Background (Keep absolute for bleed)
     sidebarBackground: {
       position: "absolute",
-      top: -25,
+      top: -35,
       left: 0,
-      bottom: -25,
+      bottom: -35,
       width: "35%", 
-      backgroundColor: activeColor.primary, // 🟢 Dynamic Dark Background
+      backgroundColor: activeColor.primary, 
     },
 
     // 🟢 Left Column (Sidebar Content)
     leftColumn: {
-      position: "absolute",
-      top: 0,
-      left: 0,
       width: "35%", 
-      paddingHorizontal: 25,
-      paddingTop: 30,
+      paddingHorizontal: 20,
+      paddingTop: 0, // Align with Right Column
       height: "100%",
       color: "#ffffff",
     },
 
     // 🟢 Right Column (Main Content)
     rightColumn: {
-      marginLeft: "35%",
-      paddingLeft: 35,
-      paddingRight: 35,
+      flex: 1, // Take remaining space
+      paddingLeft: 30,
+      paddingRight: 30,
     },
 
     // Header
@@ -401,7 +398,55 @@ const ReferencesSidebar = ({ data, styles }) => (
   </View>
 );
 
-// Main Content - Timeline
+
+
+const PersonalDetails = ({ data, styles, theme }) => (
+  <View style={{ marginBottom: 20 }}>
+    <Text style={styles.sidebarTitle}>Personal Details</Text>
+    {data.dob && (
+       <View style={{ marginBottom: 4 }}>
+         <Text style={{ ...styles.contactText, opacity: 0.8 }}>DOB: {data.dob}</Text>
+       </View>
+    )}
+    {data.gender && (
+       <View style={{ marginBottom: 4 }}>
+         <Text style={{ ...styles.contactText, opacity: 0.8 }}>Gender: {data.gender}</Text>
+       </View>
+    )}
+    {data.nationality && (
+       <View style={{ marginBottom: 4 }}>
+         <Text style={{ ...styles.contactText, opacity: 0.8 }}>Nationality: {data.nationality}</Text>
+       </View>
+    )}
+    {data.maritalStatus && (
+       <View style={{ marginBottom: 4 }}>
+         <Text style={{ ...styles.contactText, opacity: 0.8 }}>Status: {data.maritalStatus}</Text>
+       </View>
+    )}
+    {data.idNumber && (
+       <View style={{ marginBottom: 4 }}>
+         <Text style={{ ...styles.contactText, opacity: 0.8 }}>ID: {data.idNumber}</Text>
+       </View>
+    )}
+  </View>
+);
+
+const ExtracurricularSection = ({ data, styles, theme }) => (
+  <View style={{ marginBottom: 20 }}>
+    <Text style={styles.mainSectionTitle}>Extracurricular</Text>
+    <View style={styles.timelineContainer}>
+      {data.map((item, index) => (
+        <View key={index} style={styles.entryBlock} wrap={false}>
+          <View style={styles.timelineDot} />
+           <Text style={styles.entryTitle}>{item.title}</Text>
+          <Text style={styles.entryDate}>{item.date}</Text>
+          <Text style={styles.entrySubtitle}>{item.organization}</Text>
+          <Text style={styles.description}>{item.description}</Text>
+        </View>
+      ))}
+    </View>
+  </View>
+);
 const TimelineEntry = ({
   title,
   subtitle,
@@ -429,6 +474,39 @@ const ReferencesGrid = ({ data, styles }) => (
           <Text style={{ ...styles.entrySubtitle, marginBottom: 2, fontSize: 9 }}>{ref.position} / {ref.company}</Text>
           <Text style={{ ...styles.description, fontSize: 8.5 }}>{ref.phone}</Text>
           <Text style={{ ...styles.description, fontSize: 8.5 }}>{ref.email}</Text>
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+const CertificatesSection = ({ certificates, styles, theme }) => (
+  <View style={{ marginBottom: 20 }}>
+    <Text style={styles.mainSectionTitle}>Certificates</Text>
+    <View style={styles.timelineContainer}>
+      {certificates.map((item, index) => (
+        <View key={index} style={styles.entryBlock} wrap={false}>
+          <View style={styles.timelineDot} />
+          <Text style={styles.entryTitle}>{item.name}</Text>
+          <Text style={styles.entryDate}>{item.date}</Text>
+          <Text style={styles.entrySubtitle}>{item.issuer}</Text>
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+const AwardsSection = ({ awards, styles, theme }) => (
+  <View style={{ marginBottom: 20 }}>
+    <Text style={styles.mainSectionTitle}>Awards</Text>
+    <View style={styles.timelineContainer}>
+      {awards.map((item, index) => (
+        <View key={index} style={styles.entryBlock} wrap={false}>
+          <View style={styles.timelineDot} />
+           <Text style={styles.entryTitle}>{item.title}</Text>
+          <Text style={styles.entryDate}>{item.date}</Text>
+          <Text style={styles.entrySubtitle}>{item.awarder}</Text>
+          <Text style={styles.description}>{item.summary}</Text>
         </View>
       ))}
     </View>
@@ -498,6 +576,9 @@ const ElegantTemplate = ({ data, activeSections = [] }) => {
           <Image src={personalInfo.photo} style={styles.photo} />
         )}
         <ContactSection data={personalInfo} styles={styles} theme={theme} />
+
+        {/* 🟢 Personal Details (Bio) - Added */}
+        <PersonalDetails data={personalInfo} styles={styles} theme={theme} />
 
         {activeSections.map((section) => {
           if (!SIDEBAR_SECTIONS.includes(section.id)) return null;
@@ -573,6 +654,18 @@ const ElegantTemplate = ({ data, activeSections = [] }) => {
                   styles={styles}
                   theme={theme}
                 />
+              );
+            case "certificates":
+              return data.certificates?.length > 0 && (
+                <CertificatesSection key={section.id} certificates={data.certificates} styles={styles} theme={theme} />
+              );
+            case "awards":
+              return data.awards?.length > 0 && (
+                <AwardsSection key={section.id} awards={data.awards} styles={styles} theme={theme} />
+              );
+            case "extracurricular":
+              return data.extracurricular?.length > 0 && (
+                 <ExtracurricularSection key={section.id} data={data.extracurricular} styles={styles} theme={theme} />
               );
             case "references": 
                return (

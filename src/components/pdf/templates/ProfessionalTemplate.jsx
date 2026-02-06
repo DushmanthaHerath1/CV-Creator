@@ -205,6 +205,57 @@ const IconProject = ({ color = "#374151" }) => (
   </Svg>
 );
 
+const IconGithub = ({ color = "#374151" }) => (
+  <Svg width={11} height={11} viewBox="0 0 24 24" style={{ marginRight: 6 }}>
+    <Path
+      d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 18c-4.51 2-5-2-7-2"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const IconActivity = ({ color = "#374151" }) => (
+  <Svg width={11} height={11} viewBox="0 0 24 24" style={{ marginRight: 6 }}>
+    <Path d="M3.5 21 14 3" stroke={color} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M20.5 21 10 3" stroke={color} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M15.5 21 12 15l-3.5 6" stroke={color} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M2 21h20" stroke={color} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+const IconCert = ({ color = "#374151" }) => (
+  <Svg width={11} height={11} viewBox="0 0 24 24" style={{ marginRight: 6 }}>
+     <Path
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="m9 12 2 2 4-4"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 // --------------------------------------------------------------------------
 // 🎨 STYLES
 // --------------------------------------------------------------------------
@@ -214,39 +265,35 @@ const createStyles = (theme) => StyleSheet.create({
     backgroundColor: "#ffffff",
     fontFamily: "Helvetica",
     fontSize: 10,
-    lineHeight: 1.5,
-    position: "relative",
-    paddingTop: 55, // 🟢 Increased Header Space
-    paddingBottom: 65,
+    flexDirection: "row",
+    paddingTop: 35, // 🟢 Tier 1: Page Margins (Repeats on every page)
+    paddingBottom: 35,
   },
 
   // 1. Fixed Sidebar Background (Appears on ALL pages)
   sidebarBackground: {
     position: "absolute",
-    top: -55, // 🟢 Offset padding
+    top: -35, // 🟢 Offset Page Padding
     left: 0,
-    bottom: -65, // 🟢 Offset padding
+    bottom: -35, // 🟢 Offset Page Padding
     width: "36%",
     backgroundColor: theme.colors.sidebarBg,
   },
 
-  // 2. Sidebar Content (Only on Page 1)
+  // 2. Sidebar Content
   leftColumn: {
-    position: "absolute",
-    top: 0,
-    left: 0,
     width: "36%",
-    padding: 24,
-    paddingTop: 35, // 🟢 Pushing content down to match Page Padding
-    height: "100%",
+    paddingLeft: 20,
+    paddingRight: 10,
   },
 
   // 3. Main Content (Flows naturally)
+  // 3. Main Content
   rightColumn: {
-    marginLeft: "36%",
-    padding: 32,
-    paddingTop: 0,
-    paddingRight: 40,
+    flex: 1, 
+    paddingHorizontal: 28, // 🟢 Align with Profile Pic (Removed vertical padding)
+    paddingRight: 32,
+    paddingTop: 0, 
   },
 
   // Header (Centered in Sidebar)
@@ -254,35 +301,43 @@ const createStyles = (theme) => StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: theme.colors.text,
-    marginBottom: 4,
+
     letterSpacing: 0.5,
     lineHeight: 1.2,
     textAlign: "center",
+    marginBottom: 12, // Increased from 4 to fix overlap
   },
 
   headerRole: {
     fontSize: 11,
     color: theme.colors.icon,
-    marginBottom: 30,
+    marginBottom: 20, // Reduced from 30
     fontWeight: "normal",
     textTransform: "uppercase",
     letterSpacing: 1.5,
     textAlign: "center",
   },
 
-  photo: {
+  photoContainer: {
     width: 125,
     height: 125,
     borderRadius: 62.5,
     marginBottom: 20,
-    objectFit: "cover",
     alignSelf: "center",
+    overflow: "hidden", // 🟢 Force circular clip
+    flexShrink: 0, // 🟢 CRITICAL: Prevent squashing
+  },
+
+  photo: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
 
   // Sidebar sections
   sidebarSection: {
-    marginBottom: 24,
-    paddingRight: 10,
+    marginBottom: 18, // 🟢 Match Creative: ~18px gap (was 24)
+    paddingRight: 8,
   },
 
   sidebarTitle: {
@@ -300,7 +355,8 @@ const createStyles = (theme) => StyleSheet.create({
   contactItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 8, // 🟢 Tier 3: Item Spacing
+
   },
 
   contactText: {
@@ -331,27 +387,27 @@ const createStyles = (theme) => StyleSheet.create({
   skillItem: {
     fontSize: 9,
     color: theme.colors.icon,
-    marginBottom: 5,
+    marginBottom: 4, // 🟢 Tier 4: Element Spacing
     lineHeight: 1.3,
   },
 
   languageItem: {
     fontSize: 9,
     color: theme.colors.icon,
-    marginBottom: 5,
+    marginBottom: 4, // Reduced from 8
   },
 
   // Main content sections
   mainSection: {
-    marginBottom: 22,
+    marginBottom: 18, // 🟢 Match Creative: ~18px gap (was 24)
   },
   
   // ... (Keep existing Main Section Styles but ensure they are untouched by replacement if possible) ...
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
-    paddingBottom: 6,
+    marginBottom: 10, // Reduced from 16
+    paddingBottom: 4, // Reduced from 8
     borderBottomWidth: 1.5,
     borderBottomColor: "#e2e8f0",
   },
@@ -365,14 +421,14 @@ const createStyles = (theme) => StyleSheet.create({
   },
 
   entryBlock: {
-    marginBottom: 14,
+    marginBottom: 12, // 🟢 Match Creative: 12px gap (was 16)
   },
 
   entryHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 3,
+    marginBottom: 4, // 🟢 Tier 4: Element Spacing
   },
 
   entryTitle: {
@@ -392,7 +448,7 @@ const createStyles = (theme) => StyleSheet.create({
   entrySubtitle: {
     fontSize: 9.5,
     color: theme.colors.icon,
-    marginBottom: 5,
+    marginBottom: 4, // 🟢 Tier 4: Element Spacing
     fontStyle: "italic",
     fontWeight: "medium",
   },
@@ -412,7 +468,7 @@ const createStyles = (theme) => StyleSheet.create({
   },
 
   referenceBlock: {
-    marginBottom: 14,
+    marginBottom: 12, // 🟢 Match Creative: 12px gap (was 16)
   },
 
   referenceName: {
@@ -465,6 +521,48 @@ const ContactSection = ({ data, styles, theme }) => (
         </Link>
       </View>
     )}
+    {data.github && (
+      <View style={styles.contactItem}>
+        <IconGithub color={theme.colors.icon} />
+        <Link src={data.github} style={styles.contactText}>
+          Github
+        </Link>
+      </View>
+    )}
+
+    {/* Bio Details - Regional Requirement */}
+    {(data.dob || data.gender || data.nationality || data.maritalStatus || data.idNumber) && (
+      <View style={{ marginTop: 15 }}>
+        <Text style={styles.sidebarTitle}>Personal Details</Text>
+        <View>
+          {data.dob && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 9, color: theme.colors.icon }}>DOB: {data.dob}</Text>
+            </View>
+          )}
+          {data.gender && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 9, color: theme.colors.icon }}>Gender: {data.gender}</Text>
+            </View>
+          )}
+          {data.nationality && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 9, color: theme.colors.icon }}>Nationality: {data.nationality}</Text>
+            </View>
+          )}
+          {data.maritalStatus && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 9, color: theme.colors.icon }}>Status: {data.maritalStatus}</Text>
+            </View>
+          )}
+          {data.idNumber && (
+            <View style={{ marginBottom: 4 }}>
+               <Text style={{ fontSize: 9, color: theme.colors.icon }}>ID: {data.idNumber}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    )}
   </View>
 );
 
@@ -483,20 +581,22 @@ const SkillsSidebar = ({ data, styles }) => (
 
 const LanguagesSidebar = ({ data, styles }) => (
   <View style={styles.sidebarSection}>
-    <Text style={styles.sidebarTitle}>Language</Text>
     {data.map((lang, i) => (
-      <Text key={i} style={styles.languageItem}>
-        • {lang.language} ({lang.proficiency})
-      </Text>
+      <View key={i} style={styles.languageItem} wrap={false}>
+        {i === 0 && <Text style={styles.sidebarTitle}>Language</Text>}
+        <Text>
+          • {lang.language} ({lang.proficiency})
+        </Text>
+      </View>
     ))}
   </View>
 );
 
 const ReferencesSidebar = ({ data, styles }) => (
   <View style={styles.sidebarSection}>
-    <Text style={styles.sidebarTitle}>References</Text>
     {data.map((ref, i) => (
-      <View key={i} style={styles.referenceBlock}>
+      <View key={i} style={styles.referenceBlock} wrap={false}>
+        {i === 0 && <Text style={styles.sidebarTitle}>References</Text>}
         <Text style={styles.referenceName}>{ref.name}</Text>
         <Text style={styles.referenceDetails}>
           {ref.position} @ {ref.company}
@@ -523,20 +623,25 @@ const AboutSection = ({ text, styles, theme }) => (
 
 const ExperienceMain = ({ data, styles, theme }) => (
   <View style={styles.mainSection}>
-    <View style={styles.sectionHeader}>
-      <IconBriefcase color={theme.colors.text} />
-      <Text style={styles.sectionTitle}>Experience</Text>
-    </View>
     {data.map((job, i) => (
-      <View key={i} style={styles.entryBlock} wrap={false}>
-        <View style={styles.entryHeader}>
-          <Text style={styles.entryTitle}>{job.role}</Text>
-          <Text style={styles.entryDate}>
-            {job.startDate} – {job.endDate}
-          </Text>
+      <View key={i} wrap={false}>
+        {/* 🟢 Render Header WITH first item to prevent widowing */}
+        {i === 0 && (
+          <View style={styles.sectionHeader}>
+            <IconBriefcase color={theme.colors.text} />
+            <Text style={styles.sectionTitle}>Experience</Text>
+          </View>
+        )}
+        <View style={styles.entryBlock}>
+          <View style={styles.entryHeader}>
+            <Text style={styles.entryTitle}>{job.role}</Text>
+            <Text style={styles.entryDate}>
+              {job.startDate} – {job.endDate}
+            </Text>
+          </View>
+          <Text style={styles.entrySubtitle}>{job.company}</Text>
+          <Text style={styles.entryDescription}>{job.description}</Text>
         </View>
-        <Text style={styles.entrySubtitle}>{job.company}</Text>
-        <Text style={styles.entryDescription}>{job.description}</Text>
       </View>
     ))}
   </View>
@@ -544,18 +649,22 @@ const ExperienceMain = ({ data, styles, theme }) => (
 
 const EducationMain = ({ data, styles, theme }) => (
   <View style={styles.mainSection}>
-    <View style={styles.sectionHeader}>
-      <IconGraduate color={theme.colors.text} />
-      <Text style={styles.sectionTitle}>Education</Text>
-    </View>
     {data.map((edu, i) => (
-      <View key={i} style={styles.entryBlock} wrap={false}>
-        <View style={styles.entryHeader}>
-          <Text style={styles.entryTitle}>{edu.degree}</Text>
-          <Text style={styles.entryDate}>{edu.date}</Text>
+      <View key={i} wrap={false}>
+        {i === 0 && (
+          <View style={styles.sectionHeader}>
+            <IconGraduate color={theme.colors.text} />
+            <Text style={styles.sectionTitle}>Education</Text>
+          </View>
+        )}
+        <View style={styles.entryBlock}>
+          <View style={styles.entryHeader}>
+            <Text style={styles.entryTitle}>{edu.degree}</Text>
+            <Text style={styles.entryDate}>{edu.date}</Text>
+          </View>
+          <Text style={styles.entrySubtitle}>{edu.school}</Text>
+          <Text style={styles.entryDescription}>{edu.description}</Text>
         </View>
-        <Text style={styles.entrySubtitle}>{edu.school}</Text>
-        <Text style={styles.entryDescription}>{edu.description}</Text>
       </View>
     ))}
   </View>
@@ -563,20 +672,24 @@ const EducationMain = ({ data, styles, theme }) => (
 
 const ProjectsMain = ({ data, styles, theme }) => (
   <View style={styles.mainSection}>
-    <View style={styles.sectionHeader}>
-      <IconProject color={theme.colors.text} />
-      <Text style={styles.sectionTitle}>Projects</Text>
-    </View>
     {data.map((item, i) => (
-      <View key={i} style={styles.entryBlock} wrap={false}>
-        <View style={styles.entryHeader}>
-          <Text style={styles.entryTitle}>{item.title}</Text>
-          {item.technologies && (
-            <Text style={styles.entryDate}>{item.technologies}</Text>
-          )}
+      <View key={i} wrap={false}>
+        {i === 0 && (
+          <View style={styles.sectionHeader}>
+            <IconProject color={theme.colors.text} />
+            <Text style={styles.sectionTitle}>Projects</Text>
+          </View>
+        )}
+        <View style={styles.entryBlock}>
+          <View style={styles.entryHeader}>
+            <Text style={styles.entryTitle}>{item.title}</Text>
+            {item.technologies && (
+              <Text style={styles.entryDate}>{item.technologies}</Text>
+            )}
+          </View>
+          {item.link && <Text style={styles.entrySubtitle}>{item.link}</Text>}
+          <Text style={styles.entryDescription}>{item.description}</Text>
         </View>
-        {item.link && <Text style={styles.entrySubtitle}>{item.link}</Text>}
-        <Text style={styles.entryDescription}>{item.description}</Text>
       </View>
     ))}
   </View>
@@ -584,17 +697,71 @@ const ProjectsMain = ({ data, styles, theme }) => (
 
 const AchievementsMain = ({ data, styles, theme }) => (
   <View style={styles.mainSection}>
-    <View style={styles.sectionHeader}>
-      <IconTrophy color={theme.colors.text} />
-      <Text style={styles.sectionTitle}>Achievements</Text>
-    </View>
     {data.map((item, i) => (
-      <View key={i} style={styles.entryBlock} wrap={false}>
-        <View style={styles.entryHeader}>
-          <Text style={styles.entryTitle}>{item.title}</Text>
-          <Text style={styles.entryDate}>{item.date}</Text>
+      <View key={i} wrap={false}>
+        {i === 0 && (
+          <View style={styles.sectionHeader}>
+            <IconTrophy color={theme.colors.text} />
+            <Text style={styles.sectionTitle}>Achievements</Text>
+          </View>
+        )}
+        <View style={styles.entryBlock}>
+          <View style={styles.entryHeader}>
+            <Text style={styles.entryTitle}>{item.title}</Text>
+            <Text style={styles.entryDate}>{item.date}</Text>
+          </View>
+          <Text style={styles.entryDescription}>{item.description}</Text>
         </View>
-        <Text style={styles.entryDescription}>{item.description}</Text>
+      </View>
+    ))}
+  </View>
+);
+
+
+// --------------------------------------------------------------------------
+// 🏁 COMPONENT DEFINITIONS (Certificates & Extracurricular)
+// --------------------------------------------------------------------------
+
+const CertificatesMain = ({ data, styles, theme }) => (
+  <View style={styles.mainSection}>
+    {data.map((item, i) => (
+      <View key={i} wrap={false}>
+        {i === 0 && (
+          <View style={styles.sectionHeader}>
+            <IconCert color={theme.colors.text} />
+            <Text style={styles.sectionTitle}>Certificates</Text>
+          </View>
+        )}
+        <View style={styles.entryBlock}>
+          <View style={styles.entryHeader}>
+            <Text style={styles.entryTitle}>{item.name}</Text>
+            <Text style={styles.entryDate}>{item.date}</Text>
+          </View>
+          <Text style={styles.entrySubtitle}>{item.issuer}</Text>
+        </View>
+      </View>
+    ))}
+  </View>
+);
+
+const ExtracurricularMain = ({ data, styles, theme }) => (
+  <View style={styles.mainSection}>
+    {data.map((item, i) => (
+      <View key={i} wrap={false}>
+        {i === 0 && (
+          <View style={styles.sectionHeader}>
+            <IconActivity color={theme.colors.text} />
+            <Text style={styles.sectionTitle}>Extracurricular</Text>
+          </View>
+        )}
+        <View style={styles.entryBlock}>
+          <View style={styles.entryHeader}>
+            <Text style={styles.entryTitle}>{item.role}</Text>
+            <Text style={styles.entryDate}>{item.date}</Text>
+          </View>
+          <Text style={styles.entrySubtitle}>{item.organization}</Text>
+          <Text style={styles.entryDescription}>{item.description}</Text>
+        </View>
       </View>
     ))}
   </View>
@@ -620,6 +787,7 @@ const ProfessionalTemplate = ({ data, activeSections = [] }) => {
     "education",
     "projects",
     "achievements",
+    "certificates",
     "extracurricular",
   ];
 
@@ -633,7 +801,9 @@ const ProfessionalTemplate = ({ data, activeSections = [] }) => {
       <View style={styles.leftColumn}>
         {/* Name & Role */}
         {personalInfo.photo && (
-          <Image src={personalInfo.photo} style={styles.photo} />
+          <View style={styles.photoContainer}>
+            <Image src={personalInfo.photo} style={styles.photo} />
+          </View>
         )}
         <Text style={styles.headerName}>{personalInfo.fullName}</Text>
         <Text style={styles.headerRole}>{personalInfo.role}</Text>
@@ -702,6 +872,18 @@ const ProfessionalTemplate = ({ data, activeSections = [] }) => {
               return (
                 data.achievements?.length > 0 && (
                   <AchievementsMain key={section.id} data={data.achievements} styles={styles} theme={theme} />
+                )
+              );
+            case "certificates":
+              return (
+                data.certificates?.length > 0 && (
+                  <CertificatesMain key={section.id} data={data.certificates} styles={styles} theme={theme} />
+                )
+              );
+            case "extracurricular":
+              return (
+                data.extracurricular?.length > 0 && (
+                  <ExtracurricularMain key={section.id} data={data.extracurricular} styles={styles} theme={theme} />
                 )
               );
             default:

@@ -50,7 +50,7 @@ export const TEMPLATES = {
     description: "Contemporary two-column layout with gray sidebar and bold typography.",
     tags: ["Creative", "Designer", "Modern"],
     isNew: true,
-    hasColorVariants: false, // 🚫 Fixed Gray Theme
+    hasColorVariants: true, // ✅ Customizable Theme
   },
 };
 
