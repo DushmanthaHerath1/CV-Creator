@@ -95,12 +95,12 @@ const createStyles = (themeColor) => {
       fontFamily: "Helvetica",
       fontSize: 10,
       lineHeight: 1.5,
-      paddingTop: 35, // 🟢 Standardized Match
+      paddingTop: 35, // 🟢 Standardized Page Margins
       paddingBottom: 35,
-      flexDirection: "row", // 🟢 Switch to Flexbox
+      flexDirection: "row", // 🟢 Standard Flexbox Layout
     },
 
-    // 🟢 Sidebar Background (Keep absolute for bleed)
+    // 🟢 Sidebar Background (Visual Only - Absolute)
     sidebarBackground: {
       position: "absolute",
       top: -35,
@@ -110,18 +110,17 @@ const createStyles = (themeColor) => {
       backgroundColor: activeColor.primary, 
     },
 
-    // 🟢 Left Column (Sidebar Content)
+    // 🟢 Left Column (Content - Relative in Flex Row)
     leftColumn: {
       width: "35%", 
       paddingHorizontal: 20,
-      paddingTop: 0, // Align with Right Column
-      height: "100%",
+      paddingTop: 0, 
       color: "#ffffff",
     },
 
-    // 🟢 Right Column (Main Content)
+    // 🟢 Right Column (Content - Relative in Flex Row)
     rightColumn: {
-      flex: 1, // Take remaining space
+      flex: 1, 
       paddingLeft: 30,
       paddingRight: 30,
     },
@@ -245,6 +244,7 @@ const createStyles = (themeColor) => {
     entryBlock: {
       marginBottom: 12,
       position: "relative",
+      minHeight: 20, // Ensure it has height
     },
 
     timelineDot: {
@@ -256,9 +256,11 @@ const createStyles = (themeColor) => {
       borderRadius: 4.5,
       backgroundColor: "#ffffff",
       borderWidth: 2,
-      borderColor: activeColor.primary, // 🟢 Dynamic Dot Border
+      borderColor: activeColor.primary, 
       zIndex: 10,
     },
+    
+    // ... items ...
     
     entryDate: {
       fontSize: 9.5,
@@ -364,28 +366,46 @@ const SkillsSidebar = ({ data, styles }) => (
 
 const LanguagesSidebar = ({ data, styles }) => (
   <View style={{ marginBottom: 20 }}>
-    <Text style={styles.sidebarTitle}>Languages</Text>
-    <View style={styles.skillsContainer}>
-      {data.map((lang, i) => (
-        <View key={i} style={styles.skillTag}>
+    <View wrap={false}>
+      <Text style={styles.sidebarTitle}>Languages</Text>
+      {data[0] && (
+        <View style={{ marginBottom: 4 }}>
           <Text style={styles.skillText}>
-            {lang.language}
+            {data[0].language} ({data[0].proficiency})
           </Text>
         </View>
-      ))}
+      )}
     </View>
+    {data.slice(1).map((lang, i) => (
+      <View key={i} style={{ marginBottom: 4 }}>
+        <Text style={styles.skillText}>
+          {lang.language} ({lang.proficiency})
+        </Text>
+      </View>
+    ))}
   </View>
 );
 
 const ReferencesSidebar = ({ data, styles }) => (
   <View style={{ marginBottom: 20 }}>
-    <Text style={styles.sidebarTitle}>References</Text>
-    {data.map((ref, i) => (
+    <View wrap={false}>
+      <Text style={styles.sidebarTitle}>References</Text>
+      {data[0] && (
+        <View style={[styles.referenceBlockSidebar, data.length > 1 && styles.referenceSeparator]}>
+          <Text style={{ ...styles.skillText, fontWeight: 'bold', color: '#fff' }}>{data[0].name}</Text>
+          <Text style={{ ...styles.skillText, fontSize: 8.5, fontStyle: 'italic' }}>{data[0].position}</Text>
+          <Text style={{ ...styles.skillText, fontSize: 8.5 }}>{data[0].company}</Text>
+          <Text style={{ ...styles.skillText, fontSize: 8.5, opacity: 0.7 }}>{data[0].phone}</Text>
+          <Text style={{ ...styles.skillText, fontSize: 8.5, opacity: 0.7 }}>{data[0].email}</Text>
+        </View>
+      )}
+    </View>
+    {data.slice(1).map((ref, i) => (
       <View 
         key={i} 
         style={[
           styles.referenceBlockSidebar,
-          i < data.length - 1 && styles.referenceSeparator // Separator for all except last
+          i < data.slice(1).length - 1 && styles.referenceSeparator 
         ]}
       >
         <Text style={{ ...styles.skillText, fontWeight: 'bold', color: '#fff' }}>{ref.name}</Text>
@@ -401,31 +421,31 @@ const ReferencesSidebar = ({ data, styles }) => (
 
 
 const PersonalDetails = ({ data, styles, theme }) => (
-  <View style={{ marginBottom: 20 }}>
+  <View style={{ marginBottom: 20, marginTop: 15 }} wrap={false}>
     <Text style={styles.sidebarTitle}>Personal Details</Text>
     {data.dob && (
-       <View style={{ marginBottom: 4 }}>
-         <Text style={{ ...styles.contactText, opacity: 0.8 }}>DOB: {data.dob}</Text>
+       <View style={{ marginBottom: 6 }}>
+         <Text style={{ fontSize: 9, color: "#ffffff", opacity: 0.9, lineHeight: 1.5 }}>DOB: {data.dob}</Text>
        </View>
     )}
     {data.gender && (
-       <View style={{ marginBottom: 4 }}>
-         <Text style={{ ...styles.contactText, opacity: 0.8 }}>Gender: {data.gender}</Text>
+       <View style={{ marginBottom: 6 }}>
+         <Text style={{ fontSize: 9, color: "#ffffff", opacity: 0.9, lineHeight: 1.5 }}>Gender: {data.gender}</Text>
        </View>
     )}
     {data.nationality && (
-       <View style={{ marginBottom: 4 }}>
-         <Text style={{ ...styles.contactText, opacity: 0.8 }}>Nationality: {data.nationality}</Text>
+       <View style={{ marginBottom: 6 }}>
+         <Text style={{ fontSize: 9, color: "#ffffff", opacity: 0.9, lineHeight: 1.5 }}>Nationality: {data.nationality}</Text>
        </View>
     )}
     {data.maritalStatus && (
-       <View style={{ marginBottom: 4 }}>
-         <Text style={{ ...styles.contactText, opacity: 0.8 }}>Status: {data.maritalStatus}</Text>
+       <View style={{ marginBottom: 6 }}>
+         <Text style={{ fontSize: 9, color: "#ffffff", opacity: 0.9, lineHeight: 1.5 }}>Status: {data.maritalStatus}</Text>
        </View>
     )}
     {data.idNumber && (
-       <View style={{ marginBottom: 4 }}>
-         <Text style={{ ...styles.contactText, opacity: 0.8 }}>ID: {data.idNumber}</Text>
+       <View style={{ marginBottom: 6 }}>
+         <Text style={{ fontSize: 9, color: "#ffffff", opacity: 0.9, lineHeight: 1.5 }}>ID: {data.idNumber}</Text>
        </View>
     )}
   </View>
@@ -433,9 +453,22 @@ const PersonalDetails = ({ data, styles, theme }) => (
 
 const ExtracurricularSection = ({ data, styles, theme }) => (
   <View style={{ marginBottom: 20 }}>
-    <Text style={styles.mainSectionTitle}>Extracurricular</Text>
+    <View wrap={false}>
+       <Text style={styles.mainSectionTitle}>Extracurricular</Text>
+       {data[0] && (
+         <View style={[styles.timelineContainer, { marginBottom: 0 }]}>
+            <View style={styles.entryBlock}>
+              <View style={styles.timelineDot} />
+              <Text style={styles.entryTitle}>{data[0].title}</Text>
+              <Text style={styles.entryDate}>{data[0].date}</Text>
+              <Text style={styles.entrySubtitle}>{data[0].organization}</Text>
+              <Text style={styles.description}>{data[0].description}</Text>
+            </View>
+         </View>
+       )}
+    </View>
     <View style={styles.timelineContainer}>
-      {data.map((item, index) => (
+      {data.slice(1).map((item, index) => (
         <View key={index} style={styles.entryBlock} wrap={false}>
           <View style={styles.timelineDot} />
            <Text style={styles.entryTitle}>{item.title}</Text>
@@ -464,11 +497,25 @@ const TimelineEntry = ({
 );
 
 // Grid References for Main Area
+// Grid References for Main Area
+// Grid References for Main Area
 const ReferencesGrid = ({ data, styles }) => (
   <View>
-    <Text style={styles.mainSectionTitle}>References</Text>
+    <View wrap={false}>
+       <Text style={styles.mainSectionTitle}>References</Text>
+       {data[0] && (
+          <View style={styles.referencesGrid}>
+            <View style={styles.referenceItemMain}>
+              <Text style={{ ...styles.entryTitle, fontSize: 10.5 }}>{data[0].name}</Text>
+              <Text style={{ ...styles.entrySubtitle, marginBottom: 2, fontSize: 9 }}>{data[0].position} / {data[0].company}</Text>
+              <Text style={{ ...styles.description, fontSize: 8.5 }}>{data[0].phone}</Text>
+              <Text style={{ ...styles.description, fontSize: 8.5 }}>{data[0].email}</Text>
+            </View>
+          </View>
+       )}
+    </View>
     <View style={styles.referencesGrid}>
-      {data.map((ref, i) => (
+      {data.slice(1).map((ref, i) => (
         <View key={i} style={styles.referenceItemMain}>
           <Text style={{ ...styles.entryTitle, fontSize: 10.5 }}>{ref.name}</Text>
           <Text style={{ ...styles.entrySubtitle, marginBottom: 2, fontSize: 9 }}>{ref.position} / {ref.company}</Text>
@@ -482,9 +529,21 @@ const ReferencesGrid = ({ data, styles }) => (
 
 const CertificatesSection = ({ certificates, styles, theme }) => (
   <View style={{ marginBottom: 20 }}>
-    <Text style={styles.mainSectionTitle}>Certificates</Text>
+    <View wrap={false}>
+      <Text style={styles.mainSectionTitle}>Certificates</Text>
+      {certificates[0] && (
+        <View style={[styles.timelineContainer, { marginBottom: 0 }]}>
+           <View style={styles.entryBlock}>
+              <View style={styles.timelineDot} />
+              <Text style={styles.entryTitle}>{certificates[0].name}</Text>
+              <Text style={styles.entryDate}>{certificates[0].date}</Text>
+              <Text style={styles.entrySubtitle}>{certificates[0].issuer}</Text>
+           </View>
+        </View>
+      )}
+    </View>
     <View style={styles.timelineContainer}>
-      {certificates.map((item, index) => (
+      {certificates.slice(1).map((item, index) => (
         <View key={index} style={styles.entryBlock} wrap={false}>
           <View style={styles.timelineDot} />
           <Text style={styles.entryTitle}>{item.name}</Text>
@@ -498,9 +557,22 @@ const CertificatesSection = ({ certificates, styles, theme }) => (
 
 const AwardsSection = ({ awards, styles, theme }) => (
   <View style={{ marginBottom: 20 }}>
-    <Text style={styles.mainSectionTitle}>Awards</Text>
+    <View wrap={false}>
+      <Text style={styles.mainSectionTitle}>Awards</Text>
+      {awards[0] && (
+        <View style={[styles.timelineContainer, { marginBottom: 0 }]}>
+          <View style={styles.entryBlock}>
+            <View style={styles.timelineDot} />
+             <Text style={styles.entryTitle}>{awards[0].title}</Text>
+            <Text style={styles.entryDate}>{awards[0].date}</Text>
+            <Text style={styles.entrySubtitle}>{awards[0].awarder}</Text>
+            <Text style={styles.description}>{awards[0].summary}</Text>
+          </View>
+        </View>
+      )}
+    </View>
     <View style={styles.timelineContainer}>
-      {awards.map((item, index) => (
+      {awards.slice(1).map((item, index) => (
         <View key={index} style={styles.entryBlock} wrap={false}>
           <View style={styles.timelineDot} />
            <Text style={styles.entryTitle}>{item.title}</Text>
@@ -515,33 +587,43 @@ const AwardsSection = ({ awards, styles, theme }) => (
 
 const TimelineSection = ({ title, data, type, styles, theme }) => {
   if (!data || data.length === 0) return null;
+  
+  const renderItem = (item, i) => {
+    const titleText =
+      type === "edu" ? item.degree : type === "exp" ? item.role : item.title;
+    const subtitleText =
+      type === "edu" ? item.school : type === "exp" ? item.company : "";
+    const dateText =
+      type === "edu"
+        ? item.date
+        : type === "exp"
+        ? `${item.startDate} - ${item.endDate}`
+        : item.date;
+
+    return (
+      <TimelineEntry
+        key={i}
+        title={titleText}
+        subtitle={subtitleText}
+        date={dateText}
+        description={item.description}
+        styles={styles}
+      />
+    );
+  };
+
   return (
     <View>
-      <Text style={styles.mainSectionTitle}>{title}</Text>
+      <View wrap={false}>
+         <Text style={styles.mainSectionTitle}>{title}</Text>
+         {data[0] && (
+            <View style={[styles.timelineContainer, { marginBottom: 0 }]}>
+               {renderItem(data[0], 0)}
+            </View>
+         )}
+      </View>
       <View style={styles.timelineContainer}>
-        {data.map((item, i) => {
-          const titleText =
-            type === "edu" ? item.degree : type === "exp" ? item.role : item.title;
-          const subtitleText =
-            type === "edu" ? item.school : type === "exp" ? item.company : "";
-          const dateText =
-            type === "edu"
-              ? item.date
-              : type === "exp"
-              ? `${item.startDate} - ${item.endDate}`
-              : item.date;
-
-          return (
-            <TimelineEntry
-              key={i}
-              title={titleText}
-              subtitle={subtitleText}
-              date={dateText}
-              description={item.description}
-              styles={styles}
-            />
-          );
-        })}
+        {data.slice(1).map((item, i) => renderItem(item, i))}
       </View>
     </View>
   );
