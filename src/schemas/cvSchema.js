@@ -17,6 +17,7 @@ export const cvSchema = z.object({
     // Socials (Modern CV)
     linkedin: z.string().optional(),
     github: z.string().optional(),
+    website: z.string().optional(),
 
     // Bio Details (Regional/SL Standard)
     dob: z.string().optional(),
@@ -54,6 +55,13 @@ export const cvSchema = z.object({
       })
     )
     .optional(),
+  tools: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Tool cannot be empty"),
+      })
+    )
+    .optional(),
 
   certificates: z
     .array(
@@ -61,6 +69,7 @@ export const cvSchema = z.object({
         name: z.string().min(2, "Certificate name required"),
         issuer: z.string().optional(),
         date: z.string().optional(),
+        link: z.string().optional(), // 🔗 New Field
       })
     )
     .optional(),
@@ -94,6 +103,7 @@ export const cvSchema = z.object({
         link: z.string().optional(),
         technologies: z.string().optional(),
         description: z.string().optional(),
+        isCurrent: z.boolean().optional(), // 🟢 New Field
       })
     )
     .optional(),

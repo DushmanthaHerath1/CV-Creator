@@ -1,0 +1,62 @@
+import React from "react";
+import { useFormContext, useFieldArray } from "react-hook-form";
+import { Wrench, X } from "lucide-react"; // 👈 Using Wrench icon for Tools
+import FormSection from "../ui/FormSection.jsx";
+
+const Tools = () => {
+  const { register, control } = useFormContext();
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "tools",
+  });
+
+  return (
+    <FormSection
+      title="Tools"
+      icon={Wrench}
+      onAdd={() => append({ name: "" })}
+      addButtonLabel="Add Tool"
+    >
+      {/* 🏷️ The Chip Container */}
+      <div className="flex flex-wrap gap-3">
+        {fields.map((item, index) => (
+          <div
+            key={item.id}
+            className="flex items-center gap-2 px-4 py-2 text-blue-800 transition-all border border-blue-100 rounded-full bg-blue-50 hover:bg-blue-100 hover:shadow-sm group"
+          >
+            {/* ✍️ Transparent Input */}
+            <input
+              {...register(`tools.${index}.name`)}
+              className="bg-transparent border-none outline-none text-sm font-semibold text-blue-900 placeholder-blue-300 w-24 sm:w-auto min-w-[60px]"
+              placeholder="Tool..."
+              autoFocus={fields.length > 1 && index === fields.length - 1} // Auto-focus new chips
+            />
+
+            {/* ❌ Remove Icon */}
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              className="text-blue-300 transition-colors hover:text-red-500"
+              title="Remove Tool"
+            >
+              <X size={14} strokeWidth={3} />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Empty State */}
+      {fields.length === 0 && (
+        <div className="p-8 text-center text-gray-400 border-2 border-gray-200 border-dashed rounded-xl">
+          <p className="text-sm font-medium">No tools listed.</p>
+          <p className="mt-1 text-xs">
+            Add software, hardware, or other tools you use.
+          </p>
+        </div>
+      )}
+    </FormSection>
+  );
+};
+
+export default Tools;

@@ -348,6 +348,14 @@ const ContactSection = ({ data, styles, theme }) => (
         </Link>
       </View>
     )}
+    {data.website && (
+      <View style={styles.contactItem}>
+        <View style={{ width: 20 }}><IconGlobe color={"#ffffff"} /></View>
+        <Link src={data.website} style={styles.contactText}>
+          {formatUrl(data.website)}
+        </Link>
+      </View>
+    )}
   </View>
 );
 
@@ -358,6 +366,19 @@ const SkillsSidebar = ({ data, styles }) => (
       {data.map((skill, i) => (
         <View key={i} style={styles.skillTag}>
           <Text style={styles.skillText}>{skill.name}</Text>
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+const ToolsSidebar = ({ data, styles }) => (
+  <View style={{ marginBottom: 20 }}>
+    <Text style={styles.sidebarTitle}>Tools</Text>
+    <View style={styles.skillsContainer}>
+      {data.map((tool, i) => (
+        <View key={i} style={styles.skillTag}>
+          <Text style={styles.skillText}>{tool.name}</Text>
         </View>
       ))}
     </View>
@@ -538,6 +559,14 @@ const CertificatesSection = ({ certificates, styles, theme }) => (
               <Text style={styles.entryTitle}>{certificates[0].name}</Text>
               <Text style={styles.entryDate}>{certificates[0].date}</Text>
               <Text style={styles.entrySubtitle}>{certificates[0].issuer}</Text>
+              {certificates[0].link && (
+                <Link
+                  src={certificates[0].link}
+                  style={{ ...styles.entrySubtitle, color: theme.colors.primary, textDecoration: "none", marginTop: 2 }}
+                >
+                  {certificates[0].link.replace(/^https?:\/\//, "")}
+                </Link>
+              )}
            </View>
         </View>
       )}
@@ -549,6 +578,96 @@ const CertificatesSection = ({ certificates, styles, theme }) => (
           <Text style={styles.entryTitle}>{item.name}</Text>
           <Text style={styles.entryDate}>{item.date}</Text>
           <Text style={styles.entrySubtitle}>{item.issuer}</Text>
+          {item.link && (
+            <Link
+              src={item.link}
+              style={{ ...styles.entrySubtitle, color: theme.colors.primary, textDecoration: "none", marginTop: 2 }}
+            >
+              {item.link.replace(/^https?:\/\//, "")}
+            </Link>
+          )}
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
+const ProjectsSection = ({ projects, styles, theme }) => (
+  <View style={{ marginBottom: 20 }}>
+    <View wrap={false}>
+      <Text style={styles.mainSectionTitle}>Projects</Text>
+      {projects[0] && (
+        <View style={[styles.timelineContainer, { marginBottom: 0 }]}>
+           <View style={styles.entryBlock}>
+              <View style={styles.timelineDot} />
+              <View style={styles.entryHeader}>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, marginRight: 8 }}>
+                  <Text style={styles.entryTitle}>
+                    {projects[0].title}
+                    {projects[0].isCurrent && (
+                      <Text
+                        style={{
+                          color: theme.colors.primary,
+                          fontSize: 10,
+                          fontWeight: "normal",
+                        }}
+                      >
+                         {"  "}● Ongoing
+                      </Text>
+                    )}
+                  </Text>
+                </View>
+                {projects[0].technologies && (
+                  <Text style={styles.entryDate}>{projects[0].technologies}</Text>
+                )}
+              </View>
+              {projects[0].link && (
+                <Link
+                  src={projects[0].link}
+                  style={{ ...styles.entrySubtitle, color: theme.colors.secondary, textDecoration: "none", marginTop: 2 }}
+                >
+                  {projects[0].link.replace(/^https?:\/\//, "")}
+                </Link>
+              )}
+              <Text style={styles.description}>{projects[0].description}</Text>
+           </View>
+        </View>
+      )}
+    </View>
+    <View style={styles.timelineContainer}>
+      {projects.slice(1).map((item, index) => (
+        <View key={index} style={styles.entryBlock} wrap={false}>
+          <View style={styles.timelineDot} />
+          <View style={styles.entryHeader}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, marginRight: 8 }}>
+              <Text style={styles.entryTitle}>
+                {item.title}
+                {item.isCurrent && (
+                  <Text
+                    style={{
+                      color: theme.colors.primary,
+                      fontSize: 10,
+                      fontWeight: "normal",
+                    }}
+                  >
+                     {"  "}● Ongoing
+                  </Text>
+                )}
+              </Text>
+            </View>
+            {item.technologies && (
+              <Text style={styles.entryDate}>{item.technologies}</Text>
+            )}
+          </View>
+          {item.link && (
+            <Link
+              src={item.link}
+              style={{ ...styles.entrySubtitle, color: theme.colors.secondary, textDecoration: "none", marginTop: 2 }}
+            >
+              {item.link.replace(/^https?:\/\//, "")}
+            </Link>
+          )}
+          <Text style={styles.description}>{item.description}</Text>
         </View>
       ))}
     </View>
@@ -595,9 +714,11 @@ const TimelineSection = ({ title, data, type, styles, theme }) => {
       type === "edu" ? item.school : type === "exp" ? item.company : "";
     const dateText =
       type === "edu"
-        ? item.date
+        ? item.startDate && item.endDate
+          ? `${item.startDate} - ${item.isCurrent ? "Present" : item.endDate}`
+          : item.date
         : type === "exp"
-        ? `${item.startDate} - ${item.endDate}`
+        ? `${item.startDate} - ${item.isCurrent ? "Present" : item.endDate}`
         : item.date;
 
     return (
@@ -638,7 +759,7 @@ const ElegantTemplate = ({ data, activeSections = [] }) => {
   const theme = THEMES[themeColor] || THEMES.blue; // Keep for non-color styling if needed
   const styles = useMemo(() => createStyles(themeColor), [themeColor]);
 
-  const SIDEBAR_SECTIONS = ["skills", "languages", "references"];
+  const SIDEBAR_SECTIONS = ["skills", "tools", "languages", "references"];
   const MAIN_SECTIONS = [
     "experience",
     "education",
@@ -669,6 +790,10 @@ const ElegantTemplate = ({ data, activeSections = [] }) => {
             case "skills":
               return data.skills?.length > 0 && (
                 <SkillsSidebar key={section.id} data={data.skills} styles={styles} />
+              );
+            case "tools":
+              return data.tools?.length > 0 && (
+                <ToolsSidebar key={section.id} data={data.tools} styles={styles} />
               );
             case "languages":
               return data.languages?.length > 0 && (

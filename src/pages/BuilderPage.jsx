@@ -18,7 +18,9 @@ import {
   User,
   Eye,
   Pencil,
+
   LayoutTemplate,
+  Wrench,
 } from "lucide-react";
 
 // 🏎️ Drag & Drop Imports
@@ -54,6 +56,7 @@ import BioSection from "../components/form/BioSection.jsx";
 import Experience from "../components/form/Experience.jsx";
 import Education from "../components/form/Education.jsx";
 import Skills from "../components/form/Skills.jsx";
+import Tools from "../components/form/Tools.jsx";
 import Certificates from "../components/form/Certificates.jsx";
 import References from "../components/form/References.jsx";
 import Languages from "../components/form/Languages.jsx";
@@ -91,6 +94,7 @@ const BuilderPage = () => {
       icon: GraduationCap,
     },
     skills: { component: <Skills />, title: "Skills", icon: Lightbulb },
+    tools: { component: <Tools />, title: "Tools", icon: Wrench },
     certificates: {
       component: <Certificates />,
       title: "Certificates",

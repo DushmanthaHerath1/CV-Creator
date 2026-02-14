@@ -4,6 +4,7 @@ import { FolderGit2, Trash2 } from "lucide-react";
 import FormSection from "../ui/FormSection.jsx";
 import FormInput from "../ui/FormInput.jsx";
 import FormTextArea from "../ui/FormTextArea.jsx";
+import FormCheckbox from "../ui/FormCheckbox.jsx";
 
 const Projects = () => {
   const { control } = useFormContext();
@@ -50,6 +51,12 @@ const Projects = () => {
                 name={`projects.${index}.technologies`}
                 label="Technologies Used"
                 placeholder="e.g. React, Node.js, MongoDB"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <FormCheckbox
+                name={`projects.${index}.isCurrent`}
+                label="I am currently working on this project (Ongoing)"
               />
             </div>
           </div>

@@ -8,6 +8,7 @@ import {
   Link,
   Svg,
   Path,
+  Circle,
 } from "@react-pdf/renderer";
 import { THEMES, CREATIVE_THEMES } from "../../../data/themes";
 
@@ -185,9 +186,42 @@ const IconGlobe = ({ color, style }) => (
 
 const IconProject = ({ color, style }) => (
   <Svg width={13} height={13} viewBox="0 0 24 24" style={style}>
-    <Path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" stroke={color || "#1f2937"} strokeWidth={2} fill="none" />
-    <Path d="m12 10 2 2-2 2" stroke={color || "#1f2937"} strokeWidth={2} fill="none" />
-    <Path d="m17 10-2 2 2 2" stroke={color || "#1f2937"} strokeWidth={2} fill="none" />
+    <Path
+      d="M18 19a5 5 0 0 1-5-5v8"
+      stroke={color || "#1f2937"}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M9 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v5"
+      stroke={color || "#1f2937"}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle
+      cx="13"
+      cy="12"
+      r="2"
+      stroke={color || "#1f2937"}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle
+      cx="20"
+      cy="19"
+      r="2"
+      stroke={color || "#1f2937"}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </Svg>
 );
 
@@ -235,6 +269,47 @@ const IconCert = ({ color, style }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+  </Svg>
+);
+
+const IconTools = ({ color, style }) => (
+  <Svg width={13} height={13} viewBox="0 0 24 24" style={style}>
+    <Path
+      d="M14 17H5"
+      stroke={color || "#1f2937"}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M19 7h-9"
+      stroke={color || "#1f2937"}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle
+       cx="17"
+       cy="17"
+       r="3"
+       stroke={color || "#1f2937"}
+       strokeWidth={2}
+       fill="none"
+       strokeLinecap="round"
+       strokeLinejoin="round"
+     />
+     <Circle
+       cx="7"
+       cy="7"
+       r="3"
+       stroke={color || "#1f2937"}
+       strokeWidth={2}
+       fill="none"
+       strokeLinecap="round"
+       strokeLinejoin="round"
+     />
   </Svg>
 );
 
@@ -498,30 +573,30 @@ const createStyles = (theme) =>
 
 const ContactSection = ({ data, styles, theme }) => (
   <View style={styles.contactSection}>
-    <View style={styles.sidebarSectionTitle}>
+    <View style={styles.sidebarSectionTitle} wrap={false}>
         <IconUser color={theme.colors.text} />
         <Text style={{ marginLeft: 7 }}>Contact</Text>
     </View>
     {data.phone && (
-      <View style={styles.contactItem}>
+      <View style={styles.contactItem} wrap={false}>
         <IconPhone color={theme.colors.icon} />
         <Text style={styles.contactText}>{data.phone}</Text>
       </View>
     )}
     {data.email && (
-      <View style={styles.contactItem}>
+      <View style={styles.contactItem} wrap={false}>
         <IconMail color={theme.colors.icon} />
         <Text style={styles.contactText}>{data.email}</Text>
       </View>
     )}
     {data.address && (
-      <View style={styles.contactItem}>
+      <View style={styles.contactItem} wrap={false}>
         <IconMapPin color={theme.colors.icon} />
         <Text style={styles.contactText}>{data.address}</Text>
       </View>
     )}
     {data.linkedin && (
-      <View style={styles.contactItem}>
+      <View style={styles.contactItem} wrap={false}>
         <IconLinkedin color={theme.colors.icon} />
         <Link src={data.linkedin} style={{...styles.contactText, textDecoration:'none', color: theme.colors.icon }}>
           {data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}
@@ -529,17 +604,25 @@ const ContactSection = ({ data, styles, theme }) => (
       </View>
     )}
     {data.github && (
-      <View style={styles.contactItem}>
+      <View style={styles.contactItem} wrap={false}>
         <IconGithub color={theme.colors.icon} />
         <Link src={data.github} style={{...styles.contactText, textDecoration:'none', color: theme.colors.icon }}>
           {data.github.replace(/^https?:\/\/(www\.)?/, '')}
         </Link>
       </View>
     )}
+    {data.website && (
+      <View style={styles.contactItem} wrap={false}>
+        <IconGlobe color={theme.colors.icon} />
+        <Link src={data.website} style={{...styles.contactText, textDecoration:'none', color: theme.colors.icon }}>
+          {data.website.replace(/^https?:\/\//, '')}
+        </Link>
+      </View>
+    )}
 
     {/* Bio Details - Regional Requirement (Robust Layout) */}
     {(data.dob || data.gender || data.nationality || data.maritalStatus || data.idNumber) && (
-      <View style={{ marginTop: 10 }}> {/* 🟢 Reduced margin from 15 */}
+      <View style={{ marginTop: 10 }} wrap={false}> {/* 🟢 Reduced margin from 15 */}
         <View style={styles.sidebarSectionTitle}>
             <IconUser color={theme.colors.text} />
             <Text style={{ marginLeft: 7 }}>Personal Details</Text>
@@ -606,14 +689,21 @@ const SkillsSection = ({ skills, styles, theme }) => (
 
 const LanguagesSection = ({ languages, styles, theme }) => (
   <View style={{ marginBottom: 14 }}>
-    {languages.map((lang, index) => (
+    <View wrap={false}>
+       <View style={styles.sidebarSectionTitle}>
+         <IconGlobe color={theme.colors.text} />
+         <Text style={{ marginLeft: 7 }}>Languages</Text>
+       </View>
+       {languages[0] && (
+         <View style={styles.languageItem}>
+            <Text style={styles.languageText}>
+              {languages[0].language}{languages[0].proficiency ? ` (${languages[0].proficiency})` : ""}
+            </Text>
+         </View>
+       )}
+    </View>
+    {languages.slice(1).map((lang, index) => (
       <View key={index} style={styles.languageItem} wrap={false}>
-        {index === 0 && (
-          <View style={styles.sidebarSectionTitle}>
-            <IconGlobe color={theme.colors.text} />
-            <Text style={{ marginLeft: 7 }}>Languages</Text>
-          </View>
-        )}
         <Text style={styles.languageText}>
           {lang.language}{lang.proficiency ? ` (${lang.proficiency})` : ""}
         </Text>
@@ -624,14 +714,21 @@ const LanguagesSection = ({ languages, styles, theme }) => (
 
 const AchievementsSection = ({ achievements, styles, theme }) => (
   <View style={{ marginBottom: 14 }}>
-    {achievements.map((item, index) => (
+    <View wrap={false}>
+       <View style={styles.sidebarSectionTitle}>
+         <IconTrophy color={theme.colors.text} />
+         <Text style={{ marginLeft: 7 }}>Awards</Text>
+       </View>
+       {achievements[0] && (
+        <View style={styles.rewardBlock}>
+          {achievements[0].date && <Text style={styles.rewardDate}>{achievements[0].date}</Text>}
+          <Text style={styles.rewardTitle}>{achievements[0].title}</Text>
+          {achievements[0].issuer && <Text style={styles.rewardIssuer}>{achievements[0].issuer}</Text>}
+        </View>
+       )}
+    </View>
+    {achievements.slice(1).map((item, index) => (
       <View key={index} style={styles.rewardBlock} wrap={false}>
-        {index === 0 && (
-          <View style={styles.sidebarSectionTitle}>
-            <IconTrophy color={theme.colors.text} />
-            <Text style={{ marginLeft: 7 }}>Awards</Text>
-          </View>
-        )}
         {item.date && <Text style={styles.rewardDate}>{item.date}</Text>}
         <Text style={styles.rewardTitle}>{item.title}</Text>
         {item.issuer && <Text style={styles.rewardIssuer}>{item.issuer}</Text>}
@@ -640,20 +737,50 @@ const AchievementsSection = ({ achievements, styles, theme }) => (
   </View>
 );
 
+
+
+const ToolsSection = ({ tools, styles, theme }) => (
+  <View style={{ marginBottom: 14 }} wrap={false}>
+    <View style={styles.sidebarSectionTitle}>
+       <IconTools color={theme.colors.text} />
+       <Text style={{ marginLeft: 7 }}>Tools</Text>
+    </View>
+    <View style={styles.skillsContainer}>
+      {tools.map((tool, index) => (
+        <View key={index} style={styles.skillBadge}>
+           <Text style={styles.skillText}>{tool.name}</Text>
+        </View>
+      ))}
+    </View>
+  </View>
+);
+
 const ExperienceSection = ({ experience, styles, theme }) => (
   <View>
-    {experience.map((job, index) => (
-      <View key={index} style={styles.entryBlock} wrap={false}>
-        {index === 0 && (
-          <View style={styles.sectionTitle}>
-            <IconExperience color={theme.colors.text} />
-            <Text style={{ marginLeft: 8 }}>Experience</Text>
+    <View wrap={false}>
+       <View style={styles.sectionTitle}>
+         <IconExperience color={theme.colors.text} />
+         <Text style={{ marginLeft: 8 }}>Experience</Text>
+       </View>
+       {experience[0] && (
+          <View style={styles.entryBlock}>
+            <View style={styles.entryHeader}>
+              <Text style={styles.entryTitle}>{experience[0].role}</Text>
+              <Text style={styles.entryDate}>
+                {experience[0].startDate} – {experience[0].isCurrent ? "Present" : experience[0].endDate}
+              </Text>
+            </View>
+            <Text style={styles.entrySubtitle}>{experience[0].company}</Text>
+            {experience[0].description && <Text style={styles.bodyText}>{experience[0].description}</Text>}
           </View>
-        )}
+       )}
+    </View>
+    {experience.slice(1).map((job, index) => (
+      <View key={index} style={styles.entryBlock} wrap={false}>
         <View style={styles.entryHeader}>
           <Text style={styles.entryTitle}>{job.role}</Text>
           <Text style={styles.entryDate}>
-            {job.startDate} – {job.endDate}
+            {job.startDate} – {job.isCurrent ? "Present" : job.endDate}
           </Text>
         </View>
         <Text style={styles.entrySubtitle}>{job.company}</Text>
@@ -665,17 +792,39 @@ const ExperienceSection = ({ experience, styles, theme }) => (
 
 const EducationSection = ({ education, styles, theme }) => (
   <View>
-    {education.map((edu, index) => (
-      <View key={index} style={styles.entryBlock} wrap={false}>
-        {index === 0 && (
-          <View style={styles.sectionTitle}>
-            <IconEducation color={theme.colors.text} />
-            <Text style={{ marginLeft: 8 }}>Education</Text>
+    <View wrap={false}>
+       <View style={styles.sectionTitle}>
+         <IconEducation color={theme.colors.text} />
+         <Text style={{ marginLeft: 8 }}>Education</Text>
+       </View>
+       {education[0] && (
+          <View style={styles.entryBlock}>
+            <View style={styles.entryHeader}>
+              <Text style={styles.entryTitle}>{education[0].degree}</Text>
+              <Text style={styles.entryDate}>
+                {education[0].startDate && education[0].endDate
+                  ? `${education[0].startDate} – ${
+                      education[0].isCurrent ? "Present" : education[0].endDate
+                    }`
+                  : education[0].date}
+              </Text>
+            </View>
+            <Text style={styles.entrySubtitle}>{education[0].school}</Text>
+            {education[0].description && <Text style={styles.bodyText}>{education[0].description}</Text>}
           </View>
-        )}
+       )}
+    </View>
+    {education.slice(1).map((edu, index) => (
+      <View key={index} style={styles.entryBlock} wrap={false}>
         <View style={styles.entryHeader}>
           <Text style={styles.entryTitle}>{edu.degree}</Text>
-          <Text style={styles.entryDate}>{edu.date}</Text>
+          <Text style={styles.entryDate}>
+            {edu.startDate && edu.endDate
+              ? `${edu.startDate} – ${
+                  edu.isCurrent ? "Present" : edu.endDate
+                }`
+              : edu.date}
+          </Text>
         </View>
         <Text style={styles.entrySubtitle}>{edu.school}</Text>
         {edu.description && <Text style={styles.bodyText}>{edu.description}</Text>}
@@ -686,16 +835,50 @@ const EducationSection = ({ education, styles, theme }) => (
 
 const ProjectsSection = ({ projects, styles, theme }) => (
   <View>
-    {projects.map((item, index) => (
+    <View wrap={false}>
+        <View style={styles.sectionTitle}>
+          <IconProject color={theme.colors.text} />
+          <Text style={{ marginLeft: 8 }}>Projects</Text>
+        </View>
+        {projects[0] && (
+           <View style={styles.entryBlock}>
+              <View style={styles.entryHeader}>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, marginRight: 8 }}>
+                  <Text style={styles.entryTitle}>
+                    {projects[0].title}
+                    {projects[0].isCurrent && (
+                      <Text style={{ color: theme.colors.accents, fontSize: 10, fontWeight: "bold" }}>
+                         {"  "}● Ongoing
+                      </Text>
+                    )}
+                  </Text>
+                </View>
+                {projects[0].technologies && (
+                  <Text style={styles.entryDate}>{projects[0].technologies}</Text>
+                )}
+              </View>
+             {projects[0].link && (
+               <Text style={{ ...styles.entrySubtitle, color: theme.colors.text, marginBottom: 4 }}>
+                 {projects[0].link}
+               </Text>
+             )}
+             {projects[0].description && <Text style={styles.bodyText}>{projects[0].description}</Text>}
+           </View>
+        )}
+    </View>
+    {projects.slice(1).map((item, index) => (
       <View key={index} style={styles.entryBlock} wrap={false}>
-         {index === 0 && (
-          <View style={styles.sectionTitle}>
-            <IconProject color={theme.colors.text} />
-            <Text style={{ marginLeft: 8 }}>Projects</Text>
-          </View>
-         )}
         <View style={styles.entryHeader}>
-          <Text style={styles.entryTitle}>{item.title}</Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, marginRight: 8 }}>
+            <Text style={styles.entryTitle}>
+              {item.title}
+              {item.isCurrent && (
+                <Text style={{ color: theme.colors.accents, fontSize: 10, fontWeight: "bold" }}>
+                   {"  "}● Ongoing
+                </Text>
+              )}
+            </Text>
+          </View>
           {item.technologies && (
             <Text style={styles.entryDate}>{item.technologies}</Text>
           )}
@@ -713,19 +896,38 @@ const ProjectsSection = ({ projects, styles, theme }) => (
 
 const CertificatesSection = ({ certificates, styles, theme }) => (
   <View>
-    {certificates.map((item, index) => (
-      <View key={index} style={styles.entryBlock} wrap={false}>
-        {index === 0 && (
-          <View style={styles.sectionTitle}>
-            <IconCert color={theme.colors.text} />
-            <Text style={{ marginLeft: 8 }}>Certificates</Text>
+    <View wrap={false}>
+       <View style={styles.sectionTitle}>
+         <IconCert color={theme.colors.text} />
+         <Text style={{ marginLeft: 8 }}>Certificates</Text>
+       </View>
+       {certificates[0] && (
+          <View style={styles.entryBlock}>
+            <View style={styles.entryHeader}>
+               <Text style={styles.entryTitle}>{certificates[0].name}</Text>
+               <Text style={styles.entryDate}>{certificates[0].date}</Text>
+            </View>
+            <Text style={styles.entrySubtitle}>{certificates[0].issuer}</Text>
+            {certificates[0].link && (
+              <Link src={certificates[0].link} style={{ ...styles.entrySubtitle, color: theme.colors.text, textDecoration: "none", marginTop: 2 }}>
+                {certificates[0].link.replace(/^https?:\/\//, "")}
+              </Link>
+            )}
           </View>
-        )}
+       )}
+    </View>
+    {certificates.slice(1).map((item, index) => (
+      <View key={index} style={styles.entryBlock} wrap={false}>
         <View style={styles.entryHeader}>
           <Text style={styles.entryTitle}>{item.name}</Text>
           <Text style={styles.entryDate}>{item.date}</Text>
         </View>
         <Text style={styles.entrySubtitle}>{item.issuer}</Text>
+        {item.link && (
+          <Link src={item.link} style={{ ...styles.entrySubtitle, color: theme.colors.text, textDecoration: "none", marginTop: 2 }}>
+            {item.link.replace(/^https?:\/\//, "")}
+          </Link>
+        )}
       </View>
     ))}
   </View>
@@ -733,14 +935,24 @@ const CertificatesSection = ({ certificates, styles, theme }) => (
 
 const ExtracurricularSection = ({ extracurricular, styles, theme }) => (
   <View>
-    {extracurricular.map((item, index) => (
-      <View key={index} style={styles.entryBlock} wrap={false}>
-        {index === 0 && (
-          <View style={styles.sectionTitle}>
-            <IconActivity color={theme.colors.text} />
-            <Text style={{ marginLeft: 8 }}>Extracurricular</Text>
+    <View wrap={false}>
+       <View style={styles.sectionTitle}>
+         <IconActivity color={theme.colors.text} />
+         <Text style={{ marginLeft: 8 }}>Extracurricular</Text>
+       </View>
+       {extracurricular[0] && (
+          <View style={styles.entryBlock}>
+            <View style={styles.entryHeader}>
+              <Text style={styles.entryTitle}>{extracurricular[0].role}</Text>
+              <Text style={styles.entryDate}>{extracurricular[0].date}</Text>
+            </View>
+            <Text style={styles.entrySubtitle}>{extracurricular[0].organization}</Text>
+            {extracurricular[0].description && <Text style={styles.bodyText}>{extracurricular[0].description}</Text>}
           </View>
-        )}
+       )}
+    </View>
+    {extracurricular.slice(1).map((item, index) => (
+      <View key={index} style={styles.entryBlock} wrap={false}>
         <View style={styles.entryHeader}>
           <Text style={styles.entryTitle}>{item.role}</Text>
           <Text style={styles.entryDate}>{item.date}</Text>
@@ -755,14 +967,28 @@ const ExtracurricularSection = ({ extracurricular, styles, theme }) => (
 const ReferencesSection = ({ references, styles, theme }) => (
   <View style={{ marginTop: 14 }}>
     <View style={{ flexDirection: "column" }}>
-      {references.map((ref, index) => (
-        <View key={index} style={styles.referenceItem} wrap={false}>
-          {index === 0 && (
-            <View style={styles.sectionTitle}>
-              <IconUsers color={theme.colors.text} />
-              <Text style={{ marginLeft: 8 }}>References</Text>
+      <View wrap={false}>
+         <View style={styles.sectionTitle}>
+           <IconUsers color={theme.colors.text} />
+           <Text style={{ marginLeft: 8 }}>References</Text>
+         </View>
+         {references[0] && (
+            <View style={styles.referenceItem}>
+              <Text style={styles.referenceName}>{references[0].name}</Text>
+              <Text style={styles.referencePosition}>
+                {references[0].position} @ {references[0].company}
+              </Text>
+              {references[0].phone && (
+                <Text style={styles.referenceContact}>{references[0].phone}</Text>
+              )}
+              {references[0].email && (
+                <Text style={styles.referenceContact}>{references[0].email}</Text>
+              )}
             </View>
-          )}
+         )}
+      </View>
+      {references.slice(1).map((ref, index) => (
+        <View key={index} style={styles.referenceItem} wrap={false}>
           <Text style={styles.referenceName}>{ref.name}</Text>
           <Text style={styles.referencePosition}>
             {ref.position} @ {ref.company}
@@ -819,6 +1045,9 @@ const CreativeTemplate = ({ data, activeSections = [] }) => {
           
           if (section.id === "skills" && data.skills?.length > 0) {
             return <SkillsSection key="skills" skills={data.skills} styles={styles} theme={theme} />;
+          }
+          if (section.id === "tools" && data.tools?.length > 0) {
+            return <ToolsSection key="tools" tools={data.tools} styles={styles} theme={theme} />;
           }
           if (section.id === "achievements" && data.achievements?.length > 0) {
             return <AchievementsSection key="achievements" achievements={data.achievements} styles={styles} theme={theme} />;

@@ -7,6 +7,7 @@ const FormInput = ({
   placeholder,
   type = "text",
   className = "",
+  ...props
 }) => {
   const {
     register,
@@ -39,6 +40,7 @@ const FormInput = ({
               : "border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           }
         `}
+        {...props}
       />
 
       {error && (

@@ -60,6 +60,13 @@ const HeaderSection = () => {
           label="GitHub (Optional)"
           placeholder="github.com/..."
         />
+
+        <FormInput
+          name="personalInfo.website"
+          label="Website / Portfolio (Optional)"
+          placeholder="mysite.com"
+          className="md:col-span-2"
+        />
       </div>
     </div>
   );

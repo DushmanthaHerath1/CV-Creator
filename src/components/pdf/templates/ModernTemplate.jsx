@@ -9,7 +9,9 @@ import {
   Link,
   Svg,
   Path,
+  Circle,
 } from "@react-pdf/renderer";
+import { THEMES } from "../../../data/themes";
 
 const IconMail = ({ style }) => (
   <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
@@ -47,23 +49,23 @@ const IconLinkedin = ({ style }) => (
   <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
     <Path
       d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
-      stroke="#2563eb"
+      stroke="#374151"
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <Path
-      d="M2 9 h4 v12 h-4 z"
-      stroke="#2563eb"
+      d="M2 9h4v12H2z"
+      stroke="#374151"
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <Path
-      d="M4 2 a2 2 0 1 1 0 4 a2 2 0 0 1 0 -4 z"
-      stroke="#2563eb"
+      d="M4 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"
+      stroke="#374151"
       strokeWidth={2}
       fill="none"
       strokeLinecap="round"
@@ -74,15 +76,7 @@ const IconLinkedin = ({ style }) => (
 const IconGithub = ({ style }) => (
   <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
     <Path
-      d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
-      stroke="#374151"
-      strokeWidth={2}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <Path
-      d="M9 18c-4.51 2-5-2-7-2"
+      d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
       stroke="#374151"
       strokeWidth={2}
       fill="none"
@@ -91,6 +85,7 @@ const IconGithub = ({ style }) => (
     />
   </Svg>
 );
+
 const IconMapPin = ({ style }) => (
   <Svg width={10} height={10} viewBox="0 0 24 24" style={style}>
     <Path
@@ -118,7 +113,6 @@ const IconSummary = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
       d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
@@ -143,7 +137,6 @@ const IconExperience = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
       d="M12 12h.01"
@@ -184,7 +177,6 @@ const IconEducation = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
       d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"
@@ -217,7 +209,6 @@ const IconSkills = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
       d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"
@@ -250,7 +241,6 @@ const IconCert = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
       d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"
@@ -275,7 +265,6 @@ const IconUsers = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
       d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
@@ -313,23 +302,23 @@ const IconUsers = () => (
 );
 
 // 🆕 NEW ICONS
-const IconGlobe = () => (
+const IconGlobe = ({ style, stroke = "#1f2937" }) => (
   <Svg
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
+    style={style}
   >
     <Path
       d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"
-      stroke="#1f2937"
+      stroke={stroke}
       strokeWidth={2}
       fill="none"
     />
-    <Path d="M2 12h20" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path d="M2 12h20" stroke={stroke} strokeWidth={2} fill="none" />
     <Path
       d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-      stroke="#1f2937"
+      stroke={stroke}
       strokeWidth={2}
       fill="none"
     />
@@ -340,16 +329,43 @@ const IconProject = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
-      d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+      d="M18 19a5 5 0 0 1-5-5v8"
       stroke="#1f2937"
       strokeWidth={2}
       fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <Path d="m12 10 2 2-2 2" stroke="#1f2937" strokeWidth={2} fill="none" />
-    <Path d="m17 10-2 2 2 2" stroke="#1f2937" strokeWidth={2} fill="none" />
+    <Path
+      d="M9 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v5"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle
+      cx="13"
+      cy="12"
+      r="2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle
+      cx="20"
+      cy="19"
+      r="2"
+      stroke="#1f2937"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </Svg>
 );
 const IconTrophy = () => (
@@ -357,7 +373,6 @@ const IconTrophy = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
       d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"
@@ -440,7 +455,6 @@ const IconUser = () => (
     width={12}
     height={12}
     viewBox="0 0 24 24"
-    style={{ transform: "translateY(-2)" }}
   >
     <Path
       d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"
@@ -520,7 +534,7 @@ const styles = StyleSheet.create({
     color: "#1f2937",
     marginLeft: 6,
   },
-  jobBlock: { marginBottom: 10 },
+  jobBlock: { marginBottom: 10, flexShrink: 0 },
   jobHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -584,16 +598,32 @@ const styles = StyleSheet.create({
 // --- RENDER HELPERS ---
 const ExperienceSection = ({ data }) => (
   <View style={styles.section}>
-    <View style={styles.sectionTitleRow}>
-      <IconExperience />
-      <Text style={styles.sectionTitle}>Experience</Text>
+    <View style={{ height: 1 }} />
+    <View wrap={false} style={{ flexDirection: "column" }}>
+       <View style={{ ...styles.sectionTitleRow, marginBottom: 0 }}>
+         <IconExperience />
+         <Text style={styles.sectionTitle}>Experience</Text>
+       </View>
+       <View style={{ height: 6, flexShrink: 0 }} />
+       {data[0] && (
+         <View style={styles.jobBlock}>
+           <View style={styles.jobHeader}>
+             <Text style={styles.jobRole}>{data[0].role}</Text>
+             <Text style={styles.jobDate}>
+               {data[0].startDate} — {data[0].isCurrent ? "Present" : data[0].endDate}
+             </Text>
+           </View>
+           <Text style={styles.company}>{data[0].company}</Text>
+           <Text style={styles.description}>{data[0].description}</Text>
+         </View>
+       )}
     </View>
-    {data.map((job, index) => (
+    {data.slice(1).map((job, index) => (
       <View key={index} style={styles.jobBlock} wrap={false}>
         <View style={styles.jobHeader}>
           <Text style={styles.jobRole}>{job.role}</Text>
           <Text style={styles.jobDate}>
-            {job.startDate} — {job.endDate}
+            {job.startDate} — {job.isCurrent ? "Present" : job.endDate}
           </Text>
         </View>
         <Text style={styles.company}>{job.company}</Text>
@@ -605,15 +635,43 @@ const ExperienceSection = ({ data }) => (
 
 const EducationSection = ({ data }) => (
   <View style={styles.section}>
-    <View style={styles.sectionTitleRow}>
-      <IconEducation />
-      <Text style={styles.sectionTitle}>Education</Text>
+    <View style={{ height: 1 }} />
+    <View wrap={false} style={{ flexDirection: "column" }}>
+       <View style={{ ...styles.sectionTitleRow, marginBottom: 0 }}>
+         <IconEducation />
+         <Text style={styles.sectionTitle}>Education</Text>
+       </View>
+       <View style={{ height: 6, flexShrink: 0 }} />
+       {data[0] && (
+         <View style={styles.jobBlock}>
+           <View style={styles.jobHeader}>
+             <Text style={styles.jobRole}>{data[0].school}</Text>
+             <Text style={styles.jobDate}>
+               {data[0].startDate && data[0].endDate
+                 ? `${data[0].startDate} — ${
+                     data[0].isCurrent ? "Present" : data[0].endDate
+                   }`
+                 : data[0].date}
+             </Text>
+           </View>
+           <Text style={styles.company}>{data[0].degree}</Text>
+           {data[0].description && (
+             <Text style={styles.description}>{data[0].description}</Text>
+           )}
+         </View>
+       )}
     </View>
-    {data.map((edu, index) => (
+    {data.slice(1).map((edu, index) => (
       <View key={index} style={styles.jobBlock} wrap={false}>
         <View style={styles.jobHeader}>
           <Text style={styles.jobRole}>{edu.school}</Text>
-          <Text style={styles.jobDate}>{edu.date}</Text>
+          <Text style={styles.jobDate}>
+            {edu.startDate && edu.endDate
+              ? `${edu.startDate} — ${
+                  edu.isCurrent ? "Present" : edu.endDate
+                }`
+              : edu.date}
+          </Text>
         </View>
         <Text style={styles.company}>{edu.degree}</Text>
         {edu.description && (
@@ -640,19 +698,103 @@ const SkillsSection = ({ data }) => (
   </View>
 );
 
+const IconTools = () => (
+   <Svg
+     width={12}
+     height={12}
+     viewBox="0 0 24 24"
+   >
+     <Path
+       d="M14 17H5"
+       stroke="#1f2937"
+       strokeWidth={2}
+       fill="none"
+       strokeLinecap="round"
+       strokeLinejoin="round"
+     />
+     <Path
+       d="M19 7h-9"
+       stroke="#1f2937"
+       strokeWidth={2}
+       fill="none"
+       strokeLinecap="round"
+       strokeLinejoin="round"
+     />
+     <Circle
+       cx="17"
+       cy="17"
+       r="3"
+       stroke="#1f2937"
+       strokeWidth={2}
+       fill="none"
+       strokeLinecap="round"
+       strokeLinejoin="round"
+     />
+     <Circle
+       cx="7"
+       cy="7"
+       r="3"
+       stroke="#1f2937"
+       strokeWidth={2}
+       fill="none"
+       strokeLinecap="round"
+       strokeLinejoin="round"
+     />
+   </Svg>
+ );
+
+const ToolsSection = ({ data }) => (
+  <View wrap={false} style={styles.section}>
+    <View style={styles.sectionTitleRow}>
+      <IconTools />
+      <Text style={styles.sectionTitle}>Tools</Text>
+    </View>
+    <View style={styles.skillsContainer}>
+      {data.map((tool, index) => (
+        <Text key={index} style={styles.skillBadge}>
+          {tool.name}
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
 const CertificatesSection = ({ data }) => (
   <View style={styles.section}>
-    <View style={styles.sectionTitleRow}>
-      <IconCert />
-      <Text style={styles.sectionTitle}>Certificates</Text>
+    <View style={{ height: 1 }} />
+    <View wrap={false} style={{ flexDirection: "column" }}>
+       <View style={{ ...styles.sectionTitleRow, marginBottom: 0 }}>
+         <IconCert />
+         <Text style={styles.sectionTitle}>Certificates</Text>
+       </View>
+       <View style={{ height: 6, flexShrink: 0 }} />
+       {data[0] && (
+         <View style={styles.jobBlock}>
+           <View style={styles.jobHeader}>
+             <Text style={styles.jobRole}>{data[0].name}</Text>
+             <Text style={styles.jobDate}>{data[0].date}</Text>
+           </View>
+           <Text style={styles.description}>{data[0].issuer}</Text>
+           {data[0].link && (
+             <Link src={data[0].link} style={{ ...styles.company, color: "#2563eb", textDecoration: "none", marginTop: 2 }}>
+               {data[0].link.replace(/^https?:\/\//, "")}
+             </Link>
+           )}
+         </View>
+       )}
     </View>
-    {data.map((cert, index) => (
+    {data.slice(1).map((cert, index) => (
       <View key={index} style={styles.jobBlock} wrap={false}>
         <View style={styles.jobHeader}>
           <Text style={styles.jobRole}>{cert.name}</Text>
           <Text style={styles.jobDate}>{cert.date}</Text>
         </View>
         <Text style={styles.description}>{cert.issuer}</Text>
+        {cert.link && (
+          <Link src={cert.link} style={{ ...styles.company, color: "#2563eb", textDecoration: "none", marginTop: 2 }}>
+            {cert.link.replace(/^https?:\/\//, "")}
+          </Link>
+        )}
       </View>
     ))}
   </View>
@@ -738,24 +880,62 @@ const LanguagesSection = ({ data }) => (
   </View>
 );
 
-const ProjectsSection = ({ data }) => (
+const ProjectsSection = ({ data, theme }) => (
   <View style={styles.section}>
-    <View style={styles.sectionTitleRow}>
-      <IconProject />
-      <Text style={styles.sectionTitle}>Projects</Text>
+    <View style={{ height: 1 }} />
+    <View wrap={false} style={{ flexDirection: "column" }}>
+       <View style={{ ...styles.sectionTitleRow, marginBottom: 0 }}>
+         <IconProject />
+         <Text style={styles.sectionTitle}>Projects</Text>
+       </View>
+       <View style={{ height: 6, flexShrink: 0 }} />
+       {data[0] && (
+         <View style={styles.jobBlock}>
+           <View style={styles.jobHeader}>
+             <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, marginRight: 8 }}>
+               <Text style={styles.jobRole}>
+                 {data[0].title}
+                 {data[0].isCurrent && (
+                   <Text style={{ color: theme.colors.primary, fontSize: 10, fontWeight: "normal" }}>
+                     {"  "}- Ongoing
+                   </Text>
+                 )}
+               </Text>
+             </View>
+             {data[0].technologies && (
+               <Text style={styles.jobDate}>{data[0].technologies}</Text>
+             )}
+           </View>
+           {data[0].link && (
+             <Link src={data[0].link} style={{ ...styles.company, textDecoration: "none" }}>
+               {data[0].link}
+             </Link>
+           )}
+           <Text style={styles.description}>{data[0].description}</Text>
+         </View>
+       )}
     </View>
-    {data.map((item, index) => (
+    {data.slice(1).map((item, index) => (
       <View key={index} style={styles.jobBlock} wrap={false}>
         <View style={styles.jobHeader}>
-          <Text style={styles.jobRole}>{item.title}</Text>
+           <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, marginRight: 8 }}>
+             <Text style={styles.jobRole}>
+               {item.title}
+               {item.isCurrent && (
+                 <Text style={{ color: theme.colors.primary, fontSize: 10, fontWeight: "normal" }}>
+                   {"  "}- Ongoing
+                 </Text>
+               )}
+             </Text>
+           </View>
           {item.technologies && (
             <Text style={styles.jobDate}>{item.technologies}</Text>
           )}
         </View>
         {item.link && (
-          <Text style={{ ...styles.company, color: "#2563eb" }}>
+          <Link src={item.link} style={{ ...styles.company, textDecoration: "none" }}>
             {item.link}
-          </Text>
+          </Link>
         )}
         <Text style={styles.description}>{item.description}</Text>
       </View>
@@ -765,11 +945,24 @@ const ProjectsSection = ({ data }) => (
 
 const AchievementsSection = ({ data }) => (
   <View style={styles.section}>
-    <View style={styles.sectionTitleRow}>
-      <IconTrophy />
-      <Text style={styles.sectionTitle}>Achievements</Text>
+    <View style={{ height: 1 }} />
+    <View wrap={false} style={{ flexDirection: "column" }}>
+        <View style={{ ...styles.sectionTitleRow, marginBottom: 0 }}>
+          <IconTrophy />
+          <Text style={styles.sectionTitle}>Achievements</Text>
+        </View>
+        <View style={{ height: 6, flexShrink: 0 }} />
+        {data[0] && (
+          <View style={styles.jobBlock}>
+            <View style={styles.jobHeader}>
+              <Text style={styles.jobRole}>{data[0].title}</Text>
+              <Text style={styles.jobDate}>{data[0].date}</Text>
+            </View>
+            <Text style={styles.description}>{data[0].description}</Text>
+          </View>
+        )}
     </View>
-    {data.map((item, index) => (
+    {data.slice(1).map((item, index) => (
       <View key={index} style={styles.jobBlock} wrap={false}>
         <View style={styles.jobHeader}>
           <Text style={styles.jobRole}>{item.title}</Text>
@@ -783,11 +976,25 @@ const AchievementsSection = ({ data }) => (
 
 const ExtracurricularSection = ({ data }) => (
   <View style={styles.section}>
-    <View style={styles.sectionTitleRow}>
-      <IconActivity />
-      <Text style={styles.sectionTitle}>Extracurricular</Text>
+    <View style={{ height: 1 }} />
+    <View wrap={false} style={{ flexDirection: "column" }}>
+        <View style={{ ...styles.sectionTitleRow, marginBottom: 0 }}>
+          <IconActivity />
+          <Text style={styles.sectionTitle}>Extracurricular</Text>
+        </View>
+        <View style={{ height: 6, flexShrink: 0 }} />
+        {data[0] && (
+          <View style={styles.jobBlock}>
+            <View style={styles.jobHeader}>
+              <Text style={styles.jobRole}>{data[0].role}</Text>
+              <Text style={styles.jobDate}>{data[0].date}</Text>
+            </View>
+            <Text style={styles.company}>{data[0].organization}</Text>
+            <Text style={styles.description}>{data[0].description}</Text>
+          </View>
+        )}
     </View>
-    {data.map((item, index) => (
+    {data.slice(1).map((item, index) => (
       <View key={index} style={styles.jobBlock} wrap={false}>
         <View style={styles.jobHeader}>
           <Text style={styles.jobRole}>{item.role}</Text>
@@ -859,20 +1066,27 @@ function ModernTemplate({ data, activeSections = [] }) {
     data.personalInfo.gender ||
     data.personalInfo.nationality ||
     data.personalInfo.maritalStatus ||
+    data.personalInfo.nationality ||
+    data.personalInfo.maritalStatus ||
     data.personalInfo.idNumber;
 
+  const { themeColor = "blue" } = data;
+  const theme = THEMES[themeColor] || THEMES.blue;
+
   const RENDER_MAP = {
-    experience: (d) => <ExperienceSection data={d.experience} />,
-    education: (d) => <EducationSection data={d.education} />,
-    skills: (d) => <SkillsSection data={d.skills} />,
-    certificates: (d) => <CertificatesSection data={d.certificates} />,
-    references: (d) => <ReferencesSection data={d.references} />,
-    languages: (d) => <LanguagesSection data={d.languages} />,
-    projects: (d) => <ProjectsSection data={d.projects} />,
-    achievements: (d) => <AchievementsSection data={d.achievements} />,
-    extracurricular: (d) => <ExtracurricularSection data={d.extracurricular} />,
-    // 🆕 Add Bio to the Map (Pass personalInfo object)
-    bio: (d) => <BioSection data={d.personalInfo} />,
+    exp: (d, theme) => <ExperienceSection data={d.experience} />,
+    education: (d, theme) => <EducationSection data={d.education} />,
+    skills: (d, theme) => <SkillsSection data={d.skills} />,
+    tools: (d, theme) => <ToolsSection data={d.tools} />,
+    certificates: (d, theme) => <CertificatesSection data={d.certificates} />,
+    references: (d, theme) => <ReferencesSection data={d.references} />,
+    languages: (d, theme) => <LanguagesSection data={d.languages} />,
+    projects: (d, theme) => <ProjectsSection data={d.projects} theme={theme} />,
+    achievements: (d, theme) => <AchievementsSection data={d.achievements} />,
+    extracurricular: (d, theme) => (
+      <ExtracurricularSection data={d.extracurricular} />
+    ),
+    bio: (d, theme) => <BioSection data={d.personalInfo} />,
   };
 
   return (
@@ -914,7 +1128,7 @@ function ModernTemplate({ data, activeSections = [] }) {
                     src={data.personalInfo.linkedin}
                     style={{ marginLeft: 4, ...styles.link }}
                   >
-                    LinkedIn
+                    {data.personalInfo.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}
                   </Link>
                 </View>
               )}
@@ -925,7 +1139,21 @@ function ModernTemplate({ data, activeSections = [] }) {
                     src={data.personalInfo.github}
                     style={{ marginLeft: 4, ...styles.link }}
                   >
-                    GitHub
+                    {data.personalInfo.github.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
+                  </Link>
+                </View>
+              )}
+              {data.personalInfo.website && (
+                <View style={styles.contactItem}>
+                  <IconGlobe
+                    style={{ transform: "translateY(-0.5)" }}
+                    stroke="#374151"
+                  />
+                  <Link
+                    src={data.personalInfo.website}
+                    style={{ marginLeft: 4, ...styles.link }}
+                  >
+                    {data.personalInfo.website.replace(/^https?:\/\//, "")}
                   </Link>
                 </View>
               )}
@@ -958,7 +1186,7 @@ function ModernTemplate({ data, activeSections = [] }) {
 
         // STANDARD CHECK: Arrays
         if (renderFunc && data[section.id] && data[section.id].length > 0) {
-          return <View key={section.id}>{renderFunc(data)}</View>;
+          return <View key={section.id}>{renderFunc(data, theme)}</View>;
         }
         return null;
       })}

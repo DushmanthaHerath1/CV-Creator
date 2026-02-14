@@ -8,6 +8,7 @@ import {
   Link,
   Svg,
   Path,
+  Circle,
 } from "@react-pdf/renderer";
 import { THEMES } from "../../../data/themes";
 
@@ -55,6 +56,49 @@ const IconMail = ({ color = "#6b7280" }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
+  </Svg>
+);
+// --------------------------------------------------------------------------
+
+// 🆕 TOOLS ICON (Settings)
+const IconTools = ({ color = "#6b7280" }) => (
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={{ marginRight: 8 }}>
+    <Path
+      d="M14 17H5"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M19 7h-9"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle
+       cx="17"
+       cy="17"
+       r="3"
+       stroke={color}
+       strokeWidth={2}
+       fill="none"
+       strokeLinecap="round"
+       strokeLinejoin="round"
+     />
+     <Circle
+       cx="7"
+       cy="7"
+       r="3"
+       stroke={color}
+       strokeWidth={2}
+       fill="none"
+       strokeLinecap="round"
+       strokeLinejoin="round"
+     />
   </Svg>
 );
 
@@ -155,6 +199,19 @@ const IconUser = ({ color = "#374151" }) => (
   </Svg>
 );
 
+const IconGlobe = ({ color = "#374151" }) => (
+  <Svg width={10} height={10} viewBox="0 0 24 24" style={{ marginRight: 8 }}>
+    <Circle cx="12" cy="12" r="10" stroke={color} strokeWidth={2} fill="none" />
+    <Path d="M2 12h20" stroke={color} strokeWidth={2} />
+    <Path
+      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+    />
+  </Svg>
+);
+
 // Added extra icons for other sections to match style
 const IconTrophy = ({ color = "#374151" }) => (
   <Svg width={11} height={11} viewBox="0 0 24 24" style={{ marginRight: 6 }}>
@@ -195,13 +252,41 @@ const IconTrophy = ({ color = "#374151" }) => (
 const IconProject = ({ color = "#374151" }) => (
   <Svg width={11} height={11} viewBox="0 0 24 24" style={{ marginRight: 6 }}>
     <Path
-      d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
+      d="M18 19a5 5 0 0 1-5-5v8"
       stroke={color}
       strokeWidth={2}
       fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
-    <Path d="m12 10 2 2-2 2" stroke={color} strokeWidth={2} fill="none" />
-    <Path d="m17 10-2 2 2 2" stroke={color} strokeWidth={2} fill="none" />
+    <Path
+      d="M9 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v5"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle
+      cx="13"
+      cy="12"
+      r="2"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Circle
+      cx="20"
+      cy="19"
+      r="2"
+      stroke={color}
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </Svg>
 );
 
@@ -517,7 +602,7 @@ const ContactSection = ({ data, styles, theme }) => (
       <View style={styles.contactItem}>
         <IconLinkedin color={theme.colors.icon} />
         <Link src={data.linkedin} style={styles.contactText}>
-          LinkedIn Profile
+          {data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}
         </Link>
       </View>
     )}
@@ -525,7 +610,15 @@ const ContactSection = ({ data, styles, theme }) => (
       <View style={styles.contactItem}>
         <IconGithub color={theme.colors.icon} />
         <Link src={data.github} style={styles.contactText}>
-          Github
+          {data.github.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
+        </Link>
+      </View>
+    )}
+    {data.website && (
+      <View style={styles.contactItem}>
+        <IconGlobe color={theme.colors.icon} />
+        <Link src={data.website} style={styles.contactText}>
+          {data.website.replace(/^https?:\/\//, '')}
         </Link>
       </View>
     )}
@@ -573,6 +666,19 @@ const SkillsSidebar = ({ data, styles }) => (
       {data.map((skill, i) => (
         <Text key={i} style={styles.skillBadge}>
           {skill.name}
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
+const ToolsSidebar = ({ data, styles }) => (
+  <View style={styles.sidebarSection}>
+    <Text style={styles.sidebarTitle}>Tools</Text>
+    <View style={styles.skillsContainer}>
+      {data.map((tool, i) => (
+        <Text key={i} style={styles.skillBadge}>
+          {tool.name}
         </Text>
       ))}
     </View>
@@ -636,7 +742,7 @@ const ExperienceMain = ({ data, styles, theme }) => (
           <View style={styles.entryHeader}>
             <Text style={styles.entryTitle}>{job.role}</Text>
             <Text style={styles.entryDate}>
-              {job.startDate} – {job.endDate}
+              {job.startDate} – {job.isCurrent ? "Present" : job.endDate}
             </Text>
           </View>
           <Text style={styles.entrySubtitle}>{job.company}</Text>
@@ -660,7 +766,13 @@ const EducationMain = ({ data, styles, theme }) => (
         <View style={styles.entryBlock}>
           <View style={styles.entryHeader}>
             <Text style={styles.entryTitle}>{edu.degree}</Text>
-            <Text style={styles.entryDate}>{edu.date}</Text>
+            <Text style={styles.entryDate}>
+              {edu.startDate && edu.endDate
+                ? `${edu.startDate} – ${
+                    edu.isCurrent ? "Present" : edu.endDate
+                  }`
+                : edu.date}
+            </Text>
           </View>
           <Text style={styles.entrySubtitle}>{edu.school}</Text>
           <Text style={styles.entryDescription}>{edu.description}</Text>
@@ -682,7 +794,16 @@ const ProjectsMain = ({ data, styles, theme }) => (
         )}
         <View style={styles.entryBlock}>
           <View style={styles.entryHeader}>
-            <Text style={styles.entryTitle}>{item.title}</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", flex: 1, marginRight: 8 }}>
+              <Text style={styles.entryTitle}>
+                {item.title}
+                {item.isCurrent && (
+                  <Text style={{ color: theme.colors.accent, fontSize: 10, fontWeight: "normal" }}>
+                    {"  "}● Ongoing
+                  </Text>
+                )}
+              </Text>
+            </View>
             {item.technologies && (
               <Text style={styles.entryDate}>{item.technologies}</Text>
             )}
@@ -738,6 +859,11 @@ const CertificatesMain = ({ data, styles, theme }) => (
             <Text style={styles.entryDate}>{item.date}</Text>
           </View>
           <Text style={styles.entrySubtitle}>{item.issuer}</Text>
+          {item.link && (
+            <Link src={item.link} style={{ ...styles.entrySubtitle, color: theme.colors.primary, textDecoration: "none" }}>
+              {item.link.replace(/^https?:\/\//, "")}
+            </Link>
+          )}
         </View>
       </View>
     ))}
@@ -781,7 +907,7 @@ const ProfessionalTemplate = ({ data, activeSections = [] }) => {
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   // Configuration for Two-Column Split
-  const SIDEBAR_SECTIONS = ["skills", "languages", "references"];
+  const SIDEBAR_SECTIONS = ["skills", "tools", "languages", "references"];
   const MAIN_SECTIONS = [
     "experience",
     "education",
@@ -820,6 +946,12 @@ const ProfessionalTemplate = ({ data, activeSections = [] }) => {
               return (
                 data.skills?.length > 0 && (
                   <SkillsSidebar key={section.id} data={data.skills} styles={styles} />
+                )
+              );
+            case "tools":
+              return (
+                data.tools?.length > 0 && (
+                  <ToolsSidebar key={section.id} data={data.tools} styles={styles} />
                 )
               );
             case "languages":

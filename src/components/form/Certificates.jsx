@@ -54,6 +54,13 @@ const Certificates = () => {
               label="Date Received"
               placeholder="e.g. 2024"
             />
+
+            <FormInput
+              name={`certificates.${index}.link`}
+              label="Certificate Link (Optional)"
+              placeholder="e.g. https://udemy.com/certificate/..."
+              className="md:col-span-2"
+            />
           </div>
         </div>
       ))}
